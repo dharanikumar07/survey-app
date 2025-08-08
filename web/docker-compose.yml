@@ -8,7 +8,7 @@ services:
         uid: 1000
       context: ./
       dockerfile: Dockerfile
-    container_name: laravel_app
+    container_name: survey_laravel_app
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
@@ -20,7 +20,7 @@ services:
     build:
       context: ./
       dockerfile: docker-compose/nginx.dockerfile
-    container_name: test-nginx
+    container_name: survey-test-nginx
     restart: unless-stopped
     ports:
       - ${SERVER_PORT:-80}:80
@@ -32,7 +32,7 @@ services:
       - shopify-network
   db:
     image: postgres:latest
-    container_name: postgres_db
+    container_name: survey_postgres_db
     restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data

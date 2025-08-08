@@ -1,5 +1,5 @@
 roles = ["backend"]
 
 [commands]
-dev = "sudo docker exec -i laravel_app composer serve"
-build = "sudo docker exec -i laravel_app composer build"
+dev = "sudo docker exec -i survey_laravel_app composer serve"
+build = "sudo docker exec -i survey_laravel_app composer build"
