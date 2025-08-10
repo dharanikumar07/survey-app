@@ -34,13 +34,19 @@ use Shopify\Webhooks\Topics;
 */
 
 Route::fallback(function (Request $request) {
-    info('fallback');
     if (Context::$IS_EMBEDDED_APP && $request->query("embedded", false) === "1") {
-        if (env('APP_ENV') === 'production') {
-            return file_get_contents(public_path('index.html'));
-        } else {
-            return file_get_contents(base_path('frontend/index.html'));
-        }
+        $apiKey = Context::$API_KEY;
+        $file = file_get_contents(
+            env('APP_ENV') === 'production' ?
+                public_path('index.html') :
+                base_path('frontend/index.html')
+        );
+
+        return str_replace(
+            "__SHOPIFY_API_KEY__",
+            $apiKey,
+            $file
+        );
     } else {
         return redirect(Utils::getEmbeddedAppUrl($request->query("host", null)) . "/" . $request->path());
     }
