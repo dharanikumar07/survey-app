@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-// Sync Cloudflare/Shopify dev tunnel URL from shopify.app.toml into env files
+// Sync Cloudflare/Shopify dev tunnel URL from shopify.app.toml into web/.env
 // - Reads application_url from shopify.app.toml
 // - Updates HOST, SHOPIFY_API_HOST, SHOPIFY_FRONT_API_HOST, SHOPIFY_REDIRECT_URI in web/.env
 // - Keeps SHOPIFY_API_REDIRECT_URI path as-is (default api/auth/callback)
-// - When --watch is provided, watches the toml file for changes and resyncs automatically
+// - Requires existing web/.env; if missing, exits without making changes.
 
 const fs = require('fs');
 const path = require('path');
@@ -12,7 +12,6 @@ const path = require('path');
 const ROOT = process.cwd();
 const TOML_PATH = path.join(ROOT, 'shopify.app.toml');
 const WEB_ENV = path.join(ROOT, 'web/.env');
-const WEB_ENV_EXAMPLE = path.join(ROOT, 'web/.env.example');
 
 function readFileSafe(p) {
   try {
@@ -68,9 +67,18 @@ function syncOnce({ silent = false } = {}) {
   const hostUrl = ensureTrailingSlash(appUrl);
   const hostName = appUrl.replace(/^https?:\/\//, '');
 
-  let webEnv = readFileSafe(WEB_ENV);
-  if (!webEnv) {
-    webEnv = readFileSafe(WEB_ENV_EXAMPLE) || '';
+  // Require existing .env; do not fallback to .env.example
+  if (!fs.existsSync(WEB_ENV)) {
+    if (!silent) console.error(`Missing ${WEB_ENV}. Create it (e.g. copy web/.env.example) and rerun.`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const webEnv = readFileSafe(WEB_ENV);
+  if (webEnv === null) {
+    if (!silent) console.error(`Unable to read ${WEB_ENV}`);
+    process.exitCode = 1;
+    return;
   }
 
   // Derive redirect path from existing WEB env if present, else default
