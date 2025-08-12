@@ -30,20 +30,6 @@ services:
       - ./docker-compose/nginx:/etc/nginx/conf.d/
     networks:
       - shopify-network
-  db:
-    image: postgres:latest
-    container_name: survey_postgres_db
-    restart: unless-stopped
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: shopify
-      POSTGRES_PASSWORD: shopify
-      POSTGRES_DB: shopify
-    ports:
-      - "5432:5432"
-    networks:
-      - shopify-network
 networks:
   shopify-network:
     driver: bridge
