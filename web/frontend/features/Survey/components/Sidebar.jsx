@@ -5,8 +5,8 @@ import {
     BlockStack,
     InlineStack,
     Button,
+    ButtonGroup,
     Divider,
-    Tabs,
     Modal,
     TextField
 } from '@shopify/polaris';
@@ -79,20 +79,35 @@ function Sidebar({ items = [], onSelectItem = () => { } }) {
                 </InlineStack>
                 <Divider />
                 {/* Tabs Section */}
-                <div style={{ width: '100%', minWidth: 0 }}>
-                    <Tabs
-                        fitted
-                        tabs={tabs}
-                        selected={selectedTab}
-                        onSelect={handleTabChange}
-                        disclosureText=""
-                    >
-                        <Box paddingBlockStart="400">
-                            <Divider />
-                            {renderTabContent()}
-                        </Box>
-                    </Tabs>
-                </div>
+                <Box>
+                    <ButtonGroup variant="segmented" fullWidth>
+                        <Button
+                            pressed={selectedTab === 0}
+                            onClick={() => handleTabChange(0)}
+                            variant='tertiary'
+                        >
+                            Content
+                        </Button>
+                        <Button
+                            pressed={selectedTab === 1}
+                            onClick={() => handleTabChange(1)}
+                            variant='tertiary'
+                        >
+                            Channel
+                        </Button>
+                        <Button
+                            pressed={selectedTab === 2}
+                            onClick={() => handleTabChange(2)}
+                            variant='tertiary'
+                        >
+                            Discount
+                        </Button>
+                    </ButtonGroup>
+                    <Box paddingBlockStart="400">
+                        <Divider />
+                        {renderTabContent()}
+                    </Box>
+                </Box>
             </BlockStack>
 
             {/* Edit Survey Modal (Polaris) */}

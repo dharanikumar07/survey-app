@@ -103,106 +103,101 @@ export function ContentTab({ items = [], onSelectItem = () => { } }) {
         if (isAction) {
             // Non-draggable Add question row with popover
             return (
-                <div
+                <Box
                     key={item.id}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        padding: '4px 8px',
-                        borderRadius: 6,
-                        maxWidth: '100%',
-                    }}
+                    padding="200"
+                    background="bg-surface-secondary"
+                    borderRadius="200"
+                    borderStyle="dashed"
+                    borderWidth="025"
+                // borderColor="border"
                 >
-                    <span style={{ width: 16 }} />
                     <InlineStack
                         gap="150"
                         blockAlign="center"
                         align="start"
-                        style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere', wordBreak: 'break-word' }}
+                        wrap={false}
                     >
-                        <Icon source={iconSource} color="interactive" />
-                        <Popover
-                            active={addPopoverActive}
-                            activator={
-                                <Button plain monochrome onClick={toggleAddPopover}>
-                                    Add question
-                                </Button>
-                            }
-                            onClose={() => setAddPopoverActive(false)}
-                            preferredAlignment="left"
-                        >
-                            <ActionList
-                                actionRole="menuitem"
-                                items={[
-                                    { content: 'Single choice', onAction: () => insertQuestionByType('single-choice') },
-                                    { content: 'Multiple choice', onAction: () => insertQuestionByType('multiple-choice') },
-                                    { content: 'Number scale', onAction: () => insertQuestionByType('number-scale') },
-                                    { content: 'Star rating', onAction: () => insertQuestionByType('rating') },
-                                    { content: 'Satisfaction', onAction: () => insertQuestionByType('satisfaction') },
-                                    { content: 'Short answer', onAction: () => insertQuestionByType('text') },
-                                    { content: 'Date', onAction: () => insertQuestionByType('date') },
-                                ]}
-                            />
-                        </Popover>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <Popover
+                                active={addPopoverActive}
+                                activator={
+                                    <Button variant='plain' onClick={toggleAddPopover} icon={PlusIcon} iconPosition="end">
+                                        Add question
+                                    </Button>
+                                }
+                                onClose={() => setAddPopoverActive(false)}
+                                preferredAlignment="left"
+                            >
+                                <ActionList
+                                    actionRole="menuitem"
+                                    items={[
+                                        { content: 'Single choice', onAction: () => insertQuestionByType('single-choice') },
+                                        { content: 'Multiple choice', onAction: () => insertQuestionByType('multiple-choice') },
+                                        { content: 'Number scale', onAction: () => insertQuestionByType('number-scale') },
+                                        { content: 'Star rating', onAction: () => insertQuestionByType('rating') },
+                                        { content: 'Satisfaction', onAction: () => insertQuestionByType('satisfaction') },
+                                        { content: 'Short answer', onAction: () => insertQuestionByType('text') },
+                                        { content: 'Date', onAction: () => insertQuestionByType('date') },
+                                    ]}
+                                />
+                            </Popover>
+                        </div>
                     </InlineStack>
-                </div>
+                </Box>
             );
         }
 
         return (
-            <div
+            <Box
                 key={item.id}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '4px 8px',
-                    borderRadius: 6,
-                    userSelect: 'none',
-                    cursor: 'grab',
-                    maxWidth: '100%',
-                }}
-                draggable
-                onDragStart={handleDragStart(item.id)}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop(item.id)}
-                onClick={() => onSelectItem(item.id)}
+                padding="200"
+                background="bg-fill-secondary"
+                // borderWidth="025"
+                // borderColor="border-subdued"
+                borderRadius="200"
+                shadow="xs"
             >
-                {/* <InlineStack gap="100" blockAlign="center" style={{ flex: '0 0 auto' }}>
-                    <Icon source={DragHandleIcon} color="subdued" />
-                </InlineStack> */}
-
-                <InlineStack
-                    gap="150"
-                    blockAlign="center"
-                    align="start"
-                    style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere', wordBreak: 'break-word' }}
+                <div
+                    style={{
+                        userSelect: 'none',
+                        cursor: 'grab',
+                        maxWidth: '100%',
+                    }}
+                    draggable
+                    onDragStart={handleDragStart(item.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop(item.id)}
+                    onClick={() => onSelectItem(item.id)}
                 >
-                    <Icon source={iconSource} color="subdued" />
-                    <Text
-                        as="span"
-                        variant="bodySm"
-                        style={{
-                            display: 'block',
-                            maxWidth: '100%',
-                            whiteSpace: 'normal',
-                            overflowWrap: 'anywhere',
-                            wordBreak: 'break-word',
-                            lineHeight: '20px',
-                        }}
+                    <InlineStack
+                        gap="150"
+                        blockAlign="center"
+                        align="start"
+                        wrap={false}
                     >
-                        {item.content}
-                    </Text>
-                </InlineStack>
-            </div>
+                        {/* <Box paddingInlineEnd="100">
+                            <Icon source={DragHandleIcon} color="subdued" />
+                        </Box> */}
+                        <Icon source={iconSource} color="subdued" />
+                        <div style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                            <Text
+                                as="span"
+                                variant="bodySm"
+                            >
+                                {item.content}
+                            </Text>
+                        </div>
+                    </InlineStack>
+                </div>
+            </Box>
         );
     };
 
     return (
-        <BlockStack gap="150">
-            <Box style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                <BlockStack gap="75">
+        <BlockStack gap="300">
+            <Box padding="200" background="bg-surface" borderRadius="300">
+                <BlockStack gap="200">
                     {list.map((item) => (
                         <Row key={item.id} item={item} />
                     ))}

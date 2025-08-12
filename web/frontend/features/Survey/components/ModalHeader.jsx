@@ -162,7 +162,7 @@ function ModalHeader({ title = "Survey #1" }) {
                                     onClick={toggleSurveyPagePopover}
                                     icon={getSelectedSurveyPage()?.icon}
                                     iconPosition="left"
-                                    plain
+                                    variant='monochromePlain'
                                     size="slim"
                                     disclosure
                                 >

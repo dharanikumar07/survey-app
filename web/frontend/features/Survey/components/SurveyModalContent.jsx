@@ -28,13 +28,13 @@ function SurveyModalContent() {
                     >
                         <BlockStack gap="400" align="center">
                             {/* Logo */}
-                            <Box padding="400" width="200px">
+                            {/* <Box padding="400" width="200px">
                                 <img
                                     src="https://via.placeholder.com/200x80?text=SEA+Logo"
                                     alt="SEA Logo"
                                     style={{ maxWidth: '100%', height: 'auto' }}
                                 />
-                            </Box>
+                            </Box> */}
 
                             {/* Survey Card */}
                             <Card>
