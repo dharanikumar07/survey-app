@@ -12,6 +12,7 @@ import {
     CalendarIcon,
     ListNumberedIcon
 } from '@shopify/polaris-icons';
+import useStore from '../../../../State/store';
 
 function getTypeIcon(type) {
     switch (type) {
@@ -30,39 +31,37 @@ function getTypeIcon(type) {
     }
 }
 
-export function ContentTab({ items = [], onSelectItem = () => { } }) {
-    const initialItems = useMemo(
-        () =>
-            items.length > 0
-                ? [...items, { id: 'add', content: 'Add question', type: 'action' }]
-                : [
-                    { id: '1', content: 'How likely are you to recommend us to a friend?', type: 'rating' },
-                    { id: '2', content: 'How easy was it to purchase from our online store?', type: 'rating' },
-                    { id: '3', content: 'How could we improve?', type: 'text' },
-                    { id: 'add', content: 'Add question', type: 'action' },
-                    { id: '4', content: 'Thank You Card', type: 'card' },
-                ],
-        [items]
-    );
+export function ContentTab() {
+    const {
+        questions,
+        addQuestion,
+        reorderQuestions,
+        selectedQuestionId,
+        setSelectedQuestionId
+    } = useStore();
 
-    const [list, setList] = useState(initialItems);
     const [addPopoverActive, setAddPopoverActive] = useState(false);
     const dragIdRef = useRef(null);
 
-    const moveItem = (fromId, toId) => {
-        if (!fromId || !toId || fromId === toId) return;
-        if (toId === 'add' || fromId === 'add') return; // no dragging of UI-only row
-        const current = [...list];
-        const fromIndex = current.findIndex((i) => i.id === fromId);
-        const toIndex = current.findIndex((i) => i.id === toId);
-        if (fromIndex < 0 || toIndex < 0) return;
-        const [moved] = current.splice(fromIndex, 1);
-        current.splice(toIndex, 0, moved);
-        setList(current);
-    };
+    // Create display list with "Add question" item inserted before the thank you card
+    const displayList = useMemo(() => {
+        const newList = [...questions];
+        // Insert "Add question" item before the thank you card
+        const insertIndex = newList.findIndex(q => q.id === 'thankyou');
+        if (insertIndex !== -1) {
+            newList.splice(insertIndex, 0, { id: 'add', content: 'Add question', type: 'action' });
+        } else {
+            // If thank you card doesn't exist, add it at the end
+            newList.push({ id: 'add', content: 'Add question', type: 'action' });
+        }
+        return newList;
+    }, [questions]);
 
     const handleDragStart = (id) => () => {
-        dragIdRef.current = id;
+        const item = questions.find(q => q.id === id);
+        if (item && item.isDraggable !== false) {
+            dragIdRef.current = id;
+        }
     };
 
     const handleDragOver = (e) => {
@@ -71,7 +70,16 @@ export function ContentTab({ items = [], onSelectItem = () => { } }) {
 
     const handleDrop = (overId) => (e) => {
         e.preventDefault();
-        moveItem(dragIdRef.current, overId);
+        if (!dragIdRef.current || !overId || dragIdRef.current === overId) return;
+        if (overId === 'add') return; // Don't allow dropping onto "Add question"
+
+        // Find the item being dropped onto
+        const overItem = questions.find(q => q.id === overId);
+
+        // If dropping onto a non-draggable item or it's the thank you card, don't allow it
+        if (overItem && (overItem.isDraggable === false || overId === 'thankyou')) return;
+
+        reorderQuestions(dragIdRef.current, overId);
         dragIdRef.current = null;
     };
 
@@ -87,18 +95,42 @@ export function ContentTab({ items = [], onSelectItem = () => { } }) {
             'text': 'Short answer',
             'date': 'Pick a date',
         };
+
+        const questionType = {
+            'single-choice': 'Single choice',
+            'multiple-choice': 'Multiple choice',
+            'number-scale': 'Number scale',
+            'rating': 'Star rating',
+            'satisfaction': 'Satisfaction',
+            'text': 'Short answer',
+            'date': 'Date',
+        };
+
         const nextId = `${Date.now()}`;
-        const newItem = { id: nextId, content: templates[type] || 'New question', type: type === 'short' ? 'text' : type };
-        const addIndex = list.findIndex((i) => i.id === 'add');
-        const next = [...list];
-        next.splice(addIndex, 0, newItem);
-        setList(next);
+        const newItem = {
+            id: nextId,
+            content: templates[type] || 'New question',
+            type: type === 'short' ? 'text' : type,
+            description: '',
+            questionType: questionType[type] || 'Custom',
+            isDraggable: true
+        };
+
+        addQuestion(newItem);
         setAddPopoverActive(false);
+        setSelectedQuestionId(nextId);
+    };
+
+    const handleSelectItem = (id) => {
+        if (id !== 'add') {
+            setSelectedQuestionId(id);
+        }
     };
 
     const Row = ({ item }) => {
         const isAction = item.type === 'action';
         const iconSource = isAction ? PlusIcon : getTypeIcon(item.type);
+        const isDraggable = item.isDraggable !== false && !isAction;
 
         if (isAction) {
             // Non-draggable Add question row with popover
@@ -110,7 +142,6 @@ export function ContentTab({ items = [], onSelectItem = () => { } }) {
                     borderRadius="200"
                     borderStyle="dashed"
                     borderWidth="025"
-                // borderColor="border"
                 >
                     <InlineStack
                         gap="150"
@@ -152,23 +183,21 @@ export function ContentTab({ items = [], onSelectItem = () => { } }) {
             <Box
                 key={item.id}
                 padding="200"
-                background="bg-fill-secondary"
-                // borderWidth="025"
-                // borderColor="border-subdued"
+                background={selectedQuestionId === item.id ? "bg-fill" : "bg-fill-secondary"}
                 borderRadius="200"
                 shadow="xs"
             >
                 <div
                     style={{
                         userSelect: 'none',
-                        cursor: 'grab',
+                        cursor: isDraggable ? 'grab' : 'pointer',
                         maxWidth: '100%',
                     }}
-                    draggable
-                    onDragStart={handleDragStart(item.id)}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop(item.id)}
-                    onClick={() => onSelectItem(item.id)}
+                    draggable={isDraggable}
+                    onDragStart={isDraggable ? handleDragStart(item.id) : undefined}
+                    onDragOver={isDraggable ? handleDragOver : undefined}
+                    onDrop={isDraggable ? handleDrop(item.id) : undefined}
+                    onClick={() => handleSelectItem(item.id)}
                 >
                     <InlineStack
                         gap="150"
@@ -176,9 +205,6 @@ export function ContentTab({ items = [], onSelectItem = () => { } }) {
                         align="start"
                         wrap={false}
                     >
-                        {/* <Box paddingInlineEnd="100">
-                            <Icon source={DragHandleIcon} color="subdued" />
-                        </Box> */}
                         <Icon source={iconSource} color="subdued" />
                         <div style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                             <Text
@@ -198,7 +224,7 @@ export function ContentTab({ items = [], onSelectItem = () => { } }) {
         <BlockStack gap="300">
             <Box padding="200" background="bg-surface" borderRadius="300">
                 <BlockStack gap="200">
-                    {list.map((item) => (
+                    {displayList.map((item) => (
                         <Row key={item.id} item={item} />
                     ))}
                 </BlockStack>
