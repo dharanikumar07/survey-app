@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Grid, Text, Card, BlockStack, Icon, Badge, Divider } from '@shopify/polaris';
 import Sidebar from './Sidebar';
+import useStore from '../../../State/store';
 // import { HelpIcon, QuestionIcon } from '@shopify/polaris-icons';
 
 function SurveyModalContent() {
-    const [selectedQuestionId, setSelectedQuestionId] = useState('1');
+    const { selectedQuestionId, setSelectedQuestionId } = useStore();
 
     const handleSelectQuestion = (id) => {
         setSelectedQuestionId(id);
@@ -196,4 +197,3 @@ function SurveyModalContent() {
 }
 
 export default SurveyModalContent;
-

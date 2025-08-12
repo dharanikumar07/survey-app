@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import {
     Box,
     Text,
@@ -14,15 +14,21 @@ import { EditIcon } from '@shopify/polaris-icons';
 import { ContentTab } from './tabs/ContentTab';
 import { ChannelTab } from './tabs/ChannelTab';
 import { DiscountTab } from './tabs/DiscountTab';
+import useStore from '../../../State/store';
 
 function Sidebar({ items = [], onSelectItem = () => { } }) {
-    const [selectedTab, setSelectedTab] = useState(0);
-    const [editOpen, setEditOpen] = useState(false);
-    const [surveyTitle, setSurveyTitle] = useState('Survey #1');
+    const {
+        selectedTab,
+        setSelectedTab,
+        editModalOpen,
+        setEditModalOpen,
+        surveyTitle,
+        setSurveyTitle
+    } = useStore();
 
-    const handleTabChange = useCallback((selectedTabIndex) => {
+    const handleTabChange = (selectedTabIndex) => {
         setSelectedTab(selectedTabIndex);
-    }, []);
+    };
 
     const tabs = [
         {
@@ -59,7 +65,7 @@ function Sidebar({ items = [], onSelectItem = () => { } }) {
     };
 
     const handleSave = () => {
-        setEditOpen(false);
+        setEditModalOpen(false);
     };
 
     return (
@@ -75,7 +81,7 @@ function Sidebar({ items = [], onSelectItem = () => { } }) {
                 {/* Header Section */}
                 <InlineStack align="space-between" blockAlign="center">
                     <Text variant="headingLg" as="h2">{surveyTitle}</Text>
-                    <Button size="slim" variant="plain" icon={EditIcon} accessibilityLabel="Edit survey" onClick={() => setEditOpen(true)} />
+                    <Button size="slim" variant="plain" icon={EditIcon} accessibilityLabel="Edit survey" onClick={() => setEditModalOpen(true)} />
                 </InlineStack>
                 <Divider />
                 {/* Tabs Section */}
@@ -112,11 +118,11 @@ function Sidebar({ items = [], onSelectItem = () => { } }) {
 
             {/* Edit Survey Modal (Polaris) */}
             <Modal
-                open={editOpen}
-                onClose={() => setEditOpen(false)}
+                open={editModalOpen}
+                onClose={() => setEditModalOpen(false)}
                 title="Edit survey"
                 primaryAction={{ content: 'Save', onAction: handleSave }}
-                secondaryActions={[{ content: 'Cancel', onAction: () => setEditOpen(false) }]}
+                secondaryActions={[{ content: 'Cancel', onAction: () => setEditModalOpen(false) }]}
             >
                 <Box padding="400">
                     <BlockStack gap="300">

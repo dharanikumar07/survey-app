@@ -1,8 +1,9 @@
 import React from 'react';
 import { Box, Tabs } from '@shopify/polaris';
+import useStore from '../../../State/store';
 
 function TabsContent() {
-    const [selected, setSelected] = React.useState(0);
+    const { selectedTab, setSelectedTab } = useStore();
 
     const tabs = [
         {
@@ -26,24 +27,24 @@ function TabsContent() {
     ];
 
     const handleTabChange = (selectedTabIndex) => {
-        setSelected(selectedTabIndex);
+        setSelectedTab(selectedTabIndex);
     };
 
     return (
         <Box>
-            <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange} />
+            <Tabs tabs={tabs} selected={selectedTab} onSelect={handleTabChange} />
             <Box padding="400">
-                {selected === 0 && (
+                {selectedTab === 0 && (
                     <div>
                         <p style={{ color: '#666' }}>Content tab placeholder - Survey form content will go here</p>
                     </div>
                 )}
-                {selected === 1 && (
+                {selectedTab === 1 && (
                     <div>
                         <p style={{ color: '#666' }}>Channel tab placeholder - Channel settings will go here</p>
                     </div>
                 )}
-                {selected === 2 && (
+                {selectedTab === 2 && (
                     <div>
                         <p style={{ color: '#666' }}>Discount tab placeholder - Discount settings will go here</p>
                     </div>
@@ -54,4 +55,3 @@ function TabsContent() {
 }
 
 export default TabsContent;
-

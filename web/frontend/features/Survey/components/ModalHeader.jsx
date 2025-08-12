@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Box,
     InlineStack,
@@ -24,14 +24,25 @@ import {
     ExitIcon,
     CodeIcon
 } from '@shopify/polaris-icons';
+import useStore from '../../../State/store';
 
 function ModalHeader({ title = "Survey #1" }) {
-    const [selectedView, setSelectedView] = useState('desktop');
-    const [isActive, setIsActive] = useState(true);
-    const [selectedTheme, setSelectedTheme] = useState('default');
-    const [themePopoverActive, setThemePopoverActive] = useState(false);
-    const [statusPopoverActive, setStatusPopoverActive] = useState(false);
-    const [surveyPagePopoverActive, setSurveyPagePopoverActive] = useState(false);
+    const {
+        selectedView,
+        setSelectedView,
+        isActive,
+        setIsActive,
+        selectedTheme,
+        setSelectedTheme,
+        themePopoverActive,
+        setThemePopoverActive,
+        statusPopoverActive,
+        setStatusPopoverActive,
+        surveyPagePopoverActive,
+        setSurveyPagePopoverActive,
+        selectedSurveyPage,
+        setSelectedSurveyPage
+    } = useStore();
 
     const themes = [
         { label: 'Default Theme', value: 'default' },
@@ -85,8 +96,6 @@ function ModalHeader({ title = "Survey #1" }) {
             description: 'Embed survey anywhere'
         }
     ];
-
-    const [selectedSurveyPage, setSelectedSurveyPage] = useState('branded');
 
     const handleViewChange = (view) => {
         setSelectedView(view);
@@ -258,4 +267,3 @@ function ModalHeader({ title = "Survey #1" }) {
 }
 
 export default ModalHeader;
-
