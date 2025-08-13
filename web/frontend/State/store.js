@@ -75,10 +75,39 @@ const useStore = create((set) => ({
     
     // Questions state
     questions: [
-        { id: '1', content: 'How likely are you to recommend us to a friend?', type: 'rating', description: '', questionType: 'Number scale', isDraggable: true },
-        { id: '2', content: 'How easy was it to purchase from our online store?', type: 'rating', description: '', questionType: 'Number scale', isDraggable: true },
-        { id: '3', content: 'How could we improve?', type: 'text', description: '', questionType: 'Short answer', isDraggable: true },
-        { id: 'thankyou', content: 'Thank You Card', type: 'card', description: '', questionType: 'Card', isDraggable: false },
+        { 
+            id: '1', 
+            content: 'How likely are you to recommend us to a friend?', 
+            type: 'rating', 
+            description: '', 
+            questionType: 'Number scale', 
+            isDraggable: true,
+            answerOptions: [
+                { id: 'opt1', text: 'Word of mouth' },
+                { id: 'opt2', text: 'Instagram' },
+                { id: 'opt3', text: 'Tiktok' },
+                { id: 'opt4', text: 'Facebook' },
+                { id: 'opt5', text: 'Youtube' },
+                { id: 'opt6', text: 'Google' },
+            ]
+        },
+        { 
+            id: '2', 
+            content: 'How easy was it to purchase from our online store?', 
+            type: 'rating', 
+            description: '', 
+            questionType: 'Number scale', 
+            isDraggable: true,
+            answerOptions: [
+                { id: 'opt7', text: 'Very difficult' },
+                { id: 'opt8', text: 'Somewhat difficult' },
+                { id: 'opt9', text: 'Neutral' },
+                { id: 'opt10', text: 'Somewhat easy' },
+                { id: 'opt11', text: 'Very easy' },
+            ]
+        },
+        { id: '3', content: 'How could we improve?', type: 'text', description: '', questionType: 'Short answer', isDraggable: true, answerOptions: [] },
+        { id: 'thankyou', content: 'Thank You Card', type: 'card', description: '', questionType: 'Card', isDraggable: false, answerOptions: [] },
     ],
     setQuestions: (newQuestions) => set({ questions: newQuestions }),
     
@@ -134,6 +163,96 @@ const useStore = create((set) => ({
         current.splice(toIndex, 0, moved);
         
         return { questions: current };
+    }),
+    
+    // Update answer options
+    updateAnswerOptions: (questionId, answerOptions) => set((state) => {
+        const questionIndex = state.questions.findIndex(q => q.id === questionId);
+        if (questionIndex === -1) return state;
+        
+        const newQuestions = [...state.questions];
+        newQuestions[questionIndex] = { 
+            ...newQuestions[questionIndex], 
+            answerOptions: answerOptions 
+        };
+        
+        return { questions: newQuestions };
+    }),
+    
+    // Add a new answer option
+    addAnswerOption: (questionId, optionText) => set((state) => {
+        const questionIndex = state.questions.findIndex(q => q.id === questionId);
+        if (questionIndex === -1) return state;
+        
+        const question = state.questions[questionIndex];
+        const newOption = {
+            id: `opt${Date.now()}`,
+            text: optionText || 'New option'
+        };
+        
+        const newQuestions = [...state.questions];
+        newQuestions[questionIndex] = {
+            ...question,
+            answerOptions: [...(question.answerOptions || []), newOption]
+        };
+        
+        return { questions: newQuestions };
+    }),
+    
+    // Delete an answer option
+    deleteAnswerOption: (questionId, optionId) => set((state) => {
+        const questionIndex = state.questions.findIndex(q => q.id === questionId);
+        if (questionIndex === -1) return state;
+        
+        const question = state.questions[questionIndex];
+        const newOptions = (question.answerOptions || []).filter(opt => opt.id !== optionId);
+        
+        const newQuestions = [...state.questions];
+        newQuestions[questionIndex] = {
+            ...question,
+            answerOptions: newOptions
+        };
+        
+        return { questions: newQuestions };
+    }),
+    
+    // Update a single answer option
+    updateAnswerOption: (questionId, optionId, text) => set((state) => {
+        const questionIndex = state.questions.findIndex(q => q.id === questionId);
+        if (questionIndex === -1) return state;
+        
+        const question = state.questions[questionIndex];
+        const newOptions = (question.answerOptions || []).map(opt => 
+            opt.id === optionId ? { ...opt, text } : opt
+        );
+        
+        const newQuestions = [...state.questions];
+        newQuestions[questionIndex] = {
+            ...question,
+            answerOptions: newOptions
+        };
+        
+        return { questions: newQuestions };
+    }),
+    
+    // Reorder answer options via drag and drop
+    reorderAnswerOptions: (questionId, fromIndex, toIndex) => set((state) => {
+        const questionIndex = state.questions.findIndex(q => q.id === questionId);
+        if (questionIndex === -1) return state;
+        
+        const question = state.questions[questionIndex];
+        const options = [...(question.answerOptions || [])];
+        
+        const [movedOption] = options.splice(fromIndex, 1);
+        options.splice(toIndex, 0, movedOption);
+        
+        const newQuestions = [...state.questions];
+        newQuestions[questionIndex] = {
+            ...question,
+            answerOptions: options
+        };
+        
+        return { questions: newQuestions };
     }),
 }));
 

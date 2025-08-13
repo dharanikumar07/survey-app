@@ -83,6 +83,40 @@ function SurveyPreview() {
                             </div>
                         )}
 
+                        {/* Multiple choice options */}
+                        {selectedQuestion.answerOptions && selectedQuestion.answerOptions.length > 0 && (
+                            <div style={{
+                                width: '100%',
+                                maxWidth: '500px',
+                                padding: '10px'
+                            }}>
+                                {selectedQuestion.answerOptions.map((option) => (
+                                    <div
+                                        key={option.id}
+                                        style={{
+                                            border: '1px solid #ccc',
+                                            borderRadius: '4px',
+                                            padding: '12px 16px',
+                                            marginBottom: '8px',
+                                            background: '#fff',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <div style={{
+                                            width: '16px',
+                                            height: '16px',
+                                            borderRadius: '50%',
+                                            border: '1px solid #ccc',
+                                            marginRight: '12px'
+                                        }} />
+                                        {option.text}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         {/* Text input for text type questions */}
                         {selectedQuestion.type === 'text' && (
                             <div style={{
