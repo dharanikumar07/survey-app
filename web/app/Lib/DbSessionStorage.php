@@ -22,10 +22,21 @@ class DbSessionStorage implements SessionStorage
         $dbSession = \App\Models\Session::where('session_id', $sessionId)->first();
 
         if ($dbSession) {
+            $toBool = function ($value): bool {
+                if (is_bool($value)) {
+                    return $value;
+                }
+                if (is_int($value)) {
+                    return $value === 1;
+                }
+                $stringValue = strtolower((string)$value);
+                return in_array($stringValue, ['1', 't', 'true', 'on', 'yes'], true);
+            };
+
             $session = new Session(
                 $dbSession->session_id,
                 $dbSession->shop,
-                $dbSession->is_online == 1,
+                $toBool($dbSession->is_online),
                 $dbSession->state
             );
             if ($dbSession->expires_at) {
@@ -64,7 +75,7 @@ class DbSessionStorage implements SessionStorage
         $dbSession->session_id = $session->getId();
         $dbSession->shop = $session->getShop();
         $dbSession->state = $session->getState();
-        $dbSession->is_online = $session->isOnline();
+        $dbSession->is_online = $session->isOnline() ? 'true' : 'false';
         $dbSession->access_token = $session->getAccessToken();
         $dbSession->expires_at = $session->getExpires();
         $dbSession->scope = $session->getScope();
