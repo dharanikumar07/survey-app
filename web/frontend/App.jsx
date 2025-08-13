@@ -3,9 +3,7 @@ import routes from "./Routes/Route.jsx";
 import "@shopify/polaris/build/esm/styles.css";
 import "./assets/App.css";
 import { NavMenu } from "@shopify/app-bridge-react";
-import {
-    PolarisProvider,
-} from "./components";
+import { PolarisProvider } from "./components/providers";
 /**
  * Main App Component
  */

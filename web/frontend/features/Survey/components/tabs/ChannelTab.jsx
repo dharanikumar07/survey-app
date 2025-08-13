@@ -1,7 +1,8 @@
 import React from 'react';
 import { Box, BlockStack, Text, Card } from '@shopify/polaris';
-import { ChannelAccordion } from '../../../../components';
+// import { ChannelAccordion } from '../../../../components/Accordion';
 import useStore from '../../../../State/store';
+import SurveyAccordion from '../../../../components/SurveyAccordion';
 
 export function ChannelTab() {
     const { channelItems, toggleChannelExpand, toggleChannelEnabled } = useStore();
@@ -17,7 +18,7 @@ export function ChannelTab() {
 
                     <Card padding="000">
                         {channelItems.map((item) => (
-                            <ChannelAccordion
+                            <SurveyAccordion
                                 key={item.id}
                                 item={item}
                                 onToggleExpand={toggleChannelExpand}

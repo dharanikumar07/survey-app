@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, BlockStack, Text, Card, TextField, Select, Checkbox, Banner } from '@shopify/polaris';
-import { SectionRow, CustomStyledToggle } from '../../../../components';
+import SectionRow from '../../../../components/section/SectionRow';
+import CustomStyledToggle from '../../components/CustomToggle';
 import useStore from '../../../../State/store';
 import { PageAddIcon, EmailIcon } from '@shopify/polaris-icons';
 
