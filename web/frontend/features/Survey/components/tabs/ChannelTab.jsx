@@ -1,7 +1,11 @@
 import React from 'react';
-import { Box, BlockStack, Text } from '@shopify/polaris';
+import { Box, BlockStack, Text, Card } from '@shopify/polaris';
+import { ChannelAccordion } from '../../../../components';
+import useStore from '../../../../State/store';
 
 export function ChannelTab() {
+    const { channelItems, toggleChannelExpand, toggleChannelEnabled } = useStore();
+
     return (
         <BlockStack gap="400">
             <Box padding="400">
@@ -11,19 +15,19 @@ export function ChannelTab() {
                         Configure where and how your survey will be displayed to customers.
                     </Text>
 
-                    <Box padding="400" background="bg-surface-secondary" borderRadius="100">
-                        <BlockStack gap="200">
-                            <Text variant="bodyMd" fontWeight="semibold">Available Channels:</Text>
-                            <Text variant="bodySm">• Branded survey page</Text>
-                            <Text variant="bodySm">• On-site survey widget</Text>
-                            <Text variant="bodySm">• Post-purchase page</Text>
-                            <Text variant="bodySm">• Email campaigns</Text>
-                            <Text variant="bodySm">• Exit intent popup</Text>
-                        </BlockStack>
-                    </Box>
+                    <Card padding="000">
+                        {channelItems.map((item) => (
+                            <ChannelAccordion
+                                key={item.id}
+                                item={item}
+                                onToggleExpand={toggleChannelExpand}
+                                onToggleEnabled={toggleChannelEnabled}
+                            />
+                        ))}
+                    </Card>
 
                     <Text variant="bodySm" color="text-subdued">
-                        Channel configuration options will be available here.
+                        Enable the channels you want to use for your survey and configure their settings.
                     </Text>
                 </BlockStack>
             </Box>

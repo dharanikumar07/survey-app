@@ -5,6 +5,48 @@ const useStore = create((set) => ({
     selectedTab: 0,
     setSelectedTab: (index) => set({ selectedTab: index }),
     
+    // Channel tab state
+    channelItems: [
+        { id: 'branded', title: 'Branded survey page', icon: 'document', isExpanded: false, isEnabled: false },
+        { id: 'onsite', title: 'On-site survey', icon: 'store', isExpanded: false, isEnabled: false },
+        { id: 'thankyou', title: 'Thank you page', icon: 'checkmark', isExpanded: true, isEnabled: true },
+        { id: 'email', title: 'Post-purchase email', icon: 'email', isExpanded: false, isEnabled: false },
+        { id: 'exit', title: 'Exit intent', icon: 'exit', isExpanded: false, isEnabled: false },
+        { id: 'embed', title: 'Embed survey', icon: 'code', isExpanded: false, isEnabled: false },
+    ],
+    toggleChannelExpand: (id) => set((state) => ({
+        channelItems: state.channelItems.map(item => 
+            item.id === id ? { ...item, isExpanded: !item.isExpanded } : item
+        )
+    })),
+
+    // Discount tab state
+    discountEnabled: false,
+    setDiscountEnabled: (enabled) => set({ discountEnabled: enabled }),
+    discountSettings: {
+        code: '',
+        displayOn: 'email',
+        limitPerEmail: false,
+    },
+    setDiscountSettings: (updates) => set((state) => ({
+        discountSettings: { ...state.discountSettings, ...updates },
+    })),
+    discountSections: [
+        { id: 'banner', title: 'Discount banner', icon: 'page', isExpanded: false },
+        { id: 'requestEmail', title: 'Request email card', icon: 'email', isExpanded: false },
+        { id: 'discountEmail', title: 'Discount email', icon: 'email', isExpanded: true },
+    ],
+    toggleDiscountSection: (id) => set((state) => ({
+        discountSections: state.discountSections.map((s) =>
+            s.id === id ? { ...s, isExpanded: !s.isExpanded } : s
+        ),
+    })),
+    toggleChannelEnabled: (id) => set((state) => ({
+        channelItems: state.channelItems.map(item => 
+            item.id === id ? { ...item, isEnabled: !item.isEnabled } : item
+        )
+    })),
+    
     // Sidebar state
     editModalOpen: false,
     setEditModalOpen: (isOpen) => set({ editModalOpen: isOpen }),
