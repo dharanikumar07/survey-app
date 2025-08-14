@@ -1,15 +1,10 @@
 import { useEffect } from "react";
 import { UseMutationResult } from "@tanstack/react-query";
 
-interface MutationCallbacks<TData, TError> {
-    onSuccess?: (data: TData) => void;
-    onError?: (error: TError) => void;
-}
-
-export function useMutationEvents<TData, TError, TVariables>(
-    mutation: UseMutationResult<TData, TError, TVariables>,
-    callbacks: MutationCallbacks<TData, TError>
-): UseMutationResult<TData, TError, TVariables> {
+export function useMutationEvents(
+    mutation,
+    callbacks,
+) {
     const { onSuccess, onError } = callbacks;
 
     useEffect(() => {

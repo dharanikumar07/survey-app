@@ -33,6 +33,16 @@ export const apiClient = async (request_type, url, data) => {
         });
 
         const parsedData = await response.json(); 
+        
+        // Check if the response status indicates an error
+        if (!response.ok) {
+            // Create an error object with status and data
+            const error = new Error(`HTTP error! status: ${response.status}`);
+            error.status = response.status;
+            error.data = parsedData;
+            throw error;
+        }
+        
         return { status: response.status, data: parsedData }; 
     } catch (error) {
         console.error("API request failed:", error);
