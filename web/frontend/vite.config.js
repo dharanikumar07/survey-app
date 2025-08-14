@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import { dirname } from "path";
+import path, { dirname } from "path";
 import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath } from "url";
 import https from "https";
@@ -43,6 +43,9 @@ export default defineConfig({
     plugins: [react(), tailwindcss(),],
     resolve: {
         preserveSymlinks: true,
+        alias: {
+            "@": path.resolve(__dirname, "src"),
+        },
     },
     server: {
         host: "localhost",
