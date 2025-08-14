@@ -3,6 +3,12 @@
 use App\Lib\EnsureBilling;
 
 return [
+    'host' => env('HOST'),
+    'api_key' => env('SHOPIFY_API_KEY', 'not_defined'),
+    'api_secret' => env('SHOPIFY_API_SECRET', 'not_defined'),
+    'scopes' => env('SCOPES', 'not_defined'),
+    'custom_domains' => env('SHOP_CUSTOM_DOMAIN', null),
+    'api_version' => env('SHOPIFY_API_VERSION', '2025-01'),
 
     /*
     |--------------------------------------------------------------------------
