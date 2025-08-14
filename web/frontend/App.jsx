@@ -3,20 +3,31 @@ import routes from "./Routes/Route.jsx";
 import "@shopify/polaris/build/esm/styles.css";
 import "./assets/App.css";
 import { NavMenu } from "@shopify/app-bridge-react";
-import {
-    PolarisProvider,
-} from "./components";
+import { PolarisProvider } from "./components/providers";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: false,
+            refetchOnWindowFocus: false,
+        },
+    },
+});
 /**
  * Main App Component
  */
 export default function App() {
     return (
         <PolarisProvider>
+            <QueryClientProvider client={queryClient}>
                 <RouterProvider router={routes} />
-                <NavMenu>
-                    <a href="/" rel="home">
-                        Home
-                    </a>
+            </QueryClientProvider>
+            <NavMenu>
+                <a href="/" rel="home">
+                    Home
+                </a>
+                <a href="/survey">Survey</a>
                 <a href="/settings">Settings</a>
             </NavMenu>
         </PolarisProvider>
