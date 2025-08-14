@@ -101,11 +101,11 @@ export default function Dashboard() {
                                 {rows.map((item, index) => (
                                     <IndexTable.Row id={item.id} key={item.id} position={index} onClick={() => {
                                         navigate(`/survey`);
-                                        console.log(item.id);
+                                        // console.log(item.id);
                                     }}>
                                         <IndexTable.Cell onClick={() => {
                                             navigate(`/survey/${item.id}`);
-                                            console.log(item.id);
+                                            // console.log(item.id);
                                         }}>
                                             <Text as="span" variant="bodyMd" fontWeight="semibold">
                                                 {item.name}

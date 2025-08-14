@@ -21,7 +21,7 @@ import { AlertCircleIcon, StatusActiveIcon } from "@shopify/polaris-icons";
  * - onChange: (id: string) => void
  */
 export default function Accordion({ items, activeId, onChange }) {
-    console.log(items);
+    // console.log(items);
     return (
 
         <BlockStack gap="300">
