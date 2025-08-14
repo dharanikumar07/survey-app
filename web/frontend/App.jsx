@@ -5,6 +5,8 @@ import "./assets/App.css";
 import { NavMenu } from "@shopify/app-bridge-react";
 import { PolarisProvider } from "./components/providers";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastProvider } from "./components/helper/toast-helper.jsx";
+import { Frame } from "@shopify/polaris";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -20,9 +22,13 @@ const queryClient = new QueryClient({
 export default function App() {
     return (
         <PolarisProvider>
-            <QueryClientProvider client={queryClient}>
-                <RouterProvider router={routes} />
-            </QueryClientProvider>
+            <Frame>
+                <ToastProvider>
+                    <QueryClientProvider client={queryClient}>
+                        <RouterProvider router={routes} />
+                    </QueryClientProvider>
+                </ToastProvider>
+            </Frame>
             <NavMenu>
                 <a href="/" rel="home">
                     Home
