@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\UuidTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Store extends Model
 {
@@ -16,5 +17,43 @@ class Store extends Model
         'store_url',
         'access_token',
         'status',
+        'shopify_data',
+        'extra'
     ];
+
+    protected $casts = [
+        'shopify_data' => 'array',
+        'extra' => 'array'
+    ];
+
+    // Relationships
+    public function surveys(): HasMany
+    {
+        return $this->hasMany(Survey::class, 'store_uuid', 'uuid');
+    }
+
+    public function responses(): HasMany
+    {
+        return $this->hasMany(Response::class, 'store_uuid', 'uuid');
+    }
+
+    public function impressions(): HasMany
+    {
+        return $this->hasMany(SurveyImpression::class, 'store_uuid', 'uuid');
+    }
+
+    public function settings(): HasMany
+    {
+        return $this->hasMany(Setting::class, 'store_uuid', 'uuid');
+    }
+
+    public function discountCodes(): HasMany
+    {
+        return $this->hasMany(DiscountCode::class, 'store_uuid', 'uuid');
+    }
+
+    public function webhooks(): HasMany
+    {
+        return $this->hasMany(Webhook::class, 'store_uuid', 'uuid');
+    }
 }

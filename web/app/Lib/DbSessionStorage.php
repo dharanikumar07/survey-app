@@ -99,7 +99,7 @@ class DbSessionStorage implements SessionStorage
                     'name' => $shop_data['name'],
                     'store_url' => $shop_data['myshopifyDomain'],
                     'access_token' => $session->getAccessToken(),
-                    'status' => 'online',
+                    'status' => 'active',
                 ]);
             }
             return $dbSession->save();
