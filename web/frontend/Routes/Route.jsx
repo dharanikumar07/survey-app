@@ -17,10 +17,10 @@ const router = createBrowserRouter([
         path: "/settings",
         element: <Settings />,
     },
-    // {
-    //     path: "/ExitIframe",
-    //     element: <ExitIframe />,
-    // },
+    {
+        path: "/ExitIframe",
+        element: <ExitIframe />,
+    },
 ]);
 
 export default router;
