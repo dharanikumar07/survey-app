@@ -14,7 +14,11 @@ const router = createBrowserRouter([
         element: <Survey />,
     },
     {
-        path: "/settings",
+        path: "/response",
+        element: <Settings />,
+    },
+    {
+        path: "/analytics",
         element: <Settings />,
     },
     {

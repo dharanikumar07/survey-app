@@ -1,40 +1,19 @@
 import React from 'react';
-import { Box, BlockStack, Text, InlineStack, Button, ButtonGroup, Divider, Modal, TextField } from '@shopify/polaris';
+import { Box, BlockStack, Text, InlineStack, Button, Divider, Modal, TextField } from '@shopify/polaris';
 import { EditIcon } from '@shopify/polaris-icons';
-import { ContentTab } from '../tabs/ContentTab';
-import { ChannelTab } from '../tabs/ChannelTab';
-import { DiscountTab } from '../tabs/DiscountTab';
-import useStore from '../../../../State/store';
+import TabsContent from '../common/TabsContent';
+import { useSurveyState } from '../../hooks/useSurveyState';
 
 function QuestionList() {
     const {
-        selectedTab,
-        setSelectedTab,
         editModalOpen,
         setEditModalOpen,
         surveyTitle,
         setSurveyTitle
-    } = useStore();
-
-    const handleTabChange = (selectedTabIndex) => {
-        setSelectedTab(selectedTabIndex);
-    };
+    } = useSurveyState();
 
     const handleSave = () => {
         setEditModalOpen(false);
-    };
-
-    const renderTabContent = () => {
-        switch (selectedTab) {
-            case 0:
-                return <ContentTab />;
-            case 1:
-                return <ChannelTab />;
-            case 2:
-                return <DiscountTab />;
-            default:
-                return <ContentTab />;
-        }
     };
 
     return (
@@ -54,35 +33,7 @@ function QuestionList() {
                 </InlineStack>
                 <Divider />
                 {/* Tabs Section */}
-                <Box>
-                    <ButtonGroup variant="segmented" fullWidth>
-                        <Button
-                            pressed={selectedTab === 0}
-                            onClick={() => handleTabChange(0)}
-                            variant='tertiary'
-                        >
-                            Content
-                        </Button>
-                        <Button
-                            pressed={selectedTab === 1}
-                            onClick={() => handleTabChange(1)}
-                            variant='tertiary'
-                        >
-                            Channel
-                        </Button>
-                        <Button
-                            pressed={selectedTab === 2}
-                            onClick={() => handleTabChange(2)}
-                            variant='tertiary'
-                        >
-                            Discount
-                        </Button>
-                    </ButtonGroup>
-                    <Box paddingBlockStart="400">
-                        <Divider />
-                        {renderTabContent()}
-                    </Box>
-                </Box>
+                <TabsContent />
             </BlockStack>
 
             {/* Edit Survey Modal (Polaris) */}

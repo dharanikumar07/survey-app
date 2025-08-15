@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text, BlockStack, Divider, Button, TextField, Icon, InlineStack, Checkbox, Scrollable } from '@shopify/polaris';
 import { DeleteIcon, DragHandleIcon, ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
-import useStore from '../../../../State/store';
+import { useSurveyState } from '../../hooks/useSurveyState';
 
 function QuestionSettings() {
     const {
@@ -14,7 +14,7 @@ function QuestionSettings() {
         deleteAnswerOption,
         addAnswerOption,
         reorderAnswerOptions
-    } = useStore();
+    } = useSurveyState();
 
     // Find the currently selected question
     const selectedQuestion = questions.find(q => q.id === selectedQuestionId) || {

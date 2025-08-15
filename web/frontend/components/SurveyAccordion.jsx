@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, InlineStack, Text, Collapsible, Icon, Divider } from '@shopify/polaris';
-import CustomStyledToggle from '../features/Survey/components/CustomToggle';
+import CustomToggle from '../features/Survey/components/common/CustomToggle';
 import {
     PageAddIcon,
     StoreFilledIcon,
@@ -61,7 +61,7 @@ export default function SurveyAccordion({ item, onToggleExpand, onToggleEnabled 
                     </InlineStack>
                 </Box>
                 <Box>
-                    <CustomStyledToggle
+                    <CustomToggle
                         checked={item.isEnabled}
                         onChange={() => onToggleEnabled(item.id)}
                     />

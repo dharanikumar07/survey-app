@@ -11,10 +11,10 @@ import {
     TextField
 } from '@shopify/polaris';
 import { EditIcon } from '@shopify/polaris-icons';
-import { ContentTab } from './tabs/ContentTab';
-import { ChannelTab } from './tabs/ChannelTab';
-import { DiscountTab } from './tabs/DiscountTab';
-import useStore from '../../../State/store';
+import { ContentTab } from '../tabs/ContentTab';
+import { ChannelTab } from '../tabs/ChannelTab';
+import { DiscountTab } from '../tabs/DiscountTab';
+import { useSurveyState } from '../../hooks/useSurveyState';
 
 function Sidebar({ items = [], onSelectItem = () => { } }) {
     const {
@@ -24,7 +24,7 @@ function Sidebar({ items = [], onSelectItem = () => { } }) {
         setEditModalOpen,
         surveyTitle,
         setSurveyTitle
-    } = useStore();
+    } = useSurveyState();
 
     const handleTabChange = (selectedTabIndex) => {
         setSelectedTab(selectedTabIndex);
