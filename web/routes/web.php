@@ -26,3 +26,4 @@ Route::get('/api/auth', [AuthController::class, 'start']);
 Route::get('/api/auth/callback', [AuthController::class, 'callback']);
 
 Route::post('/api/webhooks', [WebhookController::class, 'handle']);
+Route::post('/test-sync', [WebhookController::class, 'dispatchSyncJob']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\sync\SyncCustomers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Shopify\Clients\HttpHeaders;
@@ -30,6 +31,11 @@ class WebhookController extends Controller
         }
 
         return response()->noContent();
+    }
+
+    public function dispatchSyncJob()
+    {
+        SyncCustomers::dispatch();
     }
 }
 

@@ -10,11 +10,15 @@ class Store extends Model
 {
     use UuidTrait, SoftDeletes;
 
-    protected $fillable = [
-        'store_id',
-        'name',
-        'store_url',
-        'access_token',
-        'status',
-    ];
+    protected $guarded = [];
+
+    public function getAccessToken()
+    {
+        return $this->access_token;
+    }
+
+    public function getStoreUrl()
+    {
+        return $this->store_url;
+    }
 }
