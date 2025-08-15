@@ -34,7 +34,8 @@ export default function App() {
                     Home
                 </a>
                 <a href="/survey">Survey</a>
-                <a href="/settings">Settings</a>
+                <a href="/response">Response</a>
+                <a href="/analytics">Analytics</a>
             </NavMenu>
         </PolarisProvider>
     );

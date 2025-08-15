@@ -12,7 +12,7 @@ import {
     CalendarIcon,
     ListNumberedIcon
 } from '@shopify/polaris-icons';
-import useStore from '../../../../State/store';
+import { useSurveyState } from '../../hooks/useSurveyState';
 
 function getTypeIcon(type) {
     switch (type) {
@@ -38,7 +38,7 @@ export function ContentTab() {
         reorderQuestions,
         selectedQuestionId,
         setSelectedQuestionId
-    } = useStore();
+    } = useSurveyState();
 
     const [addPopoverActive, setAddPopoverActive] = useState(false);
     const dragIdRef = useRef(null);

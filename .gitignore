@@ -27,3 +27,6 @@ yarn-error.log
 .shopify.lock
 shopify.app.toml
 .zed
+
+package-lock.json
+/frontend/index.html

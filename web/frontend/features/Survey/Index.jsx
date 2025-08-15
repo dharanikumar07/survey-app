@@ -27,8 +27,8 @@ import {
     ViewIcon,
     DisabledIcon
 } from "@shopify/polaris-icons";
-import ModalHeader from "./components/ModalHeader";
-import SurveyModalContent from "./components/SurveyModalContent";
+import ModalHeader from "./components/common/ModalHeader";
+import SurveyModalContent from "./components/modal/SurveyModalContent";
 import { PolarisProvider } from "../../components/providers";
 import { PortalsManager } from "@shopify/polaris";
 

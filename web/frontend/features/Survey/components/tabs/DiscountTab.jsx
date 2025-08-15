@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, BlockStack, Text, Card, TextField, Select, Checkbox, Banner } from '@shopify/polaris';
 import SectionRow from '../../../../components/section/SectionRow';
-import CustomStyledToggle from '../../components/CustomToggle';
-import useStore from '../../../../State/store';
+import CustomToggle from '../common/CustomToggle';
+import { useSurveyState } from '../../hooks/useSurveyState';
 import { PageAddIcon, EmailIcon } from '@shopify/polaris-icons';
 
 export function DiscountTab() {
@@ -13,7 +13,7 @@ export function DiscountTab() {
         setDiscountSettings,
         discountSections,
         toggleDiscountSection,
-    } = useStore();
+    } = useSurveyState();
 
     const displayOptions = [
         { label: 'Email', value: 'email' },
@@ -29,7 +29,7 @@ export function DiscountTab() {
                         <BlockStack gap="150">
                             <Box display="flex" alignItems="center" justifyContent="space-between">
                                 <Text variant="headingMd" as="h3">Discount</Text>
-                                <CustomStyledToggle
+                                <CustomToggle
                                     checked={discountEnabled}
                                     onChange={(val) => setDiscountEnabled(val)}
                                 />
