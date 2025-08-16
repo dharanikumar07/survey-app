@@ -6,12 +6,13 @@ namespace App\Lib;
 
 use App\Api\Shopify\Shop;
 use App\Api\Shopify\Traits\ShopifyHelper;
+use App\Jobs\sync\SyncCustomers;
 use App\Models\Store;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Shopify\Auth\AccessTokenOnlineUserInfo;
 use Shopify\Auth\Session;
 use Shopify\Auth\SessionStorage;
-use Illuminate\Support\Facades\Log;
 
 class DbSessionStorage implements SessionStorage
 {
@@ -29,7 +30,8 @@ class DbSessionStorage implements SessionStorage
                 if (is_int($value)) {
                     return $value === 1;
                 }
-                $stringValue = strtolower((string)$value);
+                $stringValue = strtolower((string) $value);
+
                 return in_array($stringValue, ['1', 't', 'true', 'on', 'yes'], true);
             };
 
@@ -50,7 +52,7 @@ class DbSessionStorage implements SessionStorage
             }
             if ($dbSession->user_id) {
                 $onlineAccessInfo = new AccessTokenOnlineUserInfo(
-                    (int)$dbSession->user_id,
+                    (int) $dbSession->user_id,
                     $dbSession->user_first_name,
                     $dbSession->user_last_name,
                     $dbSession->user_email,
@@ -61,16 +63,18 @@ class DbSessionStorage implements SessionStorage
                 );
                 $session->setOnlineAccessInfo($onlineAccessInfo);
             }
+
             return $session;
         }
+
         return null;
     }
 
     public function storeSession(Session $session): bool
     {
         $dbSession = \App\Models\Session::where('session_id', $session->getId())->first();
-        if (!$dbSession) {
-            $dbSession = new \App\Models\Session();
+        if (! $dbSession) {
+            $dbSession = new \App\Models\Session;
         }
         $dbSession->session_id = $session->getId();
         $dbSession->shop = $session->getShop();
@@ -79,7 +83,7 @@ class DbSessionStorage implements SessionStorage
         $dbSession->access_token = $session->getAccessToken();
         $dbSession->expires_at = $session->getExpires();
         $dbSession->scope = $session->getScope();
-        if (!empty($session->getOnlineAccessInfo())) {
+        if (! empty($session->getOnlineAccessInfo())) {
             $dbSession->user_id = $session->getOnlineAccessInfo()->getId();
             $dbSession->user_first_name = $session->getOnlineAccessInfo()->getFirstName();
             $dbSession->user_last_name = $session->getOnlineAccessInfo()->getLastName();
@@ -90,11 +94,11 @@ class DbSessionStorage implements SessionStorage
             $dbSession->collaborator = $session->getOnlineAccessInfo()->isCollaborator();
         }
         try {
-            if (!Store::where('store_url', $session->getShop())->where('access_token', '<>', null)->exists()) {
-                $shop = new Shop();
+            if (! Store::where('store_url', $session->getShop())->where('access_token', '<>', null)->exists()) {
+                $shop = new Shop;
                 $shop->initialize($session->getShop(), $session->getAccessToken());
                 $shop_data = $shop->getShopDetails();
-                Store::create([
+                $store = Store::create([
                     'store_id' => $this->getShopId($shop_data['id']),
                     'name' => $shop_data['name'],
                     'store_url' => $shop_data['myshopifyDomain'],
@@ -102,9 +106,12 @@ class DbSessionStorage implements SessionStorage
                     'status' => 'online',
                 ]);
             }
+            info("dispatch sync jobs");
+            SyncCustomers::dispatch($store);
             return $dbSession->save();
         } catch (Exception $err) {
-            Log::error("Failed to save session to database: " . $err->getMessage());
+            Log::error('Failed to save session to database: '.$err->getMessage());
+
             return false;
         }
     }
