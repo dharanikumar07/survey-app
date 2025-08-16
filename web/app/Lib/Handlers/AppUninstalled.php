@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Lib\Handlers;
 
+use App\Models\Session;
 use Illuminate\Support\Facades\Log;
 use Shopify\Webhooks\Handler;
-use App\Models\Session;
 
 class AppUninstalled implements Handler
 {
