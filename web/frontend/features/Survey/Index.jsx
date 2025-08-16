@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
     Page,
     Card,
@@ -38,6 +38,9 @@ export default function Survey() {
     const [currentPage, setCurrentPage] = useState(1);
     const [modalTitle, setModalTitle] = useState("Create new survey");
     const [popoverActive, setPopoverActive] = useState({});
+
+    // Ref for accessing the SurveyPreview component
+    const surveyPreviewRef = useRef(null);
 
     const resourceName = {
         singular: "survey",
@@ -302,8 +305,8 @@ export default function Survey() {
                     <PolarisProvider>
                         <PortalsManager>
                             <div>
-                                <ModalHeader />
-                                <SurveyModalContent />
+                                <ModalHeader surveyPreviewRef={surveyPreviewRef} />
+                                <SurveyModalContent ref={surveyPreviewRef} />
                             </div>
                         </PortalsManager>
                     </PolarisProvider>

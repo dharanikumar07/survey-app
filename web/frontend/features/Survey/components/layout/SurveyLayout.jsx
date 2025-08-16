@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { Box, Grid } from '@shopify/polaris';
 import QuestionList from '../panels/QuestionList';
 import SurveyPreview from '../panels/SurveyPreview';
@@ -12,7 +12,7 @@ import QuestionSettings from '../panels/QuestionSettings';
  * - Center panel: Survey preview showing the currently selected question
  * - Right panel: Question settings for editing the selected question
  */
-function SurveyLayout() {
+const SurveyLayout = forwardRef((props, ref) => {
     return (
         <Box padding="0">
             <Grid>
@@ -23,7 +23,7 @@ function SurveyLayout() {
 
                 {/* Center Panel - Survey Preview */}
                 <Grid.Cell columnSpan={{ xs: 12, sm: 12, md: 6, lg: 6, xl: 6 }}>
-                    <SurveyPreview />
+                    <SurveyPreview ref={ref} />
                 </Grid.Cell>
 
                 {/* Right Panel - Question Settings */}
@@ -33,6 +33,6 @@ function SurveyLayout() {
             </Grid>
         </Box>
     );
-}
+});
 
 export default SurveyLayout;

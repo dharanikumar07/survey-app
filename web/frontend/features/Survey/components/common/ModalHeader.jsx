@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
     Box,
     InlineStack,
@@ -25,8 +25,9 @@ import {
     CodeIcon
 } from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
+import { prepareSurveyForBackend } from '../../utils/surveyHelpers';
 
-function ModalHeader({ title = "Survey #1" }) {
+function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
     const {
         selectedView,
         setSelectedView,
@@ -96,7 +97,21 @@ function ModalHeader({ title = "Survey #1" }) {
             updatedAt: new Date().toISOString()
         };
 
-        console.log('Survey Data from Store:', JSON.stringify(surveyData, null, 2));
+        // Capture HTML content from the survey preview
+        let htmlContent = '';
+        if (surveyPreviewRef && surveyPreviewRef.current) {
+            htmlContent = surveyPreviewRef.current.getBodyContent();
+        }
+
+        // Prepare complete survey data with HTML for backend storage
+        const completeSurveyData = prepareSurveyForBackend(surveyData, htmlContent);
+
+        console.log('Complete Survey Data with HTML:', completeSurveyData);
+        console.log('HTML Content for Storefront:', completeSurveyData.htmlContent);
+        console.log('Complete HTML Document:', completeSurveyData.completeHTML);
+
+        // Here you would typically send the data to your backend
+        // Example: await saveSurveyToBackend(completeSurveyData);
     };
 
     const themes = [

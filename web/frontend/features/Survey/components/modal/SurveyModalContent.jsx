@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import SurveyLayout from '../layout/SurveyLayout';
 
 /**
@@ -13,8 +13,8 @@ import SurveyLayout from '../layout/SurveyLayout';
  * All state management is handled by Zustand store, allowing seamless
  * communication between the panels.
  */
-function SurveyModalContent() {
-    return <SurveyLayout />;
-}
+const SurveyModalContent = forwardRef((props, ref) => {
+    return <SurveyLayout ref={ref} />;
+});
 
 export default SurveyModalContent;
