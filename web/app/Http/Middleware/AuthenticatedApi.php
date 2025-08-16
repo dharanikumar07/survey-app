@@ -12,18 +12,15 @@ class AuthenticatedApi
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, Closure $next): HttpFoundationResponse
     {
         $shop = $request->input('shop', '') ? Utils::sanitizeShopDomain($request->input('shop', '')) : null;
         $appInstalled = $shop && Store::where('store_url', $shop)->exists();
-        if (!$appInstalled) {
+        if (! $appInstalled) {
             return response()->json(['error' => 'Unauthorized'], HttpFoundationResponse::HTTP_UNAUTHORIZED);
         }
+
         return $next($request);
     }
 }

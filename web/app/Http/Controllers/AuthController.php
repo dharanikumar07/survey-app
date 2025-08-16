@@ -41,7 +41,7 @@ class AuthController extends Controller
             Log::debug("Registered APP_UNINSTALLED webhook for shop $shop");
         } else {
             Log::error(
-                "Failed to register APP_UNINSTALLED webhook for shop $shop with response body: " .
+                "Failed to register APP_UNINSTALLED webhook for shop $shop with response body: ".
                 print_r($response->getBody(), true)
             );
         }
@@ -50,7 +50,7 @@ class AuthController extends Controller
         if (Config::get('shopify.billing.required')) {
             [$hasPayment, $confirmationUrl] = EnsureBilling::check($session, Config::get('shopify.billing'));
 
-            if (!$hasPayment) {
+            if (! $hasPayment) {
                 $redirectUrl = $confirmationUrl;
             }
         }
@@ -58,5 +58,3 @@ class AuthController extends Controller
         return redirect($redirectUrl);
     }
 }
-
-
