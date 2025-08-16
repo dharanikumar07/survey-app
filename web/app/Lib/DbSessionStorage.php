@@ -90,18 +90,20 @@ class DbSessionStorage implements SessionStorage
             $dbSession->collaborator = $session->getOnlineAccessInfo()->isCollaborator();
         }
         try {
-            if (!Store::where('store_url', $session->getShop())->where('access_token', '<>', null)->exists()) {
-                $shop = new Shop();
-                $shop->initialize($session->getShop(), $session->getAccessToken());
-                $shop_data = $shop->getShopDetails();
-                Store::create([
+            $shop = new Shop();
+            $shop->initialize($session->getShop(), $session->getAccessToken());
+            $shop_data = $shop->getShopDetails();
+            
+            Store::updateOrCreate(
+                ['store_url' => $session->getShop()],
+                [
                     'store_id' => $this->getShopId($shop_data['id']),
                     'name' => $shop_data['name'],
                     'store_url' => $shop_data['myshopifyDomain'],
                     'access_token' => $session->getAccessToken(),
-                    'status' => 'active',
-                ]);
-            }
+                    'status' => 'connected',
+                ]
+            );
             return $dbSession->save();
         } catch (Exception $err) {
             Log::error("Failed to save session to database: " . $err->getMessage());

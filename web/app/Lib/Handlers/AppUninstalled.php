@@ -7,6 +7,7 @@ namespace App\Lib\Handlers;
 use Illuminate\Support\Facades\Log;
 use Shopify\Webhooks\Handler;
 use App\Models\Session;
+use App\Models\Store;
 
 class AppUninstalled implements Handler
 {
@@ -14,5 +15,6 @@ class AppUninstalled implements Handler
     {
         Log::debug("App was uninstalled from $shop - removing all sessions");
         Session::where('shop', $shop)->delete();
+        Store::where('store_url', $shop)->update(['status' => 'disconnected']);
     }
 }
