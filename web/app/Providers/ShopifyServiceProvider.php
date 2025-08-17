@@ -30,6 +30,7 @@ class ShopifyServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      *
      * @return void
+     *
      * @throws \Shopify\Exception\MissingArgumentException
      */
     public function boot()
@@ -42,7 +43,7 @@ class ShopifyServiceProvider extends ServiceProvider
             config('shopify.api_secret', 'not_defined'),
             config('shopify.scopes', 'not_defined'),
             $host,
-            new DbSessionStorage(),
+            new DbSessionStorage,
             ApiVersion::LATEST,
             true,
             false,
@@ -55,13 +56,11 @@ class ShopifyServiceProvider extends ServiceProvider
         URL::forceRootUrl("https://{$host}");
         URL::forceScheme('https');
 
-        Registry::addHandler(Topics::APP_UNINSTALLED, new AppUninstalled());
+        Registry::addHandler(Topics::APP_UNINSTALLED, new AppUninstalled);
 
         // Mandatory privacy webhooks
-        Registry::addHandler('CUSTOMERS_DATA_REQUEST', new CustomersDataRequest());
-        Registry::addHandler('CUSTOMERS_REDACT', new CustomersRedact());
-        Registry::addHandler('SHOP_REDACT', new ShopRedact());
+        Registry::addHandler('CUSTOMERS_DATA_REQUEST', new CustomersDataRequest);
+        Registry::addHandler('CUSTOMERS_REDACT', new CustomersRedact);
+        Registry::addHandler('SHOP_REDACT', new ShopRedact);
     }
 }
-
-
