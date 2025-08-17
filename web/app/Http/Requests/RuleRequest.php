@@ -38,6 +38,7 @@ class RuleRequest extends FormRequest
                 'uuid' => ['required'],
             ];
         }
+
         return [];
     }
 }
