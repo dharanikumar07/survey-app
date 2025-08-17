@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Store extends Model
 {
-    use UuidTrait, SoftDeletes;
+    use SoftDeletes, UuidTrait;
 
     protected $guarded = [];
 

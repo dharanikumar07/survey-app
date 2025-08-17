@@ -12,8 +12,8 @@ trait UuidTrait
     protected static function bootUuidTrait()
     {
         static::creating(function ($model) {
-            if (!$model->uuid) {
-                $model->uuid = (string)Str::uuid();
+            if (! $model->uuid) {
+                $model->uuid = (string) Str::uuid();
             }
         });
     }
@@ -26,6 +26,7 @@ trait UuidTrait
     public static function getAccessToken($store_url)
     {
         $data = self::where('store_url', $store_url)->firstOrFail();
+
         return $data->access_token;
     }
 }
