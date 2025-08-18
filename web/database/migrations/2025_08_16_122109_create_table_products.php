@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->uuid('uuid')->unique();
+            $table->uuid('store_uuid');
 
             // Shopify / Platform IDs
             $table->string('platform_product_id', 255);

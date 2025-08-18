@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->uuid('uuid')->unique();
+            $table->uuid('store_uuid');
             $table->string('platform_order_id')->unique();
             $table->string('order_name')->nullable();
             $table->string('email')->nullable();
@@ -21,7 +22,6 @@ return new class extends Migration
             $table->boolean('taxes_included')->default(false);
             $table->timestamp('processed_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
-            $table->timestamps();
 
             $table->decimal('total_amount', 12, 2)->nullable();
             $table->string('currency', 10)->nullable();

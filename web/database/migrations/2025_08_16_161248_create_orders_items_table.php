@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders_items', function (Blueprint $table) {
-            $table->id();
+        Schema::create('order_items', function (Blueprint $table) {
+            $table->id()->primary();
             $table->uuid('uuid')->unique();
+            $table->uuid('store_uuid');
 
             $table->string('platform_order_id');
             $table->uuid('order_uuid');
             $table->string('platform_order_item_id')->unique();
-            $table->string('platform_product_id')->nullable();
-            $table->string('platform_variant_id')->nullable();
+            $table->string('product_uuid')->nullable();
+            $table->string('variant_uuid')->nullable();
 
             $table->integer('quantity')->default(1);
             $table->boolean('taxable')->default(false);
