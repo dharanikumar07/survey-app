@@ -57,7 +57,7 @@ export const getQuestionTypeDisplayName = (type) => {
  * @param {string} htmlContent - The HTML content from the preview component
  * @returns {string} Complete HTML document
  */
-export const generateSurveyHTML = (surveyData, htmlContent) => {
+export const generateSurveyHTML = (surveyData, htmlContent, jsContent = '') => {
     // Extract the main content from the preview (excluding outer wrapper)
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlContent;
@@ -66,7 +66,7 @@ export const generateSurveyHTML = (surveyData, htmlContent) => {
     const mainContent = tempDiv.querySelector('[data-preview-content]');
     const surveyContent = mainContent ? mainContent.innerHTML : htmlContent;
     
-    // Create complete HTML document with body tag
+    // Create complete HTML document with body tag and JavaScript
     const completeHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,6 +96,16 @@ export const generateSurveyHTML = (surveyData, htmlContent) => {
             outline-offset: 2px;
         }
         
+        /* Add transition support for survey questions */
+        .th-sf-survey-question-area {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .th-sf-survey-question-content {
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+        
         /* Responsive design */
         @media (max-width: 768px) {
             .th-sf-survey-container {
@@ -112,6 +122,11 @@ export const generateSurveyHTML = (surveyData, htmlContent) => {
     <div class="th-sf-survey-container" style="padding: 32px; background: #f6f6f7; min-height: 100vh;">
         ${surveyContent}
     </div>
+    
+    <!-- Survey Transition JavaScript -->
+    <script>
+${jsContent}
+    </script>
 </body>
 </html>`;
     
@@ -154,10 +169,12 @@ export const sanitizeHTML = (htmlContent) => {
  * Prepares survey data for backend storage
  * @param {Object} surveyData - The survey data object
  * @param {string} htmlContent - The HTML content from the preview component
+ * @param {string} jsContent - The JavaScript content for transitions
  * @returns {Object} Formatted data for backend
  */
-export const prepareSurveyForBackend = (surveyData, htmlContent) => {
+export const prepareSurveyForBackend = (surveyData, htmlContent, jsContent = '') => {
     const sanitizedHTML = sanitizeHTML(htmlContent);
+    const sanitizedJS = sanitizeJavaScript(jsContent);
     
     return {
         name: surveyData.name || 'Survey #1',
@@ -177,8 +194,27 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
         },
         channelTypes: surveyData.channelTypes || ['thankyou'],
         htmlContent: sanitizedHTML,
-        completeHTML: generateSurveyHTML(surveyData, sanitizedHTML),
+        jsContent: sanitizedJS,
+        completeHTML: generateSurveyHTML(surveyData, sanitizedHTML, sanitizedJS),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
+};
+
+/**
+ * Sanitizes JavaScript content
+ * @param {string} jsContent - Raw JavaScript content
+ * @returns {string} Sanitized JavaScript content
+ */
+export const sanitizeJavaScript = (jsContent) => {
+    // Basic JavaScript sanitization
+    // This is a simple implementation - consider using a proper sanitizer for production
+    
+    // Remove potentially harmful patterns
+    return jsContent
+        .replace(/eval\s*\(/g, '')
+        .replace(/Function\s*\(/g, '')
+        .replace(/new\s+Function/g, '')
+        .replace(/document\.write/g, '')
+        .replace(/innerHTML\s*=/g, 'innerText=');
 };

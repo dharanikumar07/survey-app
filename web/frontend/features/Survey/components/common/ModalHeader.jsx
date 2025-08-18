@@ -97,18 +97,21 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
             updatedAt: new Date().toISOString()
         };
 
-        // Capture HTML content from the survey preview
+        // Capture HTML and JavaScript content from the survey preview
         let htmlContent = '';
+        let jsContent = '';
         if (surveyPreviewRef && surveyPreviewRef.current) {
             htmlContent = surveyPreviewRef.current.getBodyContent();
+            jsContent = surveyPreviewRef.current.getJavaScriptContent();
         }
 
-        // Prepare complete survey data with HTML for backend storage
-        const completeSurveyData = prepareSurveyForBackend(surveyData, htmlContent);
+        // Prepare complete survey data with HTML and JavaScript for backend storage
+        const completeSurveyData = prepareSurveyForBackend(surveyData, htmlContent, jsContent);
 
-        console.log('Complete Survey Data with HTML:', completeSurveyData);
+        console.log('Complete Survey Data with HTML and JS:', completeSurveyData);
         console.log('HTML Content for Storefront:', completeSurveyData.htmlContent);
-        console.log('Complete HTML Document:', completeSurveyData.completeHTML);
+        console.log('JavaScript Content for Storefront:', completeSurveyData.jsContent);
+        console.log('Complete HTML Document with JS:', completeSurveyData.completeHTML);
 
         // Here you would typically send the data to your backend
         // Example: await saveSurveyToBackend(completeSurveyData);
