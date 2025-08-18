@@ -7,6 +7,7 @@ namespace App\Lib;
 use App\Api\Shopify\Shop;
 use App\Api\Shopify\Traits\ShopifyHelper;
 use App\Jobs\sync\SyncCustomers;
+use App\Jobs\WebHook;
 use App\Models\Store;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -106,7 +107,7 @@ class DbSessionStorage implements SessionStorage
                     'status' => 'online',
                 ]);
             }
-            info("dispatch sync jobs");
+            WebHook::dispatch($store);
             SyncCustomers::dispatch($store);
             return $dbSession->save();
         } catch (Exception $err) {
