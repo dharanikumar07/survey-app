@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Api\Shopify\Traits\ShopifyHelper;
+use App\Models\Customer;
 use App\Models\Store;
 use Carbon\Carbon;
 
@@ -70,6 +71,45 @@ query GetCustomers($first: Int!, $after: String) {
 GRAPHQL;
     }
 
+    public function getCustomerByIdQuery(string $platformCustomerId)
+    {
+        return <<<'GRAPHQL'
+query GetCustomer($id: ID!) {
+  customer(id: $id) {
+    id
+    legacyResourceId
+    email
+    firstName
+    lastName
+    displayName
+    phone
+    state
+    createdAt
+    updatedAt
+    numberOfOrders
+    tags
+    emailMarketingConsent {
+      marketingState
+      marketingOptInLevel
+      consentUpdatedAt
+    }
+    defaultAddress {
+      address1
+      address2
+      city
+      province
+      country
+      zip
+    }
+    amountSpent {
+      amount
+      currencyCode
+    }
+  }
+}
+GRAPHQL;
+    }
+
     public function get(int $limit = 10, ?string $after = null)
     {
         $params = [
@@ -98,37 +138,81 @@ GRAPHQL;
         foreach ($customers['edges'] as $edge) {
             $node = $edge['node'];
 
-            $result[] = [
-                'platform_customer_id' => $node['legacyResourceId'] ?? null,
-                'email' => $node['email'] ?? null,
-                'first_name' => $node['firstName'] ?? null,
-                'last_name' => $node['lastName'] ?? null,
-                'phone' => $node['phone'] ?? null,
-                'state' => $node['state'] ?? null,
-
-                'created_at_platform' => !empty($node['createdAt']) ? Carbon::parse($node['createdAt']) : null,
-                'updated_at_platform' => !empty($node['updatedAt']) ? Carbon::parse($node['updatedAt']) : null,
-
-                'number_of_orders' => (int) ($node['numberOfOrders'] ?? 0),
-                'tags' => !empty($node['tags']) ? json_encode($node['tags']) : null,
-
-                'marketing_state' => $node['emailMarketingConsent']['marketingState'] ?? null,
-                'marketing_opt_in_level' => $node['emailMarketingConsent']['marketingOptInLevel'] ?? null,
-                'consent_updated_at' => !empty($node['emailMarketingConsent']['consentUpdatedAt'])
-                    ? Carbon::parse($node['emailMarketingConsent']['consentUpdatedAt'])
-                    : null,
-
-                'address1' => $node['defaultAddress']['address1'] ?? null,
-                'address2' => $node['defaultAddress']['address2'] ?? null,
-                'city' => $node['defaultAddress']['city'] ?? null,
-                'province' => $node['defaultAddress']['province'] ?? null,
-                'country' => $node['defaultAddress']['country'] ?? null,
-                'zip' => $node['defaultAddress']['zip'] ?? null,
-
-                'amount_spent' => $node['amountSpent']['amount'] ?? 0,
-            ];
+            $result[] = $this->mapCustomerData($node);
         }
 
         return $result;
     }
+
+    public function mapCustomerData($customerData): array
+    {
+        return [
+            'store_uuid' => $this->store->uuid,
+            'platform_customer_id' => $customerData['legacyResourceId'] ?? null,
+            'email' => $customerData['email'] ?? null,
+            'first_name' => $customerData['firstName'] ?? null,
+            'last_name' => $customerData['lastName'] ?? null,
+            'phone' => $customerData['phone'] ?? null,
+            'state' => $customerData['state'] ?? null,
+
+            'created_at_platform' => !empty($customerData['createdAt']) ? Carbon::parse($customerData['createdAt']) : null,
+            'updated_at_platform' => !empty($customerData['updatedAt']) ? Carbon::parse($customerData['updatedAt']) : null,
+
+            'number_of_orders' => (int)($customerData['numberOfOrders'] ?? 0),
+            'tags' => !empty($customerData['tags']) ? json_encode($customerData['tags']) : null,
+
+            'marketing_state' => $customerData['emailMarketingConsent']['marketingState'] ?? null,
+            'marketing_opt_in_level' => $customerData['emailMarketingConsent']['marketingOptInLevel'] ?? null,
+            'consent_updated_at' => !empty($customerData['emailMarketingConsent']['consentUpdatedAt'])
+                ? Carbon::parse($customerData['emailMarketingConsent']['consentUpdatedAt'])
+                : null,
+
+            'address1' => $customerData['defaultAddress']['address1'] ?? null,
+            'address2' => $customerData['defaultAddress']['address2'] ?? null,
+            'city' => $customerData['defaultAddress']['city'] ?? null,
+            'province' => $customerData['defaultAddress']['province'] ?? null,
+            'country' => $customerData['defaultAddress']['country'] ?? null,
+            'zip' => $customerData['defaultAddress']['zip'] ?? null,
+
+            'amount_spent' => $customerData['amountSpent']['amount'] ?? 0,
+        ];
+    }
+
+    public function getCustomerByPlatformCustomerId($platformCustomerId)
+    {
+        if (empty($platformCustomerId)) throw new \Exception('Platform Customer id empty');
+
+        $customer = Customer::where('platform_customer_id', $platformCustomerId)->first();
+
+        if ($customer) {
+            return $customer;
+        }
+
+        $response = $this->fetchCustomerFromShopify($platformCustomerId);
+
+        if (empty($response)) {
+            throw new \Exception("Customer with platform ID {$platformCustomerId} not found in Shopify.");
+        }
+
+        $customerData = $this->handleCustomerData($response);
+
+        return Customer::updateOrCreate(
+            ['platform_customer_id' => $platformCustomerId],
+            $customerData
+        );
+
+    }
+
+    public function fetchCustomerFromShopify(string $platformCustomerId): array
+    {
+        $params = [
+            'query' => $this->getCustomerByIdQuery($platformCustomerId),
+            'variables' => ['id' => $this->toGid('Customer',$platformCustomerId)],
+        ];
+
+        $response = $this->sendRequest($params);
+
+        return $response['data']['customer'] ?? [];
+    }
+
 }

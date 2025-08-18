@@ -76,18 +76,33 @@ trait ShopifyHelper
         return $json;
     }
 
-    public function toBool($value) : bool
+    public function toBoolString($value)
     {
         if (is_bool($value)) {
-            return $value;
+            return $value ? 'true' : 'false';
         }
 
         if (is_int($value)) {
-            return $value === 1;
+            return $value === 1 ? 'true' : 'false';
         }
 
         $stringValue = strtolower((string) $value);
 
-        return in_array($stringValue, ['1', 't', 'true', 'on', 'yes'], true);
+        return in_array($stringValue, ['1', 't', 'true', 'on', 'yes'], true) ? 'true' : 'false';
+    }
+
+    public function extractNumericId(?string $gid): ?string
+    {
+        if (empty($gid)) {
+            return null;
+        }
+
+        $parts = explode('/', $gid);
+        return end($parts);
+    }
+
+    public function toGid(string $type, string|int $legacyId): string
+    {
+        return "gid://shopify/{$type}/{$legacyId}";
     }
 }

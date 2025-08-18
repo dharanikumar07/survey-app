@@ -163,44 +163,69 @@ GraphQL;
         return $response['data']['orders'];
     }
 
-    public function handleOrders($orderData) : array
+    public function handleOrders($orderData): array
     {
-        $orderData = [
-            'platform_order_id'   => $orderData['id'],
-            'order_name'          => $orderData['name'] ?? null,
-            'email'               => $orderData['email'] ?? null,
-            'tags'                => !empty($orderData['tags']) ? json_encode($orderData['tags']) : null,
-            'taxes_included'      => (bool)($orderData['taxesIncluded'] ?? false),
-            'processed_at'        => $orderData['processedAt'] ?? null,
-            'cancelled_at'        => $orderData['cancelledAt'] ?? null,
-            'total_amount'        => $orderData['currentTotalPrice']['amount'] ?? null,
-            'currency'            => $orderData['currentTotalPrice']['currencyCode'] ?? null,
-            'financial_status'    => $orderData['financialStatus'] ?? null,
-            'fulfillment_status'  => $orderData['fulfillmentStatus'] ?? null,
-            'platform_customer_id'=> $orderData['customer']['id'] ?? null,
-            'customer_uuid'       => $orderData['customer']['uuid'] ?? null,
-        ];
+        $shopifyCustomerHelper = new ShopifyCustomerFetcher($this->store);
+        $customer = $shopifyCustomerHelper->getCustomerByPlatformCustomerId($this->extractNumericId($orderData['customer']['id']));
 
-        return $orderData;
+        return $this->mapOrderData($orderData, $customer);
+
     }
 
-    public function handleOrderItems($lineItem, $order, )
+    public function mapOrderData($orderData, $customer): array
     {
-        $itemData = [
-            'platform_order_id'     => $order->platform_order_id,
-            'order_uuid'            => $order->uuid,
-            'platform_order_item_id'=> $lineItem['id'],
-            'platform_product_id'   => $lineItem['product']['id'] ?? null,
-            'platform_variant_id'   => $lineItem['variant']['id'] ?? null,
-            'quantity'              => $lineItem['quantity'] ?? 1,
-            'taxable'               => (bool)($lineItem['taxable'] ?? false),
-            'requires_shipping'     => (bool)($lineItem['requiresShipping'] ?? true),
-            'original_total'        => $lineItem['originalTotalSet']['shopMoney']['amount'] ?? null,
-            'discounted_total'      => $lineItem['discountedTotalSet']['shopMoney']['amount'] ?? null,
-            'tax_amount'            => $lineItem['taxLines'][0]['priceSet']['shopMoney']['amount'] ?? null,
+        return [
+            'store_uuid' => $this->store->uuid,
+            'platform_order_id' => $this->extractNumericId($orderData['id']),
+            'order_name' => $orderData['name'] ?? null,
+            'email' => $orderData['email'] ?? null,
+            'tags' => !empty($orderData['tags']) ? json_encode($orderData['tags']) : null,
+            'taxes_included' => $this->toBoolString(($orderData['taxesIncluded'] ?? false)),
+            'processed_at' => $orderData['processedAt'] ?? null,
+            'cancelled_at' => $orderData['cancelledAt'] ?? null,
+            'total_amount' => $orderData['totalPriceSet']['shopMoney']['amount'] ?? null,
+            'currency' => $orderData['totalPriceSet']['shopMoney']['currencyCode'] ?? null,
+            'financial_status' => $orderData['financialStatus'] ?? null,
+            'fulfillment_status' => $orderData['fulfillmentStatus'] ?? null,
+            'platform_customer_id' => $this->extractNumericId($orderData['customer']['id']) ?? null,
+            'customer_uuid' => $customer->uuid ?? null,
         ];
-
-        return $itemData;
     }
 
+    public function handleOrderItems($lineItem, $order)
+    {
+        $shopifyProductHelper = new ShopifyProductFetcher($this->store);
+
+        $variantLegacyId = $lineItem['variant']['legacyResourceId'] ?? null;
+        $productLegacyId = $lineItem['product']['legacyResourceId'] ?? null;
+
+        $variantProduct = $variantLegacyId
+            ? $shopifyProductHelper->getVariantProductByPlatformId($variantLegacyId)
+            : null;
+
+        $parentProduct = $productLegacyId
+            ? $shopifyProductHelper->getParentProductByPlatformId($productLegacyId)
+            : null;
+
+
+        return $this->mapOrderItemsData($lineItem, $order, $parentProduct, $variantProduct);
+    }
+
+    public function mapOrderItemsData($lineItem, $order, $parentProduct, $variantProduct)
+    {
+        return [
+            'store_uuid' => $this->store->uuid,
+            'platform_order_id' => $order->platform_order_id,
+            'order_uuid' => $order->uuid,
+            'platform_order_item_id' => $this->extractNumericId($lineItem['id']),
+            'product_uuid' => $parentProduct->uuid ?? null,
+            'variant_uuid' => $variantProduct->uuid ?? null,
+            'quantity' => $lineItem['quantity'] ?? 1,
+            'taxable' =>  $this->toBoolString(($lineItem['taxable'] ?? false)),
+            'requires_shipping' => $this->toBoolString(($lineItem['requiresShipping'] ?? true)),
+            'original_total' => $lineItem['originalTotalSet']['shopMoney']['amount'] ?? null,
+            'discounted_total' => $lineItem['discountedTotalSet']['shopMoney']['amount'] ?? null,
+            'tax_amount' => $lineItem['taxLines'][0]['priceSet']['shopMoney']['amount'] ?? null,
+        ];
+    }
 }
