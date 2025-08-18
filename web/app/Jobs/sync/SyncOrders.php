@@ -36,11 +36,10 @@ class SyncOrders implements ShouldQueue
     {
         $shopifyOrderHelper = new ShopifyOrderFetcher($this->store);
 
-        $limit = 5;
+        $limit = 10;
         $after = $this->after ?? null;
 
         $rawOrdersData = $shopifyOrderHelper->get($limit, $after);
-
 
         if (empty($rawOrdersData['edges'])) {
             throw new \Exception('Orders data null.');
@@ -58,11 +57,8 @@ class SyncOrders implements ShouldQueue
                     $orderData
                 );
 
-
-                foreach ($node['lineItems']['edges'] as $lineItemEdge) {
-                    $lineNode = $lineItemEdge['node'];
-
-                   $itemData = $shopifyOrderHelper->handleOrderItems($lineNode, $order);
+                foreach ($node['lineItems']['nodes'] as $lineItemNode) {
+                    $itemData = $shopifyOrderHelper->handleOrderItems($lineItemNode, $order);
 
                     OrderItems::updateOrCreate(
                         ['platform_order_item_id' => $itemData['platform_order_item_id']],
@@ -70,6 +66,8 @@ class SyncOrders implements ShouldQueue
                     );
                 }
             }
+
+            $this->updateSyncStatus('completed');
 
             DB::commit();
         } catch (\Exception $e) {
@@ -86,6 +84,17 @@ class SyncOrders implements ShouldQueue
 
     public function failed(\Exception $exception)
     {
+        $this->updateSyncStatus('failed');
         Helper::logError("Error Occurred", [__CLASS__, __FUNCTION__], $exception);
+    }
+
+    public function updateSyncStatus($status)
+    {
+        $currentStatus = $this->store->sync_status ?? [];
+
+        $currentStatus['order_sync'] = $status;
+
+        $this->store->sync_status = $currentStatus;
+        $this->store->save();
     }
 }

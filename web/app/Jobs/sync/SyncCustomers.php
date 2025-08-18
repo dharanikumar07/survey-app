@@ -59,6 +59,8 @@ class SyncCustomers implements ShouldQueue
                 );
             }
 
+            $this->updateSyncStatus('completed');
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -77,6 +79,17 @@ class SyncCustomers implements ShouldQueue
 
     public function failed(?Throwable $exception)
     {
+        $this->updateSyncStatus('failed');
         Helper::logError("Error Occurred", [__CLASS__, __FUNCTION__], $exception);
+    }
+
+    public function updateSyncStatus($status)
+    {
+        $currentStatus = $this->store->sync_status ?? [];
+
+        $currentStatus['customer_sync'] = $status;
+
+        $this->store->sync_status = $currentStatus;
+        $this->store->save();
     }
 }

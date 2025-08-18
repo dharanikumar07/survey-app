@@ -12,6 +12,10 @@ class Store extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'sync_status' => 'json',
+    ];
+
     public function getAccessToken()
     {
         return $this->access_token;

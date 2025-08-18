@@ -36,7 +36,7 @@ class SyncProducts implements ShouldQueue
     {
         $shopifyProductHelper = new ShopifyProductFetcher($this->store);
 
-        $limit = 5;
+        $limit = 10;
         $after = $this->after ?? null;
 
         $rawProductsData = $shopifyProductHelper->get($limit, $after);
@@ -64,6 +64,8 @@ class SyncProducts implements ShouldQueue
                 }
             }
 
+            $this->updateSyncStatus('completed');
+
             DB::commit();
         } catch (\Exception $e) {
             Db::rollBack();
@@ -82,6 +84,17 @@ class SyncProducts implements ShouldQueue
 
     public function failed(\Exception $exception)
     {
+        $this->updateSyncStatus('failed');
         Helper::logError("Error Occurred", [__CLASS__, __FUNCTION__], $exception);
+    }
+
+    public function updateSyncStatus($status)
+    {
+        $currentStatus = $this->store->sync_status ?? [];
+
+        $currentStatus['product_sync'] = $status;
+
+        $this->store->sync_status = $currentStatus;
+        $this->store->save();
     }
 }
