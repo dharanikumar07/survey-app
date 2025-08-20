@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Text, Card, BlockStack } from '@shopify/polaris';
-import useStore from '../../../../State/store';
+import { useSurveyState } from '../../hooks/useSurveyState';
 
 function SurveyPreview() {
-    const { questions, selectedQuestionId } = useStore();
+    const { questions, selectedQuestionId } = useSurveyState();
 
     // Find the currently selected question
     const selectedQuestion = questions.find(q => q.id === selectedQuestionId) || {

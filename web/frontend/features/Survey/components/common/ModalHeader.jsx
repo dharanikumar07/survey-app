@@ -24,7 +24,7 @@ import {
     ExitIcon,
     CodeIcon
 } from '@shopify/polaris-icons';
-import useStore from '../../../State/store';
+import { useSurveyState } from '../../hooks/useSurveyState';
 
 function ModalHeader({ title = "Survey #1" }) {
     const {
@@ -42,7 +42,7 @@ function ModalHeader({ title = "Survey #1" }) {
         setSurveyPagePopoverActive,
         selectedSurveyPage,
         setSelectedSurveyPage
-    } = useStore();
+    } = useSurveyState();
 
     const themes = [
         { label: 'Default Theme', value: 'default' },
@@ -147,14 +147,15 @@ function ModalHeader({ title = "Survey #1" }) {
                         <Button
                             pressed
                             icon={NoteIcon}
+                            variant='tertiary'
                         >
                             Build Survey
                         </Button>
-                        <Button
+                        {/* <Button
                             icon={ArrowUpIcon}
                         >
                             Advanced Logic
-                        </Button>
+                        </Button> */}
                     </ButtonGroup>
 
 

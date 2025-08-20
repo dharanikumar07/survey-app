@@ -1,11 +1,11 @@
 import React from 'react';
 import { Box, BlockStack, Text, Card } from '@shopify/polaris';
 // import { ChannelAccordion } from '../../../../components/Accordion';
-import useStore from '../../../../State/store';
+import { useSurveyState } from '../../hooks/useSurveyState';
 import SurveyAccordion from '../../../../components/SurveyAccordion';
 
 export function ChannelTab() {
-    const { channelItems, toggleChannelExpand, toggleChannelEnabled } = useStore();
+    const { channelItems, toggleChannelExpand, toggleChannelEnabled } = useSurveyState();
 
     return (
         <BlockStack gap="400">

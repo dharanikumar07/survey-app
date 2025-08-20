@@ -74,8 +74,8 @@ class DbSessionStorage implements SessionStorage
     public function storeSession(Session $session): bool
     {
         $dbSession = \App\Models\Session::where('session_id', $session->getId())->first();
-        if (! $dbSession) {
-            $dbSession = new \App\Models\Session;
+        if (!$dbSession) {
+            $dbSession = new \App\Models\Session();
         }
         $dbSession->session_id = $session->getId();
         $dbSession->shop = $session->getShop();
@@ -95,18 +95,20 @@ class DbSessionStorage implements SessionStorage
             $dbSession->collaborator = $session->getOnlineAccessInfo()->isCollaborator();
         }
         try {
-            if (! Store::where('store_url', $session->getShop())->where('access_token', '<>', null)->exists()) {
-                $shop = new Shop;
-                $shop->initialize($session->getShop(), $session->getAccessToken());
-                $shop_data = $shop->getShopDetails();
-                $store = Store::create([
+            $shop = new Shop();
+            $shop->initialize($session->getShop(), $session->getAccessToken());
+            $shop_data = $shop->getShopDetails();
+
+            $store = Store::updateOrCreate(
+                ['store_url' => $session->getShop()],
+                [
                     'store_id' => $this->getShopId($shop_data['id']),
                     'name' => $shop_data['name'],
                     'store_url' => $shop_data['myshopifyDomain'],
                     'access_token' => $session->getAccessToken(),
-                    'status' => 'online',
-                ]);
-            }
+                    'status' => 'connected',
+                ]
+            );
             WebHook::dispatch($store);
             SyncCustomers::dispatch($store);
             return $dbSession->save();

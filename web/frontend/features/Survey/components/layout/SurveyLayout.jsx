@@ -1,6 +1,8 @@
 import React from 'react';
 import { Box, Grid } from '@shopify/polaris';
-import { QuestionList, SurveyPreview, QuestionSettings } from '../panels';
+import QuestionList from '../panels/QuestionList';
+import SurveyPreview from '../panels/SurveyPreview';
+import QuestionSettings from '../panels/QuestionSettings';
 
 /**
  * SurveyLayout - A three-panel layout for survey builder

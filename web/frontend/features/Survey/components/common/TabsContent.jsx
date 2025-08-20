@@ -1,0 +1,61 @@
+import React from 'react';
+import { Box, BlockStack, Button, ButtonGroup, Divider } from '@shopify/polaris';
+import { ContentTab } from '../tabs/ContentTab';
+import { ChannelTab } from '../tabs/ChannelTab';
+import { DiscountTab } from '../tabs/DiscountTab';
+import { useSurveyState } from '../../hooks/useSurveyState';
+
+function TabsContent() {
+    const { selectedTab, setSelectedTab } = useSurveyState();
+
+    const handleTabChange = (selectedTabIndex) => {
+        setSelectedTab(selectedTabIndex);
+    };
+
+    const renderTabContent = () => {
+        switch (selectedTab) {
+            case 0:
+                return <ContentTab />;
+            case 1:
+                return <ChannelTab />;
+            case 2:
+                return <DiscountTab />;
+            default:
+                return <ContentTab />;
+        }
+    };
+
+    return (
+        <Box>
+            <ButtonGroup variant="segmented" fullWidth>
+                <Button
+                    pressed={selectedTab === 0}
+                    onClick={() => handleTabChange(0)}
+                    variant='tertiary'
+                >
+                    Content
+                </Button>
+                <Button
+                    pressed={selectedTab === 1}
+                    onClick={() => handleTabChange(1)}
+                    variant='tertiary'
+                >
+                    Channel
+                </Button>
+                <Button
+                    pressed={selectedTab === 2}
+                    onClick={() => handleTabChange(2)}
+                    variant='tertiary'
+                >
+                    Discount
+                </Button>
+            </ButtonGroup>
+            <Box paddingBlockStart="400">
+                <Divider />
+                {renderTabContent()}
+            </Box>
+        </Box>
+    );
+}
+
+export default TabsContent;

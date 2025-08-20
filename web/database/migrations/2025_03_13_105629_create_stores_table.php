@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('store_id')->unique();
-            $table->uuid('uuid')->primary();
+            $table->uuid('uuid')->unique();
             $table->string('name');
             $table->string('store_url');
             $table->string('access_token');
-            $table->string('status');
+            $table->enum('status', ['connected', 'disconnected', 'trial', 'suspended']);
             $table->json('sync_status')->nullable();
             $table->json('shopify_data')->nullable();
             $table->json('extra')->nullable();

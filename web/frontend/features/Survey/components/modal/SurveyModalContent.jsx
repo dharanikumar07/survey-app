@@ -1,5 +1,5 @@
 import React from 'react';
-import { SurveyLayout } from './layout';
+import SurveyLayout from '../layout/SurveyLayout';
 
 /**
  * SurveyModalContent - Main container for the survey builder interface
