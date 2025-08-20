@@ -1,4 +1,5 @@
 import React, { useRef, forwardRef, useImperativeHandle, useEffect, useState } from 'react';
+import { Box, Text } from '@shopify/polaris';
 import { useSurveyState } from '../../hooks/useSurveyState';
 import { generateSurveyJavaScript } from '../../utils/surveyTransitions';
 
@@ -22,11 +23,25 @@ import { generateSurveyJavaScript } from '../../utils/surveyTransitions';
  * // The JavaScript content provides slide transitions between questions.
  */
 const SurveyPreview = forwardRef((props, ref) => {
-    const { questions, selectedQuestionId } = useSurveyState();
+    const { questions, selectedQuestionId, selectedView } = useSurveyState();
     const previewRef = useRef(null);
     const jsContentRef = useRef('');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+
+    // Get survey card width based on view mode
+    const getSurveyCardWidth = () => {
+        switch (selectedView) {
+            case 'mobile':
+                return { width: '100%', maxWidth: '375px' }; // Mobile width
+            case 'maximize':
+                return { width: '100%', maxWidth: '800px' }; // Fullscreen width
+            default: // desktop
+                return { width: '100%', maxWidth: '600px' }; // Default width
+        }
+    };
+
+    const surveyCardStyle = getSurveyCardWidth();
 
     // Generate JavaScript content when questions change
     useEffect(() => {
@@ -46,6 +61,29 @@ const SurveyPreview = forwardRef((props, ref) => {
         setCurrentQuestionIndex(0);
         setAnswers({});
     }, [questions]);
+
+    // Update currentQuestionIndex when selectedQuestionId changes
+    useEffect(() => {
+        if (selectedQuestionId && questions.length > 0) {
+            const questionIndex = questions.findIndex(q => q.id === selectedQuestionId);
+            if (questionIndex !== -1) {
+                setCurrentQuestionIndex(questionIndex);
+                console.log('SurveyPreview: Updated currentQuestionIndex to:', questionIndex);
+            }
+        }
+    }, [selectedQuestionId, questions]);
+
+    // Auto-select first question if none is selected
+    useEffect(() => {
+        if (questions.length > 0 && !selectedQuestionId) {
+            const firstQuestion = questions.find(q => q.id !== 'thankyou');
+            if (firstQuestion) {
+                console.log('SurveyPreview: Auto-selecting first question:', firstQuestion.id);
+                // Note: We can't call setSelectedQuestionId here as it's not available in this component
+                // This will be handled by the parent component or store
+            }
+        }
+    }, [questions, selectedQuestionId]);
 
     // Expose methods to get HTML and JavaScript content for backend storage
     useImperativeHandle(ref, () => ({
@@ -70,13 +108,47 @@ const SurveyPreview = forwardRef((props, ref) => {
     }));
 
     // Get the current question to display (for preview mode)
-    const currentQuestion = questions[currentQuestionIndex] || questions.find(q => q.id === selectedQuestionId) || {
-        id: '1',
-        content: 'How likely are you to recommend us to a friend?',
-        type: 'rating',
-        description: '',
-        questionType: 'Number scale'
-    };
+    const currentQuestion = questions.find(q => q.id === selectedQuestionId) || questions[currentQuestionIndex];
+
+    // If no question is found, show a message
+    if (!currentQuestion) {
+        return (
+            <div
+                ref={previewRef}
+                id="th-sf-survey-preview-container"
+                className="th-sf-survey-preview-container"
+                style={{
+                    padding: '16px',
+                    background: '#f6f6f7',
+                    height: '100%',
+                    overflow: 'hidden'
+                }}
+            >
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%',
+                        textAlign: 'center'
+                    }}
+                >
+                    <Text variant="headingMd" as="h2">Survey Preview</Text>
+                    <Box padding="400" background="bg-surface-secondary" borderRadius="300">
+                        <Text variant="bodyMd" alignment="center" color="subdued">
+                            No questions available. Please add questions to see the preview.
+                        </Text>
+                    </Box>
+                </div>
+            </div>
+        );
+    }
+
+    console.log('SurveyPreview: selectedQuestionId:', selectedQuestionId);
+    console.log('SurveyPreview: currentQuestionIndex:', currentQuestionIndex);
+    console.log('SurveyPreview: currentQuestion:', currentQuestion);
+    console.log('SurveyPreview: all questions:', questions);
 
     // Handle next button click
     const handleNext = () => {
@@ -145,18 +217,18 @@ const SurveyPreview = forwardRef((props, ref) => {
                     style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '32px',
+                        gap: '16px',
                         alignItems: 'center',
                         textAlign: 'center',
-                        paddingTop: '40px',
-                        paddingBottom: '40px'
+                        paddingTop: '24px',
+                        paddingBottom: '24px'
                     }}
                 >
                     <div
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '16px',
+                            gap: '8px',
                             alignItems: 'center'
                         }}
                     >
@@ -199,11 +271,12 @@ const SurveyPreview = forwardRef((props, ref) => {
                 <h3
                     className="th-sf-survey-question-heading"
                     style={{
-                        fontSize: '24px',
+                        fontSize: selectedView === 'mobile' ? '20px' : '24px',
                         fontWeight: '600',
                         margin: '0',
                         color: '#202223',
-                        textAlign: 'center'
+                        textAlign: 'center',
+                        padding: selectedView === 'mobile' ? '0 16px' : '0'
                     }}
                 >
                     {currentQuestion.content}
@@ -213,10 +286,11 @@ const SurveyPreview = forwardRef((props, ref) => {
                     <p
                         className="th-sf-survey-question-description"
                         style={{
-                            fontSize: '16px',
+                            fontSize: selectedView === 'mobile' ? '14px' : '16px',
                             margin: '0',
                             color: '#6d7175',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            padding: selectedView === 'mobile' ? '0 16px' : '0'
                         }}
                     >
                         {currentQuestion.description}
@@ -226,8 +300,8 @@ const SurveyPreview = forwardRef((props, ref) => {
                 <div
                     className="th-sf-survey-answer-area"
                     style={{
-                        paddingTop: '32px',
-                        paddingBottom: '32px',
+                        paddingTop: '16px',
+                        paddingBottom: '16px',
                         width: '100%'
                     }}
                 >
@@ -236,7 +310,7 @@ const SurveyPreview = forwardRef((props, ref) => {
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '32px',
+                            gap: '16px',
                             alignItems: 'center'
                         }}
                     >
@@ -281,36 +355,34 @@ const SurveyPreview = forwardRef((props, ref) => {
                                     paddingTop: '10px'
                                 }}
                             >
-                                {/* Rating Numbers */}
+                                {/* Star Rating */}
                                 <div
                                     style={{
                                         display: 'flex',
                                         justifyContent: 'center',
-                                        gap: '8px',
+                                        gap: selectedView === 'mobile' ? '4px' : '8px',
                                         width: '100%'
                                     }}
                                 >
-                                    {[1, 2, 3, 4, 5, 6].map(num => {
+                                    {[1, 2, 3, 4, 5].map(num => {
                                         const isSelected = answers[currentQuestionIndex]?.rating === num.toString();
                                         return (
                                             <button
                                                 key={num}
                                                 className={`th-sf-survey-rating-option ${isSelected ? 'th-sf-survey-rating-option-selected' : ''}`}
                                                 style={{
-                                                    width: '40px',
-                                                    height: '40px',
-                                                    border: '2px solid',
-                                                    borderColor: isSelected ? '#2c6ecb' : '#ccc',
-                                                    borderRadius: '50%',
-                                                    background: isSelected ? '#2c6ecb' : 'white',
-                                                    color: isSelected ? 'white' : '#000',
-                                                    fontSize: '16px',
+                                                    width: selectedView === 'mobile' ? '32px' : '40px',
+                                                    height: selectedView === 'mobile' ? '32px' : '40px',
+                                                    border: 'none',
+                                                    background: 'transparent',
                                                     cursor: 'pointer',
                                                     transition: 'all 0.2s ease',
-                                                    fontWeight: isSelected ? '600' : '400'
+                                                    fontSize: selectedView === 'mobile' ? '24px' : '32px',
+                                                    color: isSelected ? '#ffd700' : '#ddd',
+                                                    filter: isSelected ? 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.5))' : 'none'
                                                 }}
                                                 onClick={() => {
-                                                    console.log('Rating number clicked:', num);
+                                                    console.log('Star rating clicked:', num);
                                                     const currentAnswer = answers[currentQuestionIndex] || {};
                                                     const newAnswer = {
                                                         ...currentAnswer,
@@ -320,49 +392,145 @@ const SurveyPreview = forwardRef((props, ref) => {
                                                 }}
                                                 onMouseOver={(e) => {
                                                     if (!isSelected) {
-                                                        e.target.style.background = '#f8f9fa';
-                                                        e.target.style.borderColor = '#999';
+                                                        e.target.style.color = '#ffd700';
                                                         e.target.style.transform = 'scale(1.1)';
                                                     }
                                                 }}
                                                 onMouseOut={(e) => {
                                                     if (!isSelected) {
-                                                        e.target.style.background = 'white';
-                                                        e.target.style.borderColor = '#ccc';
+                                                        e.target.style.color = '#ddd';
                                                         e.target.style.transform = 'scale(1)';
                                                     }
                                                 }}
                                             >
-                                                {num}
+                                                ⭐
                                             </button>
                                         );
                                     })}
                                 </div>
-                                {/* Selected Answers Display */}
-                                {answers[currentQuestionIndex] && (answers[currentQuestionIndex].rating || answers[currentQuestionIndex].option || answers[currentQuestionIndex].multipleChoice) && (
-                                    <div
-                                        style={{
-                                            padding: '12px 16px',
-                                            background: '#f1f8ff',
-                                            border: '1px solid #2c6ecb',
-                                            borderRadius: '20px',
-                                            fontSize: '14px',
-                                            color: '#2c6ecb',
-                                            fontWeight: '500',
-                                            textAlign: 'center'
-                                        }}
-                                    >
-                                        {answers[currentQuestionIndex].rating && (
-                                            <div>Rating: {answers[currentQuestionIndex].rating}</div>
-                                        )}
-                                        {answers[currentQuestionIndex].optionLabel && (
-                                            <div>Option: {answers[currentQuestionIndex].optionLabel}</div>
-                                        )}
-                                        {answers[currentQuestionIndex].multipleChoice && (
-                                            <div>Multiple Choice: {answers[currentQuestionIndex].multipleChoice}</div>
-                                        )}
-                                    </div>
-                                )}
+
+                                {/* Rating Labels */}
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        width: '100%',
+                                        maxWidth: '300px',
+                                        fontSize: '14px',
+                                        color: '#6d7175'
+                                    }}
+                                >
+                                    <span>{currentQuestion.leftLabel || 'Hate it'}</span>
+                                    <span>{currentQuestion.rightLabel || 'Love it'}</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Satisfaction Scale - Only for satisfaction type questions */}
+                        {currentQuestion.type === 'satisfaction' && (
+                            <div
+                                className="th-sf-survey-satisfaction-scale"
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: '16px',
+                                    width: '100%',
+                                    paddingTop: '10px'
+                                }}
+                            >
+                                {/* Satisfaction Emojis */}
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        gap: selectedView === 'mobile' ? '8px' : '16px',
+                                        width: '100%'
+                                    }}
+                                >
+                                    {[
+                                        { emoji: '😠', label: 'Not satisfied', value: '1' },
+                                        { emoji: '😞', label: 'Dissatisfied', value: '2' },
+                                        { emoji: '😐', label: 'Neutral', value: '3' },
+                                        { emoji: '🙂', label: 'Satisfied', value: '4' },
+                                        { emoji: '🥰', label: 'Very satisfied', value: '5' }
+                                    ].map((item, index) => {
+                                        const isSelected = answers[currentQuestionIndex]?.rating === item.value;
+                                        return (
+                                            <button
+                                                key={index}
+                                                className={`th-sf-survey-satisfaction-option ${isSelected ? 'th-sf-survey-satisfaction-option-selected' : ''}`}
+                                                style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'center',
+                                                    gap: '8px',
+                                                    border: 'none',
+                                                    background: 'transparent',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s ease',
+                                                    padding: '8px',
+                                                    borderRadius: '8px',
+                                                    transform: isSelected ? 'scale(1.1)' : 'scale(1)'
+                                                }}
+                                                onClick={() => {
+                                                    console.log('Satisfaction rating clicked:', item.value);
+                                                    const currentAnswer = answers[currentQuestionIndex] || {};
+                                                    const newAnswer = {
+                                                        ...currentAnswer,
+                                                        rating: item.value
+                                                    };
+                                                    handleAnswerSelect(currentQuestionIndex, newAnswer);
+                                                }}
+                                                onMouseOver={(e) => {
+                                                    if (!isSelected) {
+                                                        e.target.style.transform = 'scale(1.05)';
+                                                    }
+                                                }}
+                                                onMouseOut={(e) => {
+                                                    if (!isSelected) {
+                                                        e.target.style.transform = 'scale(1)';
+                                                    }
+                                                }}
+                                            >
+                                                <div
+                                                    style={{
+                                                        fontSize: selectedView === 'mobile' ? '32px' : '48px',
+                                                        filter: isSelected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.3))' : 'none'
+                                                    }}
+                                                >
+                                                    {item.emoji}
+                                                </div>
+                                                <span
+                                                    style={{
+                                                        fontSize: '12px',
+                                                        color: isSelected ? '#2c6ecb' : '#6d7175',
+                                                        fontWeight: isSelected ? '600' : '400',
+                                                        textAlign: 'center'
+                                                    }}
+                                                >
+                                                    {item.label}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Satisfaction Labels */}
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        width: '100%',
+                                        maxWidth: '400px',
+                                        fontSize: '14px',
+                                        color: '#6d7175',
+                                        marginTop: '8px'
+                                    }}
+                                >
+                                    <span>{currentQuestion.leftLabel || 'Not satisfied'}</span>
+                                    <span>{currentQuestion.rightLabel || 'Very satisfied'}</span>
+                                </div>
                             </div>
                         )}
 
@@ -384,25 +552,25 @@ const SurveyPreview = forwardRef((props, ref) => {
                                     style={{
                                         display: 'flex',
                                         justifyContent: 'center',
-                                        gap: '8px',
+                                        gap: selectedView === 'mobile' ? '4px' : '8px',
                                         width: '100%'
                                     }}
                                 >
-                                    {[1, 2, 3, 4, 5, 6].map(num => {
+                                    {[1, 2, 3, 4, 5].map(num => {
                                         const isSelected = answers[currentQuestionIndex] === num.toString();
                                         return (
                                             <button
                                                 key={num}
                                                 className={`th-sf-survey-number-option ${isSelected ? 'th-sf-survey-number-option-selected' : ''}`}
                                                 style={{
-                                                    width: '40px',
-                                                    height: '40px',
+                                                    width: selectedView === 'mobile' ? '32px' : '40px',
+                                                    height: selectedView === 'mobile' ? '32px' : '40px',
                                                     border: '2px solid',
                                                     borderColor: isSelected ? '#2c6ecb' : '#ccc',
                                                     borderRadius: '50%',
                                                     background: isSelected ? '#2c6ecb' : 'white',
                                                     color: isSelected ? 'white' : '#000',
-                                                    fontSize: '16px',
+                                                    fontSize: selectedView === 'mobile' ? '14px' : '16px',
                                                     cursor: 'pointer',
                                                     transition: 'all 0.2s ease',
                                                     fontWeight: isSelected ? '600' : '400'
@@ -455,8 +623,8 @@ const SurveyPreview = forwardRef((props, ref) => {
                                 className="th-sf-survey-multiple-choice-container"
                                 style={{
                                     width: '100%',
-                                    maxWidth: '500px',
-                                    padding: '10px'
+                                    maxWidth: selectedView === 'mobile' ? '320px' : '500px',
+                                    padding: selectedView === 'mobile' ? '8px' : '10px'
                                 }}
                             >
                                 {currentQuestion.answerOptions.map((option) => {
@@ -468,9 +636,9 @@ const SurveyPreview = forwardRef((props, ref) => {
                                             style={{
                                                 border: '2px solid',
                                                 borderColor: isSelected ? '#2c6ecb' : '#ccc',
-                                                borderRadius: '8px',
-                                                padding: '16px 20px',
-                                                marginBottom: '12px',
+                                                borderRadius: selectedView === 'mobile' ? '12px' : '8px',
+                                                padding: selectedView === 'mobile' ? '12px 16px' : '16px 20px',
+                                                marginBottom: selectedView === 'mobile' ? '8px' : '12px',
                                                 background: isSelected ? '#f1f8ff' : '#fff',
                                                 cursor: 'pointer',
                                                 display: 'flex',
@@ -575,6 +743,39 @@ const SurveyPreview = forwardRef((props, ref) => {
                                 />
                             </div>
                         )}
+
+                        {/* Date picker for date type questions */}
+                        {currentQuestion.type === 'date' && (
+                            <div
+                                className="th-sf-survey-date-input-container"
+                                style={{
+                                    width: '100%',
+                                    maxWidth: '500px',
+                                    padding: '10px'
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        border: '1px solid #ccc',
+                                        borderRadius: '4px',
+                                        padding: '12px',
+                                        background: '#fff',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px'
+                                    }}
+                                >
+                                    <span style={{ fontSize: '16px' }}>📅</span>
+                                    <span style={{ color: '#6d7175' }}>
+                                        {currentQuestion.selectedDate
+                                            ? new Date(currentQuestion.selectedDate).toLocaleDateString()
+                                            : 'Select a date'
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -585,12 +786,12 @@ const SurveyPreview = forwardRef((props, ref) => {
         <div
             ref={previewRef}
             id="th-sf-survey-preview-container"
-            className="th-sf-survey-preview-container"
+            className={`th-sf-survey-preview-container ${selectedView}`}
             style={{
-                padding: '32px',
+                padding: '16px',
                 background: '#f6f6f7',
-                minHeight: 'calc(100vh - 100px)',
-                overflow: 'auto'
+                height: '100%',
+                overflow: 'hidden'
             }}
         >
             <style>
@@ -609,6 +810,129 @@ const SurveyPreview = forwardRef((props, ref) => {
                     .th-sf-survey-question-content {
                         animation: slideIn 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
                     }
+
+                    .th-sf-survey-preview-content {
+                        scrollbar-width: thin;
+                        scrollbar-color: #c1c1c1 #f1f1f1;
+                    }
+
+                    .th-sf-survey-preview-content::-webkit-scrollbar {
+                        width: 8px;
+                    }
+
+                    .th-sf-survey-preview-content::-webkit-scrollbar-track {
+                        background: #f1f1f1;
+                        border-radius: 4px;
+                    }
+
+                    .th-sf-survey-preview-content::-webkit-scrollbar-thumb {
+                        background: #c1c1c1;
+                        border-radius: 4px;
+                    }
+
+                    .th-sf-survey-preview-content::-webkit-scrollbar-thumb:hover {
+                        background: #a8a8a8;
+                    }
+
+                    .th-sf-survey-preview-content {
+                        overscroll-behavior: contain;
+                        scroll-behavior: smooth;
+                    }
+
+                    /* View mode transitions */
+                    .th-sf-survey-card {
+                        transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+                    }
+
+                    /* Mobile view specific styles */
+                    .th-sf-survey-preview-container.mobile-view .th-sf-survey-card {
+                        max-width: 375px;
+                        margin: 0 auto;
+                    }
+
+                    /* Fullscreen view specific styles */
+                    .th-sf-survey-preview-container.maximize-view .th-sf-survey-card {
+                        max-width: 800px;
+                        margin: 0 auto;
+                    }
+
+                    /* Desktop view specific styles */
+                    .th-sf-survey-preview-container.desktop-view .th-sf-survey-card {
+                        max-width: 600px;
+                        margin: 0 auto;
+                    }
+
+                    /* Smooth transitions for all view mode changes */
+                    .th-sf-survey-preview-container,
+                    .th-sf-survey-card,
+                    .th-sf-survey-question-heading,
+                    .th-sf-survey-question-description,
+                    .th-sf-survey-multiple-choice-container,
+                    .th-sf-survey-rating-scale {
+                        transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+                    }
+
+                    /* View mode indicator animations */
+                    .th-sf-view-mode-indicator {
+                        animation: fadeInUp 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+                    }
+
+                    @keyframes fadeInUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(10px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    /* Enhanced star rating styles */
+                    .th-sf-survey-rating-option {
+                        transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+                    }
+
+                    .th-sf-survey-rating-option:hover {
+                        transform: scale(1.1);
+                    }
+
+                    .th-sf-survey-rating-option-selected {
+                        animation: starPulse 0.6s ease-in-out;
+                    }
+
+                    @keyframes starPulse {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.2); }
+                    }
+
+                    /* Satisfaction scale styles */
+                    .th-sf-survey-satisfaction-option {
+                        transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+                    }
+
+                    .th-sf-survey-satisfaction-option:hover {
+                        transform: scale(1.05);
+                    }
+
+                    .th-sf-survey-satisfaction-option-selected {
+                        animation: emojiBounce 0.6s ease-in-out;
+                    }
+
+                    @keyframes emojiBounce {
+                        0%, 100% { transform: scale(1.1); }
+                        50% { transform: scale(1.3); }
+                    }
+
+                    /* Date input styles */
+                    .th-sf-survey-date-input-container {
+                        transition: all 0.2s ease;
+                    }
+
+                    .th-sf-survey-date-input-container:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    }
                 `}
             </style>
             <div
@@ -617,8 +941,12 @@ const SurveyPreview = forwardRef((props, ref) => {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '32px',
-                    alignItems: 'center'
+                    gap: '16px',
+                    alignItems: 'center',
+                    height: '100%',
+                    maxHeight: 'calc(100vh - 200px)',
+                    overflowY: 'auto',
+                    overflowX: 'hidden'
                 }}
             >
                 {/* Survey Card */}
@@ -626,25 +954,47 @@ const SurveyPreview = forwardRef((props, ref) => {
                     className="th-sf-survey-card"
                     style={{
                         background: 'white',
-                        borderRadius: '8px',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                        width: '100%',
-                        maxWidth: '600px'
+                        borderRadius: selectedView === 'mobile' ? '20px' : '8px',
+                        boxShadow: selectedView === 'mobile'
+                            ? '0 4px 20px rgba(0, 0, 0, 0.15)'
+                            : '0 1px 3px rgba(0, 0, 0, 0.1)',
+                        width: surveyCardStyle.width,
+                        maxWidth: surveyCardStyle.maxWidth,
+                        border: 'none',
+                        position: 'relative'
                     }}
                 >
+                    {/* Mobile device frame indicator */}
+                    {selectedView === 'mobile' && (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '-20px',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                width: '60px',
+                                height: '6px',
+                                background: '#1a1a1a',
+                                borderRadius: '3px',
+                                zIndex: 1
+                            }}
+                        />
+                    )}
+
                     <div
                         className="th-sf-survey-card-content"
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '48px',
-                            alignItems: 'center'
+                            gap: '24px',
+                            alignItems: 'center',
+                            padding: selectedView === 'mobile' ? '16px' : '0'
                         }}
                     >
                         <div
                             className="th-sf-survey-question-area"
                             style={{
-                                paddingTop: '40px',
+                                paddingTop: '24px',
                                 width: '100%',
                                 position: 'relative',
                                 overflow: 'hidden'
@@ -671,7 +1021,7 @@ const SurveyPreview = forwardRef((props, ref) => {
                             className="th-sf-survey-navigation"
                             style={{
                                 borderTop: '1px solid #e1e3e5',
-                                paddingTop: '32px',
+                                paddingTop: '16px',
                                 width: '100%'
                             }}
                         >
@@ -681,7 +1031,7 @@ const SurveyPreview = forwardRef((props, ref) => {
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     width: '100%',
-                                    padding: '0 32px 32px 32px'
+                                    padding: '0 24px 24px 24px'
                                 }}
                             >
                                 {/* Previous Button - Only show when not on thank you card */}
@@ -803,7 +1153,7 @@ const SurveyPreview = forwardRef((props, ref) => {
                 <div
                     className="th-sf-survey-branding-footer"
                     style={{
-                        paddingBottom: '32px'
+                        paddingBottom: '16px'
                     }}
                 >
                     <p
@@ -829,7 +1179,7 @@ const SurveyPreview = forwardRef((props, ref) => {
                 </div>
 
                 {/* Debug Info (for development only) */}
-                {process.env.NODE_ENV === 'development' && (
+                {/* {process.env.NODE_ENV === 'development' && (
                     <div
                         className="th-sf-survey-debug-container"
                         style={{
@@ -887,7 +1237,7 @@ const SurveyPreview = forwardRef((props, ref) => {
                             Test HTML Capture
                         </button>
                     </div>
-                )}
+                )} */}
             </div>
         </div>
     );

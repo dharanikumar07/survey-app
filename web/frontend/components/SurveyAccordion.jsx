@@ -44,7 +44,7 @@ export default function SurveyAccordion({ item, onToggleExpand, onToggleEnabled 
             borderColor="border-disabled"
         >
             <InlineStack blockAlign="center" gap="200" wrap={false}>
-                <Box onClick={() => onToggleExpand(item.id)} style={{ cursor: 'pointer', flex: 1 }}>
+                <Box onClick={() => onToggleExpand(item.id)} className="th-sf-accordion-header">
                     <InlineStack blockAlign="center" gap="300">
                         <Box>
                             <Icon

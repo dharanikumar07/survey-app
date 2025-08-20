@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Text, BlockStack, Divider, Button, TextField, Icon, InlineStack, Checkbox, Scrollable } from '@shopify/polaris';
-import { DeleteIcon, DragHandleIcon, ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
+import React, { useState, useEffect, useRef } from 'react';
+import { Box, Text, BlockStack, Divider, Button, TextField, Icon, InlineStack, Checkbox, Scrollable, Popover, Card, DatePicker } from '@shopify/polaris';
+import { DeleteIcon, DragHandleIcon, ArrowUpIcon, ArrowDownIcon, CalendarIcon } from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
 
 function QuestionSettings() {
@@ -17,24 +17,59 @@ function QuestionSettings() {
     } = useSurveyState();
 
     // Find the currently selected question
-    const selectedQuestion = questions.find(q => q.id === selectedQuestionId) || {
-        id: '1',
-        content: 'How likely are you to recommend us to a friend?',
-        type: 'rating',
-        description: '',
-        questionType: 'Number scale',
-        answerOptions: []
-    };
+    const selectedQuestion = questions.find(q => q.id === selectedQuestionId);
+
+    // If no question is selected or found, show a message
+    if (!selectedQuestion) {
+        return (
+            <Box
+                padding="400"
+                background="bg-surface"
+                borderInlineStartWidth="1"
+                borderColor="border"
+                minHeight="calc(100vh - 120px)"
+            >
+                <BlockStack gap="400" align="center">
+                    <Text variant="headingMd" as="h2">Question</Text>
+                    <Box padding="400" background="bg-surface-secondary" borderRadius="300">
+                        <Text variant="bodyMd" alignment="center" color="subdued">
+                            No question selected. Please select a question from the left panel.
+                        </Text>
+                    </Box>
+                </BlockStack>
+            </Box>
+        );
+    }
+
+    console.log('QuestionSettings: selectedQuestionId:', selectedQuestionId);
+    console.log('QuestionSettings: selectedQuestion:', selectedQuestion);
+    console.log('QuestionSettings: all questions:', questions);
 
     const [headingValue, setHeadingValue] = useState(selectedQuestion.content);
     const [descriptionValue, setDescriptionValue] = useState(selectedQuestion.description || '');
     const [allowSkip, setAllowSkip] = useState(false);
 
+    // Date picker state for date-type questions
+    const [datePickerVisible, setDatePickerVisible] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(selectedQuestion.selectedDate ? new Date(selectedQuestion.selectedDate) : new Date());
+    const [{ month, year }, setDate] = useState({
+        month: selectedDate.getMonth(),
+        year: selectedDate.getFullYear(),
+    });
+    const datePickerRef = useRef(null);
+
     // Update local state when selected question changes
     useEffect(() => {
+        console.log('QuestionSettings: selectedQuestion changed, updating local state');
         setHeadingValue(selectedQuestion.content);
         setDescriptionValue(selectedQuestion.description || '');
+        // Reset other local state as needed
     }, [selectedQuestion]);
+
+    // Also update when selectedQuestionId changes
+    useEffect(() => {
+        console.log('QuestionSettings: selectedQuestionId changed to:', selectedQuestionId);
+    }, [selectedQuestionId]);
 
     // Update the heading when input changes
     const handleHeadingChange = (value) => {
@@ -52,6 +87,38 @@ function QuestionSettings() {
     const handleAllowSkipChange = (checked) => {
         setAllowSkip(checked);
     };
+
+    // Date picker handlers
+    const handleDatePickerOpen = () => {
+        setDatePickerVisible(true);
+    };
+
+    const handleDatePickerClose = () => {
+        setDatePickerVisible(false);
+    };
+
+    const handleMonthChange = (month, year) => {
+        setDate({ month, year });
+    };
+
+    const handleDateSelection = ({ end: newSelectedDate }) => {
+        setSelectedDate(newSelectedDate);
+        setDatePickerVisible(false);
+        // Update the question with the selected date
+        updateQuestion(selectedQuestionId, { selectedDate: newSelectedDate.toISOString() });
+    };
+
+    // Update date state when selected question changes
+    useEffect(() => {
+        if (selectedQuestion.selectedDate) {
+            const newDate = new Date(selectedQuestion.selectedDate);
+            setSelectedDate(newDate);
+            setDate({
+                month: newDate.getMonth(),
+                year: newDate.getFullYear(),
+            });
+        }
+    }, [selectedQuestion.selectedDate]);
 
     // Delete the current question
     const handleDeleteQuestion = () => {
@@ -105,17 +172,17 @@ function QuestionSettings() {
                 padding="300"
                 background="bg-surface-secondary"
                 borderRadius="100"
-                style={{ marginBottom: '8px' }}
+                className="th-sf-answer-option"
             >
                 <InlineStack gap="200" blockAlign="center" wrap={false}>
-                    <div style={{ flex: 1 }}>
+                    <div className="th-sf-answer-option-content">
                         <TextField
                             value={option.text}
                             onChange={(value) => updateAnswerOption(selectedQuestionId, option.id, value)}
                             autoComplete="off"
                         />
                     </div>
-                    <InlineStack gap="100">
+                    <InlineStack gap="100" className="th-sf-answer-option-controls">
                         <Button
                             icon={ArrowUpIcon}
                             variant="plain"
@@ -152,7 +219,7 @@ function QuestionSettings() {
             minHeight="calc(100vh - 120px)"
         >
             <Scrollable
-                shadow
+                // shadow
                 horizontal={false}
                 style={{
                     height: 'calc(100vh - 120px)',
@@ -162,15 +229,12 @@ function QuestionSettings() {
             >
                 <BlockStack gap="400">
                     <Text variant="headingMd" as="h2">Question</Text>
-
                     <BlockStack gap="300">
                         <Text variant="bodySm" as="h3">Question type</Text>
-                        <div style={{
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            padding: '10px 12px'
-                        }}>
-                            <Text variant="bodySm">{selectedQuestion.questionType}</Text>
+                        <div className="th-sf-question-type-display">
+                            <Text variant="bodySm" fontWeight="medium">
+                                {selectedQuestion.questionType || 'Custom'}
+                            </Text>
                         </div>
                     </BlockStack>
 
@@ -196,6 +260,97 @@ function QuestionSettings() {
                             disabled={selectedQuestionId === 'thankyou'}
                         />
                     </BlockStack>
+
+                    {/* Date picker for date-type questions */}
+                    {selectedQuestion.type === 'date' && (
+                        <BlockStack gap="300">
+                            <Text variant="bodySm" as="h3">Default date</Text>
+                            <Popover
+                                active={datePickerVisible}
+                                activator={
+                                    <TextField
+                                        role="combobox"
+                                        label="Select a date"
+                                        prefix={<Icon source={CalendarIcon} />}
+                                        value={selectedDate.toISOString().slice(0, 10)}
+                                        onFocus={handleDatePickerOpen}
+                                        onChange={() => { }} // Read-only for date picker
+                                        autoComplete="off"
+                                        readOnly
+                                    />
+                                }
+                                onClose={handleDatePickerClose}
+                                preferredAlignment="left"
+                                fullWidth
+                                preferInputActivator={false}
+                                preferredPosition="below"
+                            >
+                                <Card ref={datePickerRef}>
+                                    <DatePicker
+                                        month={month}
+                                        year={year}
+                                        selected={selectedDate}
+                                        onMonthChange={handleMonthChange}
+                                        onChange={handleDateSelection}
+                                    />
+                                </Card>
+                            </Popover>
+                        </BlockStack>
+                    )}
+
+                    {/* Left and Right labels for satisfaction questions */}
+                    {selectedQuestion.type === 'satisfaction' && (
+                        <BlockStack gap="300">
+                            <Text variant="bodySm" as="h3">Satisfaction scale labels</Text>
+                            <InlineStack gap="300" className="th-sf-satisfaction-labels">
+                                <div className="th-sf-satisfaction-label">
+                                    <TextField
+                                        label="Left label"
+                                        value={selectedQuestion.leftLabel || 'Not satisfied'}
+                                        onChange={(value) => updateQuestion(selectedQuestionId, { leftLabel: value })}
+                                        autoComplete="off"
+                                        placeholder="e.g., Not satisfied"
+                                    />
+                                </div>
+                                <div className="th-sf-satisfaction-label">
+                                    <TextField
+                                        label="Right label"
+                                        value={selectedQuestion.rightLabel || 'Very satisfied'}
+                                        onChange={(value) => updateQuestion(selectedQuestionId, { rightLabel: value })}
+                                        autoComplete="off"
+                                        placeholder="e.g., Very satisfied"
+                                    />
+                                </div>
+                            </InlineStack>
+                        </BlockStack>
+                    )}
+
+                    {/* Left and Right labels for star rating questions */}
+                    {selectedQuestion.type === 'rating' && (
+                        <BlockStack gap="300">
+                            <Text variant="bodySm" as="h3">Star rating labels</Text>
+                            <InlineStack gap="300" className="th-sf-satisfaction-labels">
+                                <div className="th-sf-satisfaction-label">
+                                    <TextField
+                                        label="Left label"
+                                        value={selectedQuestion.leftLabel || 'Hate it'}
+                                        onChange={(value) => updateQuestion(selectedQuestionId, { leftLabel: value })}
+                                        autoComplete="off"
+                                        placeholder="e.g., Hate it"
+                                    />
+                                </div>
+                                <div className="th-sf-satisfaction-label">
+                                    <TextField
+                                        label="Right label"
+                                        value={selectedQuestion.rightLabel || 'Love it'}
+                                        onChange={(value) => updateQuestion(selectedQuestionId, { rightLabel: value })}
+                                        autoComplete="off"
+                                        placeholder="e.g., Love it"
+                                    />
+                                </div>
+                            </InlineStack>
+                        </BlockStack>
+                    )}
 
                     {selectedQuestionId !== 'thankyou' && (
                         <BlockStack gap="300">
@@ -233,12 +388,7 @@ function QuestionSettings() {
                     {selectedQuestionId !== 'thankyou' && (
                         <BlockStack gap="300">
                             <Text variant="bodySm" as="h3">Image</Text>
-                            <div style={{
-                                border: '1px dashed #ddd',
-                                borderRadius: '4px',
-                                padding: '20px',
-                                textAlign: 'center'
-                            }}>
+                            <div className="th-sf-image-upload-area">
                                 <BlockStack gap="200" align="center">
                                     <Text variant="bodySm">Add Image</Text>
                                     <Text variant="bodySm" color="text-subdued">

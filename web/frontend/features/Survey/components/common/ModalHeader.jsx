@@ -235,7 +235,7 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                 </InlineStack>
 
                 {/* Center Section - Theme Selection and Preview Switch */}
-                <Box style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                <Box className="th-sf-modal-header-center">
                     <InlineStack gap="400" blockAlign="center">
                         {/* Branded Survey Page Popover */}
                         <Popover
@@ -317,15 +317,6 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                                 tone={isActive ? "success" : "attention"}
                             >
                                 <InlineStack gap="200" blockAlign="center">
-                                    {/* <div
-                                        style={{
-                                            width: '12px',
-                                            height: '12px',
-                                            backgroundColor: isActive ? '#007f5f' : '#d9d9d9',
-                                            borderRadius: '50%',
-                                            transition: 'background-color 0.2s ease'
-                                        }}
-                                    /> */}
                                     {isActive ? 'Active' : 'Inactive'}
                                 </InlineStack>
                             </Button>

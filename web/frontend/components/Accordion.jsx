@@ -49,13 +49,13 @@ export default function Accordion({ items, activeId, onChange }) {
                                 role="button"
                                 aria-expanded={isActive}
                                 tabIndex={0}
+                                className="th-sf-accordion-header"
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter" || e.key === " ") {
                                         e.preventDefault();
                                         onChange(id);
                                     }
                                 }}
-                                style={{ cursor: "pointer" }}
                             >
                                 <Icon
                                     source={isComplete ? StatusActiveIcon : AlertCircleIcon}
