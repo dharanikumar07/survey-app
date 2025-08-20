@@ -41,8 +41,63 @@ function ModalHeader({ title = "Survey #1" }) {
         surveyPagePopoverActive,
         setSurveyPagePopoverActive,
         selectedSurveyPage,
-        setSelectedSurveyPage
+        setSelectedSurveyPage,
+        questions,
+        channelItems,
+        discountEnabled,
+        discountSettings,
+        surveyTitle
     } = useSurveyState();
+
+    // Handle save functionality
+    const handleSave = () => {
+        // Build survey data using only what exists in store
+        const surveyData = {
+            name: surveyTitle,
+            isActive: isActive,
+            questions: questions
+                .filter(q => q.id !== 'thankyou')
+                .map((q, index) => ({
+                    type: q.type,
+                    heading: q.content,
+                    description: q.description || "",
+                    position: index,
+                    answers: q.answerOptions?.map(opt => ({
+                        content: opt.text,
+                        id: opt.id
+                    })) || [],
+                    id: q.id
+                })),
+            thankYou: {
+                type: "thank_you",
+                heading: questions.find(q => q.id === 'thankyou')?.content || "Thank You Card",
+                description: questions.find(q => q.id === 'thankyou')?.description || ""
+            },
+            channels: {
+                // Only include channels that exist in your store
+                ...(channelItems.find(c => c.id === 'branded') && {
+                    dedicatedPageSurvey: {
+                        type: "dedicatedPageSurvey",
+                        enabled: channelItems.find(c => c.id === 'branded')?.isEnabled || false
+                    }
+                })
+            },
+            discount: {
+                enabled: discountEnabled,
+                code: discountSettings.code || "",
+                displayOn: discountSettings.displayOn || "email",
+                limitOnePerEmail: discountSettings.limitPerEmail || false
+            },
+            channelTypes: channelItems
+                .filter(channel => channel.isEnabled)
+                .map(channel => channel.id),
+            totalResponses: 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        console.log('Survey Data from Store:', JSON.stringify(surveyData, null, 2));
+    };
 
     const themes = [
         { label: 'Default Theme', value: 'default' },
@@ -223,8 +278,16 @@ function ModalHeader({ title = "Survey #1" }) {
                     </InlineStack>
                 </Box>
 
-                {/* Right Section - Status */}
+                {/* Right Section - Status and Save Button */}
                 <InlineStack gap="200" blockAlign="center" wrap={false}>
+                    {/* Save Button */}
+                    <Button
+                        variant="primary"
+                        size="slim"
+                        onClick={handleSave}
+                    >
+                        Save
+                    </Button>
                     <Popover
                         active={statusPopoverActive}
                         activator={
