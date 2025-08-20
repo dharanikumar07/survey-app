@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('webhook_events', function (Blueprint $table) {
             $table->id()->primary();
             $table->uuid('uuid')->unique();
+
+            //store data
             $table->uuid('store_uuid');
             $table->foreign('store_uuid')->references('uuid')->on('stores')->onDelete('cascade');
 

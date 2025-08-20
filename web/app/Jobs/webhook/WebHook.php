@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\webhook;
 
 use App\Models\Store;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -51,7 +51,7 @@ class WebHook implements ShouldQueue
             $response = Registry::register(
                 '/api/webhooks',
                 $topic,
-                $this->store,
+                $this->store->getStoreUrl(),
                 $this->store->getAccessToken()
             );
 

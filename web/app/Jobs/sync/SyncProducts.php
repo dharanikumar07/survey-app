@@ -49,7 +49,10 @@ class SyncProducts implements ShouldQueue
                 $parentData = $shopifyProductHelper->mapParentProduct($node);
 
                 $parent = Products::updateOrCreate(
-                    ['platform_product_id' => $parentData['platform_product_id']],
+                    [
+                        'platform_product_id' => $parentData['platform_product_id'],
+                        'store_uuid'    => $this->store->uuid
+                    ],
                     $parentData
                 );
 
@@ -57,7 +60,10 @@ class SyncProducts implements ShouldQueue
                     $variantsData = $shopifyProductHelper->mapProductVariants($node['variants']['edges'], $parent);
                     foreach ($variantsData as $variantData) {
                         Products::updateOrCreate(
-                            ['platform_variation_id' => $variantData['platform_variation_id']],
+                            [
+                                'platform_variation_id' => $variantData['platform_variation_id'],
+                                'store_uuid'    => $this->store->uuid
+                            ],
                             $variantData
                         );
                     }
