@@ -10,6 +10,8 @@ use App\Models\Survey;
 use App\Services\SurveyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class SurveyController extends Controller
 {
@@ -47,10 +49,10 @@ class SurveyController extends Controller
 			return SurveyResource::collection($surveys);
 		} catch (\Exception $e) {
 			Log::error('Surveys list error: '.$e->getMessage());
-			return response()->json([
+			return Response::json([
 				'success' => false,
 				'error' => 'An error occurred while fetching surveys',
-			], 500);
+			], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -66,15 +68,17 @@ class SurveyController extends Controller
 
 			$survey = $this->surveyService->createSurvey($request->validated(), $store);
 
-			return (new SurveyResource($survey))
-				->response()
-				->setStatusCode(201);
+			$resource = new SurveyResource($survey);
+			return Response::json([
+				'item' => $resource,
+				'message' => 'Survey created successfully'
+			], HttpResponse::HTTP_CREATED);
 		} catch (\Exception $e) {
 			Log::error('Survey create error: '.$e->getMessage());
-			return response()->json([
+			return Response::json([
 				'success' => false,
 				'error' => 'An error occurred while creating the survey',
-			], 500);
+			], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -90,19 +94,19 @@ class SurveyController extends Controller
 
 			$survey = Survey::where('store_uuid', $store->uuid)->where('uuid', $uuid)->first();
 			if (! $survey) {
-				return response()->json([
+				return Response::json([
 					'success' => false,
 					'error' => 'Survey not found',
-				], 404);
+				], HttpResponse::HTTP_NOT_FOUND);
 			}
 
 			return new SurveyResource($survey);
 		} catch (\Exception $e) {
 			Log::error('Survey fetch error: '.$e->getMessage());
-			return response()->json([
+			return Response::json([
 				'success' => false,
 				'error' => 'An error occurred while fetching the survey',
-			], 500);
+			], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -118,21 +122,25 @@ class SurveyController extends Controller
 
 			$survey = Survey::where('store_uuid', $store->uuid)->where('uuid', $uuid)->first();
 			if (! $survey) {
-				return response()->json([
+				return Response::json([
 					'success' => false,
 					'error' => 'Survey not found',
-				], 404);
+				], HttpResponse::HTTP_NOT_FOUND);
 			}
 
 			$updated = $this->surveyService->updateSurvey($survey, $request->validated());
 
-			return new SurveyResource($updated);
+			$resource = new SurveyResource($updated);
+			return Response::json([
+				'item' => $resource,
+				'message' => 'Survey updated successfully'
+			], HttpResponse::HTTP_OK);
 		} catch (\Exception $e) {
 			Log::error('Survey update error: '.$e->getMessage());
-			return response()->json([
+			return Response::json([
 				'success' => false,
 				'error' => 'An error occurred while updating the survey',
-			], 500);
+			], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -148,21 +156,21 @@ class SurveyController extends Controller
 
 			$survey = Survey::where('store_uuid', $store->uuid)->where('uuid', $uuid)->first();
 			if (! $survey) {
-				return response()->json([
+				return Response::json([
 					'success' => false,
 					'error' => 'Survey not found',
-				], 404);
+				], HttpResponse::HTTP_NOT_FOUND);
 			}
 
 			$this->surveyService->deleteSurvey($survey);
 
-			return response()->json(null, 204);
+			return Response::json(['message' => 'Survey deleted successfully'], HttpResponse::HTTP_OK);
 		} catch (\Exception $e) {
 			Log::error('Survey delete error: '.$e->getMessage());
-			return response()->json([
+			return Response::json([
 				'success' => false,
 				'error' => 'An error occurred while deleting the survey',
-			], 500);
+			], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
 		}
 	}
 }
