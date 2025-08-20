@@ -18,16 +18,10 @@ return new class extends Migration
             $table->string('name');
             $table->enum('status', ['active', 'inactive', 'draft'])->default('draft');
             $table->enum('survey_type', ['post_purchase', 'site_widget', 'email', 'exit_intent', 'embedded']);
-            $table->json('questions')->nullable();
-            $table->json('channels')->nullable();
-            $table->json('thank_you')->nullable();
-            $table->json('discount')->nullable();
-            $table->json('targeting')->nullable();
-            $table->json('design')->nullable();
+            $table->json('survey_meta_data')->nullable();
             $table->unsignedInteger('total_responses')->default(0);
             $table->unsignedInteger('total_impressions')->default(0);
             $table->boolean('is_active')->default(false);
-            $table->json('extra')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

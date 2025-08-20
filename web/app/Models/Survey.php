@@ -16,26 +16,14 @@ class Survey extends Model
         'name',
         'status',
         'survey_type',
-        'questions',
-        'channels',
-        'thank_you',
-        'discount',
-        'targeting',
-        'design',
+        'survey_meta_data',
         'total_responses',
         'total_impressions',
-        'is_active',
-        'extra'
+        'is_active'
     ];
 
     protected $casts = [
-        'questions' => 'array',
-        'channels' => 'array',
-        'thank_you' => 'array',
-        'discount' => 'array',
-        'targeting' => 'array',
-        'design' => 'array',
-        'extra' => 'array',
+        'survey_meta_data' => 'array',
         'is_active' => 'boolean',
         'total_responses' => 'integer',
         'total_impressions' => 'integer'
