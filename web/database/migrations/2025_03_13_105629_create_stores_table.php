@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('store_url');
             $table->string('access_token');
             $table->enum('status', ['connected', 'disconnected', 'trial', 'suspended']);
+            $table->json('sync_status')->nullable();
             $table->json('shopify_data')->nullable();
             $table->json('extra')->nullable();
             $table->timestamps();

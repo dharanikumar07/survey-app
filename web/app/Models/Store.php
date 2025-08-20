@@ -11,6 +11,11 @@ class Store extends Model
 {
     use UuidTrait, SoftDeletes;
 
+    protected $casts = [
+        'sync_status' => 'json',
+        'shopify_data' => 'array',
+        'extra' => 'array'
+    ];
     protected $fillable = [
         'store_id',
         'name',
@@ -21,11 +26,15 @@ class Store extends Model
         'extra'
     ];
 
-    protected $casts = [
-        'shopify_data' => 'array',
-        'extra' => 'array'
-    ];
+    public function getAccessToken()
+    {
+        return $this->access_token;
+    }
 
+    public function getStoreUrl()
+    {
+        return $this->store_url;
+    }
     // Relationships
     public function surveys(): HasMany
     {

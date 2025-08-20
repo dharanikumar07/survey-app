@@ -36,21 +36,11 @@ class AuthController extends Controller
         $host = $request->query('host');
         $shop = Utils::sanitizeShopDomain($request->query('shop'));
 
-        $response = Registry::register('/api/webhooks', Topics::APP_UNINSTALLED, $shop, $session->getAccessToken());
-        if ($response->isSuccess()) {
-            Log::debug("Registered APP_UNINSTALLED webhook for shop $shop");
-        } else {
-            Log::error(
-                "Failed to register APP_UNINSTALLED webhook for shop $shop with response body: " .
-                print_r($response->getBody(), true)
-            );
-        }
-
         $redirectUrl = Utils::getEmbeddedAppUrl($host);
         if (Config::get('shopify.billing.required')) {
             [$hasPayment, $confirmationUrl] = EnsureBilling::check($session, Config::get('shopify.billing'));
 
-            if (!$hasPayment) {
+            if (! $hasPayment) {
                 $redirectUrl = $confirmationUrl;
             }
         }
@@ -58,5 +48,3 @@ class AuthController extends Controller
         return redirect($redirectUrl);
     }
 }
-
-

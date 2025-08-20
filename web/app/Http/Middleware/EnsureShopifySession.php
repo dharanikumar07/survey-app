@@ -17,9 +17,10 @@ use Shopify\Utils;
 class EnsureShopifySession
 {
     public const ACCESS_MODE_ONLINE = 'online';
+
     public const ACCESS_MODE_OFFLINE = 'offline';
 
-    public const TEST_GRAPHQL_QUERY = <<<QUERY
+    public const TEST_GRAPHQL_QUERY = <<<'QUERY'
     {
         shop {
             name
@@ -30,9 +31,6 @@ class EnsureShopifySession
     /**
      * Checks if there is currently an active Shopify session.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string  $accessMode
      * @return mixed
      */
     public function handle(Request $request, Closure $next, string $accessMode = self::ACCESS_MODE_OFFLINE)
@@ -62,11 +60,11 @@ class EnsureShopifySession
             if (Config::get('shopify.billing.required')) {
                 // The request to check billing status serves to validate that the access token is still valid.
                 try {
-                    list($hasPayment, $confirmationUrl) =
+                    [$hasPayment, $confirmationUrl] =
                         EnsureBilling::check($session, Config::get('shopify.billing'));
                     $proceed = true;
 
-                    if (!$hasPayment) {
+                    if (! $hasPayment) {
                         return TopLevelRedirection::redirect($request, $confirmationUrl);
                     }
                 } catch (ShopifyBillingException $e) {
@@ -82,12 +80,13 @@ class EnsureShopifySession
 
             if ($proceed) {
                 $request->attributes->set('shopifySession', $session);
+
                 return $next($request);
             }
         }
 
-        $bearerPresent = preg_match("/Bearer (.*)/", $request->header('Authorization', ''), $bearerMatches);
-        if (!$shop) {
+        $bearerPresent = preg_match('/Bearer (.*)/', $request->header('Authorization', ''), $bearerMatches);
+        if (! $shop) {
             if ($session) {
                 $shop = $session->getShop();
             } elseif (Context::$IS_EMBEDDED_APP) {
