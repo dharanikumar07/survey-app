@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
     Box,
     InlineStack,
@@ -25,8 +25,9 @@ import {
     CodeIcon
 } from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
+import { prepareSurveyForBackend } from '../../utils/surveyHelpers';
 
-function ModalHeader({ title = "Survey #1" }) {
+function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
     const {
         selectedView,
         setSelectedView,
@@ -96,7 +97,24 @@ function ModalHeader({ title = "Survey #1" }) {
             updatedAt: new Date().toISOString()
         };
 
-        console.log('Survey Data from Store:', JSON.stringify(surveyData, null, 2));
+        // Capture HTML and JavaScript content from the survey preview
+        let htmlContent = '';
+        let jsContent = '';
+        if (surveyPreviewRef && surveyPreviewRef.current) {
+            htmlContent = surveyPreviewRef.current.getBodyContent();
+            jsContent = surveyPreviewRef.current.getJavaScriptContent();
+        }
+
+        // Prepare complete survey data with HTML and JavaScript for backend storage
+        const completeSurveyData = prepareSurveyForBackend(surveyData, htmlContent, jsContent);
+
+        console.log('Complete Survey Data with HTML and JS:', completeSurveyData);
+        console.log('HTML Content for Storefront:', completeSurveyData.htmlContent);
+        console.log('JavaScript Content for Storefront:', completeSurveyData.jsContent);
+        console.log('Complete HTML Document with JS:', completeSurveyData.completeHTML);
+
+        // Here you would typically send the data to your backend
+        // Example: await saveSurveyToBackend(completeSurveyData);
     };
 
     const themes = [
@@ -217,7 +235,7 @@ function ModalHeader({ title = "Survey #1" }) {
                 </InlineStack>
 
                 {/* Center Section - Theme Selection and Preview Switch */}
-                <Box style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                <Box className="th-sf-modal-header-center">
                     <InlineStack gap="400" blockAlign="center">
                         {/* Branded Survey Page Popover */}
                         <Popover
@@ -299,15 +317,6 @@ function ModalHeader({ title = "Survey #1" }) {
                                 tone={isActive ? "success" : "attention"}
                             >
                                 <InlineStack gap="200" blockAlign="center">
-                                    {/* <div
-                                        style={{
-                                            width: '12px',
-                                            height: '12px',
-                                            backgroundColor: isActive ? '#007f5f' : '#d9d9d9',
-                                            borderRadius: '50%',
-                                            transition: 'background-color 0.2s ease'
-                                        }}
-                                    /> */}
                                     {isActive ? 'Active' : 'Inactive'}
                                 </InlineStack>
                             </Button>

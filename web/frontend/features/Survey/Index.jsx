@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
     Page,
     Card,
@@ -38,6 +38,9 @@ export default function Survey() {
     const [currentPage, setCurrentPage] = useState(1);
     const [modalTitle, setModalTitle] = useState("Create new survey");
     const [popoverActive, setPopoverActive] = useState({});
+
+    // Ref for accessing the SurveyPreview component
+    const surveyPreviewRef = useRef(null);
 
     const resourceName = {
         singular: "survey",
@@ -202,7 +205,13 @@ export default function Survey() {
                                 position={index}
                             >
                                 <IndexTable.Cell>
-                                    <Text variant="bodyMd" fontWeight="bold" as="a" onClick={() => handleEditSurvey(survey.id)} style={{ cursor: 'pointer', color: '#2c6ecb' }}>
+                                    <Text
+                                        variant="bodyMd"
+                                        fontWeight="bold"
+                                        as="a"
+                                        onClick={() => handleEditSurvey(survey.id)}
+                                        className="th-sf-survey-edit-link"
+                                    >
                                         {survey.name}
                                     </Text>
                                 </IndexTable.Cell>
@@ -277,16 +286,15 @@ export default function Survey() {
 
                     <Box paddingBlockStart="400" paddingBlockEnd="400">
                         <InlineStack align="space-between" blockAlign="center">
-                            <div style={{ marginLeft: '16px' }}>
-                                <Text variant="bodySm" as="span">Showing {filteredSurveys.length} of {filteredSurveys.length} surveys</Text>
+                            <div className="th-sf-survey-margin-left">
+                                <Text variant="bodySm" color="subdued">
+                                    {filteredSurveys.length} surveys
+                                </Text>
                             </div>
-                            <div style={{ marginRight: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Text variant="bodySm" as="span">Items per page:</Text>
-                                <ButtonGroup segmented>
-                                    <Button size="slim" pressed>10</Button>
-                                    <Button size="slim">25</Button>
-                                    <Button size="slim">50</Button>
-                                </ButtonGroup>
+                            <div className="th-sf-survey-margin-right">
+                                <Text variant="bodySm" color="subdued">
+                                    {filteredSurveys.reduce((total, survey) => total + (survey.responses || 0), 0)} total responses
+                                </Text>
                             </div>
                         </InlineStack>
                     </Box>
@@ -302,8 +310,8 @@ export default function Survey() {
                     <PolarisProvider>
                         <PortalsManager>
                             <div>
-                                <ModalHeader />
-                                <SurveyModalContent />
+                                <ModalHeader surveyPreviewRef={surveyPreviewRef} />
+                                <SurveyModalContent ref={surveyPreviewRef} />
                             </div>
                         </PortalsManager>
                     </PolarisProvider>

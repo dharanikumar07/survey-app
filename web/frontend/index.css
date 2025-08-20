@@ -1,1 +1,485 @@
 @import "tailwindcss";
+
+/* ==========================================================================
+   SURVEY LAYOUT COMPONENT
+   ========================================================================== */
+
+/* Ensure the survey layout takes full height and doesn't scroll */
+.th-sf-survey-layout {
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Ensure Grid component fills available height */
+.th-sf-survey-layout .Polaris-Grid {
+    height: 100%;
+}
+
+/* Ensure Grid.Cell components have proper height */
+.th-sf-survey-layout .Polaris-Grid__Cell {
+    height: 100%;
+}
+
+/* ==========================================================================
+   POLARIS SCROLLABLE COMPONENTS
+   ========================================================================== */
+
+/* Ensure Polaris Scrollable components have proper height and scrolling */
+.th-sf-survey-layout .Polaris-Scrollable {
+    height: 100%;
+}
+
+/* Custom scrollbar styling for Polaris Scrollable components */
+.th-sf-survey-layout .Polaris-Scrollable::-webkit-scrollbar {
+    width: 8px;
+}
+
+.th-sf-survey-layout .Polaris-Scrollable::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.th-sf-survey-layout .Polaris-Scrollable::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.th-sf-survey-layout .Polaris-Scrollable::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* ==========================================================================
+   SURVEY COMPONENTS CSS
+   ========================================================================== */
+
+/* Content Tab Component */
+.th-sf-question-row {
+    user-select: none;
+    cursor: pointer;
+    max-width: 100%;
+}
+
+.th-sf-question-row-draggable {
+    cursor: grab;
+}
+
+.th-sf-question-row-draggable:active {
+    cursor: grabbing;
+}
+
+.th-sf-question-content-wrapper {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.th-sf-question-popover-container {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ==========================================================================
+   QUESTION SETTINGS COMPONENT
+   ========================================================================== */
+
+/* Answer option styling */
+.th-sf-answer-option {
+    margin-bottom: 8px;
+}
+
+.th-sf-answer-option-content {
+    flex: 1;
+}
+
+.th-sf-answer-option-controls {
+    display: flex;
+    gap: 4px;
+}
+
+/* Question type display */
+.th-sf-question-type-display {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px 12px;
+    background: #f8f9fa;
+}
+
+/* Image upload area */
+.th-sf-image-upload-area {
+    border: 1px dashed #ddd;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Date picker styling */
+.th-sf-date-picker-field {
+    cursor: pointer;
+}
+
+/* Satisfaction scale labels */
+.th-sf-satisfaction-labels {
+    display: flex;
+    gap: 12px;
+}
+
+.th-sf-satisfaction-label {
+    flex: 1;
+}
+
+/* ==========================================================================
+   SCROLLABLE COMPONENTS
+   ========================================================================== */
+
+.th-sf-scrollable-question-settings {
+    height: calc(100vh - 120px);
+    max-height: calc(100vh - 120px);
+}
+
+.th-sf-scrollable-question-list {
+    height: 100%;
+    max-height: calc(100vh - 120px);
+    min-height: 400px;
+}
+
+/* ==========================================================================
+   MODAL HEADER COMPONENT
+   ========================================================================== */
+
+.th-sf-modal-header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+/* ==========================================================================
+   CUSTOM TOGGLE COMPONENT
+   ========================================================================== */
+
+.th-sf-custom-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.th-sf-custom-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.th-sf-custom-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.th-sf-custom-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.th-sf-custom-toggle input:checked+.th-sf-custom-toggle-slider {
+    background-color: #008060;
+}
+
+.th-sf-custom-toggle input:checked+.th-sf-custom-toggle-slider:before {
+    transform: translateX(20px);
+}
+
+/* ==========================================================================
+   ACCORDION COMPONENTS
+   ========================================================================== */
+
+.th-sf-accordion-header {
+    cursor: pointer;
+    flex: 1;
+}
+
+.th-sf-section-row-header {
+    cursor: pointer;
+    flex: 1;
+}
+
+/* ==========================================================================
+   DASHBOARD COMPONENTS
+   ========================================================================== */
+
+.th-sf-dashboard-section {
+    margin: 20px 0;
+}
+
+.th-sf-dashboard-center {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.th-sf-dashboard-margin-right {
+    margin-right: 10px;
+}
+
+.th-sf-dashboard-margin-top {
+    margin-top: 10px;
+}
+
+.th-sf-dashboard-margin-bottom {
+    margin-bottom: 10px;
+}
+
+.th-sf-dashboard-padding {
+    padding: 20px;
+    text-align: center;
+}
+
+.th-sf-dashboard-heading {
+    color: #008060;
+    margin-bottom: 20px;
+}
+
+.th-sf-dashboard-paragraph {
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.th-sf-dashboard-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.th-sf-dashboard-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    min-width: 250px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.th-sf-dashboard-card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.th-sf-dashboard-card-description {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.th-sf-dashboard-card-link {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #008060;
+    text-decoration: none;
+}
+
+.th-sf-dashboard-card-link:hover {
+    text-decoration: underline;
+}
+
+/* Error message styling */
+.th-sf-error-message {
+    color: red;
+    padding: 10px;
+    border: 1px solid red;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+/* Modal content styling */
+.th-sf-modal-content {
+    padding: 20px;
+    text-align: center;
+}
+
+.th-sf-modal-heading {
+    color: #008060;
+    margin-bottom: 20px;
+}
+
+.th-sf-modal-paragraph {
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.th-sf-modal-info-box {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f0f8ff;
+    border: 1px solid #0066cc;
+    border-radius: 4px;
+}
+
+.th-sf-modal-info-text {
+    margin: 0;
+    font-size: 14px;
+}
+
+.th-sf-modal-paragraph-top {
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+/* ==========================================================================
+   SURVEY INDEX COMPONENTS
+   ========================================================================== */
+
+.th-sf-survey-edit-link {
+    cursor: pointer;
+    color: #2c6ecb;
+}
+
+.th-sf-survey-edit-link:hover {
+    text-decoration: underline;
+}
+
+.th-sf-survey-margin-left {
+    margin-left: 16px;
+}
+
+.th-sf-survey-margin-right {
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ==========================================================================
+   EXIT IFRAME COMPONENTS
+   ========================================================================== */
+
+.th-sf-exit-iframe-margin-top {
+    margin-top: 100px;
+}
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+.th-sf-flex-1 {
+    flex: 1;
+}
+
+.th-sf-cursor-pointer {
+    cursor: pointer;
+}
+
+.th-sf-text-center {
+    text-align: center;
+}
+
+.th-sf-overflow-hidden {
+    overflow: hidden;
+}
+
+.th-sf-user-select-none {
+    user-select: none;
+}
+
+/* Responsive adjustments for QuestionList */
+@media (max-width: 768px) {
+    .th-sf-question-list-scrollable {
+        max-height: calc(100vh - 140px);
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .th-sf-dashboard-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .th-sf-dashboard-card {
+        min-width: 100%;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    .th-sf-dashboard-padding {
+        padding: 16px;
+    }
+
+    .th-sf-dashboard-card {
+        padding: 16px;
+    }
+}
+
+/* ==========================================================================
+   ANIMATIONS AND TRANSITIONS
+   ========================================================================== */
+
+.th-sf-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.th-sf-scale-hover {
+    transition: transform 0.2s ease;
+}
+
+.th-sf-scale-hover:hover {
+    transform: scale(1.02);
+}
+
+/* ==========================================================================
+   SCROLLBAR STYLING (GLOBAL)
+   ========================================================================== */
+
+/* Custom scrollbar for all components */
+.th-sf-custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+.th-sf-custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.th-sf-custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.th-sf-custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.th-sf-custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

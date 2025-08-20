@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, BlockStack, Text, InlineStack, Button, Divider, Modal, TextField } from '@shopify/polaris';
+import { Box, Text, BlockStack, InlineStack, Button, Divider, Modal, TextField, Scrollable } from '@shopify/polaris';
 import { EditIcon } from '@shopify/polaris-icons';
 import TabsContent from '../common/TabsContent';
 import { useSurveyState } from '../../hooks/useSurveyState';
@@ -22,19 +22,28 @@ function QuestionList() {
             borderInlineEndWidth="1"
             borderColor="border"
             padding="400"
-            minHeight="calc(100vh - 100px)"
-            overflow="auto"
+            height="100%"
+            overflow="hidden"
         >
-            <BlockStack gap="400">
-                {/* Header Section */}
-                <InlineStack align="space-between" blockAlign="center">
-                    <Text variant="headingLg" as="h2">{surveyTitle}</Text>
-                    <Button size="slim" variant="plain" icon={EditIcon} accessibilityLabel="Edit survey" onClick={() => setEditModalOpen(true)} />
-                </InlineStack>
-                <Divider />
-                {/* Tabs Section */}
-                <TabsContent />
-            </BlockStack>
+            <Scrollable
+                horizontal={false}
+                style={{
+                    height: 'calc(100vh - 120px)',
+                    maxHeight: 'calc(100vh - 120px)'
+                }}
+                focusable
+            >
+                <BlockStack gap="400" paddingBlockEnd="400" paddingInlineStart="200" paddingInlineEnd="200">
+                    {/* Header Section */}
+                    <InlineStack align="space-between" blockAlign="center">
+                        <Text variant="headingLg" as="h2">{surveyTitle}</Text>
+                        <Button size="slim" variant="plain" icon={EditIcon} accessibilityLabel="Edit survey" onClick={() => setEditModalOpen(true)} />
+                    </InlineStack>
+                    <Divider />
+                    {/* Tabs Section */}
+                    <TabsContent />
+                </BlockStack>
+            </Scrollable>
 
             {/* Edit Survey Modal (Polaris) */}
             <Modal
