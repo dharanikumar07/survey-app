@@ -51,7 +51,7 @@ class WebHook implements ShouldQueue
             $response = Registry::register(
                 '/api/webhooks',
                 $topic,
-                $this->store,
+                $this->store->getStoreUrl(),
                 $this->store->getAccessToken()
             );
 
