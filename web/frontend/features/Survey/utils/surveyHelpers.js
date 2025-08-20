@@ -52,12 +52,12 @@ export const getQuestionTypeDisplayName = (type) => {
 };
 
 /**
- * Generates complete HTML content for survey storage and storefront rendering
+ * Generates clean HTML content for survey storage and storefront rendering
  * @param {Object} surveyData - The survey data object
  * @param {string} htmlContent - The HTML content from the preview component
- * @returns {string} Complete HTML document
+ * @returns {string} Clean HTML content ready for backend storage
  */
-export const generateSurveyHTML = (surveyData, htmlContent, jsContent = '') => {
+export const generateCleanSurveyHTML = (surveyData, htmlContent) => {
     // Extract the main content from the preview (excluding outer wrapper)
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlContent;
@@ -66,12 +66,54 @@ export const generateSurveyHTML = (surveyData, htmlContent, jsContent = '') => {
     const mainContent = tempDiv.querySelector('[data-preview-content]');
     const surveyContent = mainContent ? mainContent.innerHTML : htmlContent;
     
-    // Create complete HTML document with body tag and JavaScript
+    // Clean the HTML content - remove any scripts, event handlers, and console logs
+    const cleanHTML = surveyContent
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
+        .replace(/on\w+\s*=/gi, '') // Remove event handlers
+        .replace(/console\.log\([^)]*\)/g, '') // Remove console logs
+        .replace(/onClick\s*=/gi, '') // Remove React onClick handlers
+        .replace(/onMouseOver\s*=/gi, '') // Remove mouse event handlers
+        .replace(/onMouseOut\s*=/gi, '') // Remove mouse event handlers
+        .replace(/onMouseDown\s*=/gi, '') // Remove mouse event handlers
+        .replace(/onMouseUp\s*=/gi, ''); // Remove mouse event handlers
+    
+    return cleanHTML;
+};
+
+/**
+ * Generates complete HTML document with meta and body tags (no JavaScript)
+ * @param {Object} surveyData - The survey data object
+ * @param {string} htmlContent - The HTML content from the preview component
+ * @returns {string} Complete HTML document ready for standalone use
+ */
+export const generateCompleteSurveyHTML = (surveyData, htmlContent) => {
+    // Extract the main content from the preview (excluding outer wrapper)
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    
+    // Get the content inside data-preview-content attribute
+    const mainContent = tempDiv.querySelector('[data-preview-content]');
+    const surveyContent = mainContent ? mainContent.innerHTML : htmlContent;
+    
+    // Clean the HTML content first
+    const cleanHTML = surveyContent
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/on\w+\s*=/gi, '')
+        .replace(/console\.log\([^)]*\)/g, '')
+        .replace(/onClick\s*=/gi, '')
+        .replace(/onMouseOver\s*=/gi, '')
+        .replace(/onMouseOut\s*=/gi, '')
+        .replace(/onMouseDown\s*=/gi, '')
+        .replace(/onMouseUp\s*=/gi, '');
+    
+    // Create complete HTML document with body tag
     const completeHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="${surveyData.name || 'Survey'} - Customer feedback form">
+    <meta name="robots" content="noindex, nofollow">
     <title>${surveyData.name || 'Survey'}</title>
     <style>
         /* Reset and base styles */
@@ -86,6 +128,8 @@ export const generateSurveyHTML = (surveyData, htmlContent, jsContent = '') => {
             line-height: 1.5;
             color: #202223;
             background: #f6f6f7;
+            margin: 0;
+            padding: 0;
         }
         
         /* Ensure all interactive elements are accessible */
@@ -96,14 +140,23 @@ export const generateSurveyHTML = (surveyData, htmlContent, jsContent = '') => {
             outline-offset: 2px;
         }
         
-        /* Add transition support for survey questions */
-        .th-sf-survey-question-area {
-            position: relative;
-            overflow: hidden;
+        /* Survey-specific styles */
+        .th-sf-survey-container {
+            padding: 32px;
+            background: #f6f6f7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
-        .th-sf-survey-question-content {
-            transition: transform 0.4s ease, opacity 0.4s ease;
+        .th-sf-survey-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 32px;
         }
         
         /* Responsive design */
@@ -116,17 +169,25 @@ export const generateSurveyHTML = (surveyData, htmlContent, jsContent = '') => {
                 max-width: 100%;
             }
         }
+        
+        /* Print styles */
+        @media print {
+            .th-sf-survey-container {
+                background: white;
+                padding: 0;
+            }
+            
+            .th-sf-survey-card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="th-sf-survey-container" style="padding: 32px; background: #f6f6f7; min-height: 100vh;">
-        ${surveyContent}
+    <div class="th-sf-survey-container">
+        ${cleanHTML}
     </div>
-    
-    <!-- Survey Transition JavaScript -->
-    <script>
-${jsContent}
-    </script>
 </body>
 </html>`;
     
@@ -169,12 +230,10 @@ export const sanitizeHTML = (htmlContent) => {
  * Prepares survey data for backend storage
  * @param {Object} surveyData - The survey data object
  * @param {string} htmlContent - The HTML content from the preview component
- * @param {string} jsContent - The JavaScript content for transitions
  * @returns {Object} Formatted data for backend
  */
-export const prepareSurveyForBackend = (surveyData, htmlContent, jsContent = '') => {
+export const prepareSurveyForBackend = (surveyData, htmlContent) => {
     const sanitizedHTML = sanitizeHTML(htmlContent);
-    const sanitizedJS = sanitizeJavaScript(jsContent);
     
     return {
         name: surveyData.name || 'Survey #1',
@@ -194,27 +253,11 @@ export const prepareSurveyForBackend = (surveyData, htmlContent, jsContent = '')
         },
         channelTypes: surveyData.channelTypes || ['thankyou'],
         htmlContent: sanitizedHTML,
-        jsContent: sanitizedJS,
-        completeHTML: generateSurveyHTML(surveyData, sanitizedHTML, sanitizedJS),
+        cleanHTML: generateCleanSurveyHTML(surveyData, sanitizedHTML),
+        completeHTML: generateCompleteSurveyHTML(surveyData, sanitizedHTML),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
 };
 
-/**
- * Sanitizes JavaScript content
- * @param {string} jsContent - Raw JavaScript content
- * @returns {string} Sanitized JavaScript content
- */
-export const sanitizeJavaScript = (jsContent) => {
-    // Basic JavaScript sanitization
-    // This is a simple implementation - consider using a proper sanitizer for production
-    
-    // Remove potentially harmful patterns
-    return jsContent
-        .replace(/eval\s*\(/g, '')
-        .replace(/Function\s*\(/g, '')
-        .replace(/new\s+Function/g, '')
-        .replace(/document\.write/g, '')
-        .replace(/innerHTML\s*=/g, 'innerText=');
-};
+
