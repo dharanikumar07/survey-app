@@ -19,6 +19,7 @@ Route::middleware('shopify.auth')->group(function () {
     // Boilerplate routes - Shop information and products
     Route::get('/shop/info', [\App\Http\Controllers\ShopController::class, 'getShopInfo']);
     Route::get('/products', [\App\Http\Controllers\ShopController::class, 'getProducts']);
+    Route::get('/get-survey', [\App\Http\Controllers\SurveyViewController::class, 'getSurveyWidget']);
 
     // Add your app-specific routes here
     // Route::get('/your-endpoint', [YourController::class, 'method']);

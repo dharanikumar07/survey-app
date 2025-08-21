@@ -14,16 +14,17 @@ class AuthRedirection
 {
     public static function redirect(Request $request, bool $isOnline = false): RedirectResponse
     {
-        $shop = Utils::sanitizeShopDomain($request->query("shop"));
+        $shop = Utils::sanitizeShopDomain($request->query('shop'));
 
-        if (Context::$IS_EMBEDDED_APP && $request->query("embedded", false) === "1") {
-//            $redirectUrl = self::serverSideRedirectUrl($shop, $isOnline);
+        if (Context::$IS_EMBEDDED_APP && $request->query('embedded', false) === '1') {
+            //            $redirectUrl = self::serverSideRedirectUrl($shop, $isOnline);
 
             $redirectUrl = self::clientSideRedirectUrl($shop, $request->query());
         } else {
-//            $redirectUrl = self::clientSideRedirectUrl($shop, $request->query());
+            //            $redirectUrl = self::clientSideRedirectUrl($shop, $request->query());
             $redirectUrl = self::serverSideRedirectUrl($shop, $isOnline);
         }
+
         return redirect($redirectUrl);
     }
 
@@ -42,7 +43,8 @@ class AuthRedirection
         $appHost = Context::$HOST_NAME;
         $redirectUri = urlencode("https://$appHost/api/auth?shop=$shop");
 
-        $queryString = http_build_query(array_merge($query, ["redirectUri" => $redirectUri]));
+        $queryString = http_build_query(array_merge($query, ['redirectUri' => $redirectUri]));
+
         return "/ExitIframe?$queryString";
     }
 }

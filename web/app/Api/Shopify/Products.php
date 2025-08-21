@@ -2,18 +2,18 @@
 
 namespace App\Api\Shopify;
 
-use App\Api\Shopify\Traits\ShopifyBase;
+use App\Api\Shopify\Traits\ShopifyHelper;
 
 class Products
 {
-    use ShopifyBase;
+    use ShopifyHelper;
 
     /**
      * Get products with pagination
      */
-    public function getProducts(int $first = 10, string $after = null): array
+    public function getProducts(int $first = 10, ?string $after = null): array
     {
-        $afterClause = $after ? "after: \"$after\"" : "";
+        $afterClause = $after ? "after: \"$after\"" : '';
 
         $query = <<<QUERY
         {
@@ -65,7 +65,7 @@ class Products
 
         $response = $this->post('graphql.json', ['query' => $query]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return [];
         }
 
@@ -83,7 +83,7 @@ class Products
      */
     public function getProductCount(): int
     {
-        $query = <<<QUERY
+        $query = <<<'QUERY'
         {
             productsCount {
                 count
@@ -93,7 +93,7 @@ class Products
 
         $response = $this->post('graphql.json', ['query' => $query]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return 0;
         }
 
@@ -147,12 +147,10 @@ class Products
 
         $response = $this->post('graphql.json', ['query' => $query]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return [];
         }
 
         return $response->json()['data']['nodes'] ?? [];
     }
 }
-
-

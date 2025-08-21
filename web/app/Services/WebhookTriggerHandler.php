@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Services;
+
+use App\Jobs\webhook\OrderListener;
+use App\Models\WebhookEvents;
+use Illuminate\Support\Facades\Log;
+use Shopify\Webhooks\Topics;
+
+class WebhookTriggerHandler
+{
+    protected $orderTopics = [
+        Topics::ORDERS_CREATE,
+        Topics::ORDERS_CANCELLED,
+        Topics::ORDERS_FULFILLED,
+        Topics::ORDERS_PAID,
+        Topics::ORDERS_UPDATED,
+        Topics::ORDERS_DELETE,
+    ];
+
+    protected $customerTopics = [
+        Topics::CUSTOMERS_CREATE,
+        Topics::CUSTOMERS_UPDATE,
+        Topics::CUSTOMERS_DELETE,
+    ];
+
+    protected $productTopics = [
+        Topics::PRODUCTS_CREATE,
+        Topics::PRODUCTS_UPDATE,
+        Topics::PRODUCTS_DELETE,
+    ];
+
+    protected $discountTopics = [
+        Topics::DISCOUNTS_DELETE
+    ];
+
+    protected $appUninstalled = [
+        Topics::APP_UNINSTALLED
+    ];
+
+    public function triggerWebhook(WebhookEvents $webhookEvent)
+    {
+        if (in_array($webhookEvent->topic, $this->orderTopics, true)) {
+            Log::info("Order Event [$webhookEvent->topic]", ['data' => $webhookEvent->webhook_data]);
+            OrderListener::dispatch($webhookEvent);
+        }
+
+//        } elseif (in_array($topic, $this->customerTopics, true)) {
+//            Log::info("Customer Event [$topic] from $shop", ['data' => $body]);
+//            SyncCustomers::dispatch($topic, $shop, $body);
+//        } elseif (in_array($topic, $this->productTopics, true)) {
+//            Log::info("Product Event [$topic] from $shop", ['data' => $body]);
+//            SyncProducts::dispatch($topic, $shop, $body);
+//        } else {
+//            Log::info("Unhandled Event [$topic] from $shop", ['data' => $body]);
+//        }
+    }
+}

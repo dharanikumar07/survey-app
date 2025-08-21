@@ -18,8 +18,6 @@ class SpaController extends Controller
             return file_get_contents($path);
         }
 
-        return redirect(Utils::getEmbeddedAppUrl($request->query('host', null)) . '/' . $request->path());
+        return redirect(Utils::getEmbeddedAppUrl($request->query('host', null)).'/'.$request->path());
     }
 }
-
-

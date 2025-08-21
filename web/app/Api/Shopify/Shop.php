@@ -2,18 +2,18 @@
 
 namespace App\Api\Shopify;
 
-use App\Api\Shopify\Traits\ShopifyBase;
+use App\Api\Shopify\Traits\ShopifyHelper;
 
 class Shop
 {
-    use ShopifyBase;
+    use ShopifyHelper;
 
     /**
      * Get shop details with product count
      */
     public function getShopDetailsWithProductCount(): array
     {
-        $query = <<<QUERY
+        $query = <<<'QUERY'
         {
             shop {
                 id
@@ -45,11 +45,11 @@ class Shop
 
         $response = $this->post('graphql.json', ['query' => $query]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return [
                 'success' => false,
                 'error' => 'Failed to fetch shop data',
-                'data' => []
+                'data' => [],
             ];
         }
 
@@ -60,8 +60,8 @@ class Shop
             'data' => [
                 'shop' => $data['shop'] ?? [],
                 'products_count' => $data['productsCount']['count'] ?? 0,
-                'timestamp' => now()->toISOString()
-            ]
+                'timestamp' => now()->toISOString(),
+            ],
         ];
     }
 
@@ -70,7 +70,7 @@ class Shop
      */
     public function getShopDetails(): array
     {
-        $query = <<<QUERY
+        $query = <<<'QUERY'
         {
             shop {
                 id
@@ -91,7 +91,7 @@ class Shop
 
         $response = $this->post('graphql.json', ['query' => $query]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return [];
         }
 

@@ -9,7 +9,7 @@ class ShopifyProductCreatorException extends Exception
 {
     public HttpResponse $response;
 
-    public function __construct(string $message, HttpResponse $response = null)
+    public function __construct(string $message, ?HttpResponse $response = null)
     {
         parent::__construct($message);
 
