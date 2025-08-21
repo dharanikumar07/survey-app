@@ -25,7 +25,10 @@ import {
     CodeIcon
 } from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
-import { prepareSurveyForBackend, formatSurveyForAPI } from '../../utils/surveyHelpers';
+import { prepareSurveyForBackend, formatSurveyForAPI, validateSurveyForAPI } from '../../utils/surveyHelpers';
+import { useSurveyApi } from '../../action/use-survey-api';
+import { useToast } from '../../../../components/helper/toast-helper';
+import { useMutation } from '@tanstack/react-query';
 
 function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
     const {
@@ -49,6 +52,19 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
         discountSettings,
         surveyTitle
     } = useSurveyState();
+
+    const { saveSurvey } = useSurveyApi();
+    const { showToast } = useToast();
+    const { mutate: saveSurveyMutation } = useMutation({
+        mutationFn: saveSurvey,
+        onSuccess: () => {
+            showToast({ message: "Survey saved successfully", type: "success" });
+        },
+        onError: () => {
+            showToast({ message: "Failed to save survey", type: "error" });
+        }
+    });
+
 
     // Handle save functionality
     const handleSave = () => {
@@ -114,16 +130,30 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
         // Prepare complete survey data with HTML for backend storage
         const completeSurveyData = prepareSurveyForBackend(surveyData, htmlContent);
 
-        console.log('API Formatted Data:', apiFormattedData);
-        console.log('Complete Survey Data with HTML:', completeSurveyData);
-        console.log('HTML Content for Storefront:', completeSurveyData.htmlContent);
-        console.log('Clean HTML Content:', completeSurveyData.cleanHTML);
-        console.log('Complete HTML Document:', completeSurveyData.completeHTML);
-        console.log('Additional Clean HTML:', cleanHTML);
-        console.log('Additional Complete HTML:', completeHTML);
+        console.log('API Formatted Data (New Structure):', apiFormattedData);
+        console.log('Complete Survey Data with HTML (New Structure):', completeSurveyData);
+        console.log('Survey Type:', completeSurveyData.survey_type);
+        console.log('Status:', completeSurveyData.status);
+        console.log('Is Active:', completeSurveyData.is_active);
+        console.log('Survey Meta Data:', completeSurveyData.survey_meta_data);
+        console.log('HTML Content for Storefront:', completeSurveyData.survey_meta_data?.htmlContent);
+        console.log('Clean HTML Content:', completeSurveyData.survey_meta_data?.cleanHTML);
+        console.log('Complete HTML Document:', completeSurveyData.survey_meta_data?.completeHTML);
+
+        // Validate the data structure before sending to API
+        const validation = validateSurveyForAPI(completeSurveyData);
+        if (!validation.isValid) {
+            console.error('Survey data validation failed:', validation.errors);
+            showToast({
+                message: `Validation failed: ${validation.errors.join(', ')}`,
+                type: "error"
+            });
+            return;
+        }
 
         // Here you would typically send the data to your backend
         // Example: await saveSurveyToBackend(completeSurveyData);
+        saveSurveyMutation(completeSurveyData);
     };
 
     const themes = [

@@ -27,16 +27,19 @@ export const validateQuestion = (question) => {
 // Helper function to format survey data for API
 export const formatSurveyForAPI = (surveyData) => {
     return {
-        title: surveyData.title,
-        questions: surveyData.questions.map(q => ({
-            content: q.content,
-            type: q.type,
-            description: q.description,
-            questionType: q.questionType,
-            answerOptions: q.answerOptions || []
-        })),
-        channels: surveyData.channels || [],
-        discount: surveyData.discount || null
+        name: surveyData.name || surveyData.title || 'Survey #1',
+        survey_type: mapChannelTypesToSurveyType(surveyData.channelTypes || ['thankyou']),
+        status: mapIsActiveToStatus(surveyData.isActive),
+        is_active: surveyData.isActive !== undefined ? surveyData.isActive : true,
+        survey_meta_data: {
+            questions: surveyData.questions?.map(q => ({
+                id: q.id,
+                type: q.type,
+                text: q.content || q.heading || q.text || ''
+            })) || [],
+            channels: surveyData.channels || [],
+            discount: surveyData.discount || null
+        }
     };
 };
 
@@ -237,7 +240,8 @@ export const sanitizeHTML = (htmlContent) => {
 export const prepareSurveyForBackend = (surveyData, htmlContent) => {
     const sanitizedHTML = sanitizeHTML(htmlContent);
     
-    return {
+    // Prepare the existing complete survey data structure
+    const existingCompleteData = {
         name: surveyData.name || 'Survey #1',
         isActive: surveyData.isActive !== undefined ? surveyData.isActive : true,
         questions: surveyData.questions || [],
@@ -260,6 +264,73 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
+
+    // Return the new API structure
+    return {
+        name: surveyData.name || 'Survey #1',
+        survey_type: mapChannelTypesToSurveyType(surveyData.channelTypes || ['thankyou']),
+        status: mapIsActiveToStatus(surveyData.isActive),
+        is_active: surveyData.isActive !== undefined ? surveyData.isActive : true,
+        survey_meta_data: existingCompleteData
+    };
+};
+
+/**
+ * Validates the survey data structure for API submission
+ * @param {Object} surveyData - The survey data to validate
+ * @returns {Object} Validation result with isValid boolean and errors array
+ */
+export const validateSurveyForAPI = (surveyData) => {
+    const errors = [];
+    
+    if (!surveyData.name || typeof surveyData.name !== 'string') {
+        errors.push('Survey name is required and must be a string');
+    }
+    
+    if (!surveyData.survey_type || !['post_purchase', 'site_widget', 'email', 'exit_intent', 'embedded'].includes(surveyData.survey_type)) {
+        errors.push('Survey type must be one of: post_purchase, site_widget, email, exit_intent, embedded');
+    }
+    
+    if (!surveyData.status || !['active', 'inactive', 'draft'].includes(surveyData.status)) {
+        errors.push('Status must be one of: active, inactive, draft');
+    }
+    
+    if (typeof surveyData.is_active !== 'boolean') {
+        errors.push('is_active must be a boolean value');
+    }
+    
+    if (!surveyData.survey_meta_data || typeof surveyData.survey_meta_data !== 'object') {
+        errors.push('survey_meta_data is required and must be an object');
+    }
+    
+    return {
+        isValid: errors.length === 0,
+        errors
+    };
+};
+
+/**
+ * Maps channel types to survey types for API
+ * @param {Array} channelTypes - Array of channel type strings
+ * @returns {string} Survey type string
+ */
+export const mapChannelTypesToSurveyType = (channelTypes) => {
+    if (!Array.isArray(channelTypes)) return 'post_purchase';
+    
+    if (channelTypes.includes('email')) return 'email';
+    if (channelTypes.includes('onsite')) return 'site_widget';
+    if (channelTypes.includes('exit')) return 'exit_intent';
+    if (channelTypes.includes('embed')) return 'embedded';
+    return 'post_purchase'; // default
+};
+
+/**
+ * Maps isActive boolean to status string for API
+ * @param {boolean} isActive - Whether the survey is active
+ * @returns {string} Status string
+ */
+export const mapIsActiveToStatus = (isActive) => {
+    return isActive ? 'active' : 'inactive';
 };
 
 
