@@ -1,6 +1,7 @@
 import React, { useRef, forwardRef, useImperativeHandle, useEffect, useState } from 'react';
 import { Box, Text } from '@shopify/polaris';
 import { useSurveyState } from '../../hooks/useSurveyState';
+import { generateCleanSurveyHTML, generateCompleteSurveyHTML } from '../../utils/surveyHelpers';
 
 /**
  * SurveyPreview Component
@@ -22,9 +23,9 @@ import { useSurveyState } from '../../hooks/useSurveyState';
  * // The JavaScript content provides slide transitions between questions.
  */
 const SurveyPreview = forwardRef((props, ref) => {
-    const { questions, selectedQuestionId, selectedView } = useSurveyState();
+    const { questions, selectedQuestionId, selectedView, currentQuestionIndex, setCurrentQuestionIndex } = useSurveyState();
     const previewRef = useRef(null);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const jsContentRef = useRef('');
     const [answers, setAnswers] = useState({});
 
     // Get survey card width based on view mode
@@ -84,14 +85,34 @@ const SurveyPreview = forwardRef((props, ref) => {
             if (previewRef.current) {
                 // Get only the content inside the main preview area (excluding the outer wrapper)
                 const mainContent = previewRef.current.querySelector('[data-preview-content]');
-                return mainContent ? mainContent.outerHTML : '';
+                const htmlContent = mainContent ? mainContent.outerHTML : '';
+                // Use helper for clean HTML
+                return generateCleanSurveyHTML({ name: 'Survey' }, htmlContent);
+            }
+            return '';
+        },
+        getCompleteHTML: () => {
+            if (previewRef.current) {
+                const htmlContent = previewRef.current.outerHTML;
+                // Use helper for complete HTML document
+                return generateCompleteSurveyHTML({ name: 'Survey' }, htmlContent);
+            }
+            return '';
+        },
+        getCleanHTML: () => {
+            if (previewRef.current) {
+                const mainContent = previewRef.current.querySelector('[data-preview-content]');
+                const htmlContent = mainContent ? mainContent.outerHTML : '';
+                // Use helper for clean HTML
+                return generateCleanSurveyHTML({ name: 'Survey' }, htmlContent);
             }
             return '';
         }
     }));
 
     // Get the current question to display (for preview mode)
-    const currentQuestion = questions.find(q => q.id === selectedQuestionId) || questions[currentQuestionIndex];
+    // FIXED: Always use currentQuestionIndex for navigation, not selectedQuestionId
+    const currentQuestion = questions[currentQuestionIndex];
 
     // If no question is found, show a message
     if (!currentQuestion) {
@@ -137,8 +158,9 @@ const SurveyPreview = forwardRef((props, ref) => {
     const handleNext = () => {
         console.log('Next clicked. Current:', currentQuestionIndex, 'Total:', questions.length);
         if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(prev => prev + 1);
-            console.log('Moving to next question:', currentQuestionIndex + 1);
+            const nextIndex = currentQuestionIndex + 1;
+            setCurrentQuestionIndex(nextIndex);
+            // console.log('Moving to next question:', nextIndex, 'Question type:', questions[nextIndex]?.type, 'Content:', questions[nextIndex]?.content);
         } else if (currentQuestionIndex === questions.length - 1) {
             // Show thank you card
             setCurrentQuestionIndex(questions.length);
@@ -158,8 +180,9 @@ const SurveyPreview = forwardRef((props, ref) => {
     const handlePrevious = () => {
         console.log('Previous clicked. Current:', currentQuestionIndex);
         if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(prev => prev - 1);
-            console.log('Moving to previous question:', currentQuestionIndex - 1);
+            const prevIndex = currentQuestionIndex - 1;
+            setCurrentQuestionIndex(prevIndex);
+            console.log('Moving to previous question:', prevIndex, 'Question type:', questions[prevIndex]?.type, 'Content:', questions[prevIndex]?.content);
         }
     };
 
@@ -986,7 +1009,7 @@ const SurveyPreview = forwardRef((props, ref) => {
                             {/* Enhanced transition with slide effect */}
                             <div
                                 className="th-sf-survey-question-content"
-                                key={`question-${currentQuestionIndex}`}
+                                key={`question-${currentQuestionIndex}-${currentQuestion?.id}-${currentQuestion?.type}`}
                                 style={{
                                     opacity: 1,
                                     transform: 'translateX(0)',

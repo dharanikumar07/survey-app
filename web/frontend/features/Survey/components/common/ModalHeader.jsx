@@ -25,7 +25,7 @@ import {
     CodeIcon
 } from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
-import { prepareSurveyForBackend } from '../../utils/surveyHelpers';
+import { prepareSurveyForBackend, formatSurveyForAPI } from '../../utils/surveyHelpers';
 
 function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
     const {
@@ -97,19 +97,30 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
             updatedAt: new Date().toISOString()
         };
 
-        // Capture HTML content from the survey preview
+        // Capture HTML content from the survey preview using enhanced methods
         let htmlContent = '';
+        let cleanHTML = '';
+        let completeHTML = '';
+
         if (surveyPreviewRef && surveyPreviewRef.current) {
             htmlContent = surveyPreviewRef.current.getBodyContent();
+            cleanHTML = surveyPreviewRef.current.getCleanHTML();
+            completeHTML = surveyPreviewRef.current.getCompleteHTML();
         }
+
+        // Use helper for API formatting
+        const apiFormattedData = formatSurveyForAPI(surveyData);
 
         // Prepare complete survey data with HTML for backend storage
         const completeSurveyData = prepareSurveyForBackend(surveyData, htmlContent);
 
+        console.log('API Formatted Data:', apiFormattedData);
         console.log('Complete Survey Data with HTML:', completeSurveyData);
         console.log('HTML Content for Storefront:', completeSurveyData.htmlContent);
         console.log('Clean HTML Content:', completeSurveyData.cleanHTML);
         console.log('Complete HTML Document:', completeSurveyData.completeHTML);
+        console.log('Additional Clean HTML:', cleanHTML);
+        console.log('Additional Complete HTML:', completeHTML);
 
         // Here you would typically send the data to your backend
         // Example: await saveSurveyToBackend(completeSurveyData);

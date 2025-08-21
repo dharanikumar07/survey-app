@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { Box, BlockStack, Text, InlineStack, Icon, Button, Popover, ActionList } from '@shopify/polaris';
 import {
     DragHandleIcon,
@@ -13,6 +14,7 @@ import {
     ListNumberedIcon
 } from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
+import { validateQuestion, getQuestionTypeDisplayName } from '../../utils/surveyHelpers';
 
 function getTypeIcon(type) {
     switch (type) {
@@ -37,7 +39,8 @@ export function ContentTab() {
         addQuestion,
         reorderQuestions,
         selectedQuestionId,
-        setSelectedQuestionId
+        setSelectedQuestionId,
+        currentQuestionIndex
     } = useSurveyState();
 
     const [addPopoverActive, setAddPopoverActive] = useState(false);
@@ -145,93 +148,104 @@ export function ContentTab() {
             switch (type) {
                 case 'single-choice':
                     return [
-                        { id: `${Date.now()}_1`, text: 'Word of mouth' },
-                        { id: `${Date.now()}_2`, text: 'Social media' },
-                        { id: `${Date.now()}_3`, text: 'Search engine' },
-                        { id: `${Date.now()}_4`, text: 'Advertisement' },
-                        { id: `${Date.now()}_5`, text: 'Other' }
+                        { id: `${uuidv4()}_1`, text: 'Word of mouth' },
+                        { id: `${uuidv4()}_2`, text: 'Social media' },
+                        { id: `${uuidv4()}_3`, text: 'Search engine' },
+                        { id: `${uuidv4()}_4`, text: 'Advertisement' },
+                        { id: `${uuidv4()}_5`, text: 'Other' }
                     ];
                 case 'multiple-choice':
                     return [
-                        { id: `${Date.now()}_1`, text: 'Product A' },
-                        { id: `${Date.now()}_2`, text: 'Product B' },
-                        { id: `${Date.now()}_3`, text: 'Product C' },
-                        { id: `${Date.now()}_4`, text: 'Service X' },
-                        { id: `${Date.now()}_5`, text: 'Service Y' }
+                        { id: `${uuidv4()}_1`, text: 'Product A' },
+                        { id: `${uuidv4()}_2`, text: 'Product B' },
+                        { id: `${uuidv4()}_3`, text: 'Product C' },
+                        { id: `${uuidv4()}_4`, text: 'Service X' },
+                        { id: `${uuidv4()}_5`, text: 'Service Y' }
                     ];
                 case 'number-scale':
                     return [
-                        { id: `${Date.now()}_1`, text: '1 - Poor' },
-                        { id: `${Date.now()}_2`, text: '2 - Fair' },
-                        { id: `${Date.now()}_3`, text: '3 - Good' },
-                        { id: `${Date.now()}_4`, text: '4 - Very Good' },
-                        { id: `${Date.now()}_5`, text: '5 - Excellent' }
+                        { id: `${uuidv4()}_1`, text: '1 - Poor' },
+                        { id: `${uuidv4()}_2`, text: '2 - Fair' },
+                        { id: `${uuidv4()}_3`, text: '3 - Good' },
+                        { id: `${uuidv4()}_4`, text: '4 - Very Good' },
+                        { id: `${uuidv4()}_5`, text: '5 - Excellent' }
                     ];
                 case 'rating':
                     return [
-                        { id: `${Date.now()}_1`, text: '1 - Not likely' },
-                        { id: `${Date.now()}_2`, text: '2 - Somewhat likely' },
-                        { id: `${Date.now()}_3`, text: '3 - Likely' },
-                        { id: `${Date.now()}_4`, text: '4 - Very likely' },
-                        { id: `${Date.now()}_5`, text: '5 - Extremely likely' }
+                        { id: `${uuidv4()}_1`, text: '1 - Not likely' },
+                        { id: `${uuidv4()}_2`, text: '2 - Somewhat likely' },
+                        { id: `${uuidv4()}_3`, text: '3 - Likely' },
+                        { id: `${uuidv4()}_4`, text: '4 - Very likely' },
+                        { id: `${uuidv4()}_5`, text: '5 - Extremely likely' }
                     ];
                 case 'satisfaction':
                     return [
-                        { id: `${Date.now()}_1`, text: 'Very Dissatisfied' },
-                        { id: `${Date.now()}_2`, text: 'Dissatisfied' },
-                        { id: `${Date.now()}_3`, text: 'Neutral' },
-                        { id: `${Date.now()}_4`, text: 'Satisfied' },
-                        { id: `${Date.now()}_5`, text: 'Very Satisfied' }
+                        { id: `${uuidv4()}_1`, text: 'Very Dissatisfied' },
+                        { id: `${uuidv4()}_2`, text: 'Dissatisfied' },
+                        { id: `${uuidv4()}_3`, text: 'Neutral' },
+                        { id: `${uuidv4()}_4`, text: 'Satisfied' },
+                        { id: `${uuidv4()}_5`, text: 'Very Satisfied' }
                     ];
                 case 'matrix':
                     return [
-                        { id: `${Date.now()}_1`, text: 'Product Quality' },
-                        { id: `${Date.now()}_2`, text: 'Customer Service' },
-                        { id: `${Date.now()}_3`, text: 'Value for Money' },
-                        { id: `${Date.now()}_4`, text: 'Ease of Use' },
-                        { id: `${Date.now()}_5`, text: 'Overall Experience' }
+                        { id: `${uuidv4()}_1`, text: 'Product Quality' },
+                        { id: `${uuidv4()}_2`, text: 'Customer Service' },
+                        { id: `${uuidv4()}_3`, text: 'Value for Money' },
+                        { id: `${uuidv4()}_4`, text: 'Ease of Use' },
+                        { id: `${uuidv4()}_5`, text: 'Overall Experience' }
                     ];
                 case 'ranking':
                     return [
-                        { id: `${Date.now()}_1`, text: 'Price' },
-                        { id: `${Date.now()}_2`, text: 'Quality' },
-                        { id: `${Date.now()}_3`, text: 'Customer Service' },
-                        { id: `${Date.now()}_4`, text: 'Brand Reputation' },
-                        { id: `${Date.now()}_5`, text: 'Innovation' }
+                        { id: `${uuidv4()}_1`, text: 'Price' },
+                        { id: `${uuidv4()}_2`, text: 'Quality' },
+                        { id: `${uuidv4()}_3`, text: 'Customer Service' },
+                        { id: `${uuidv4()}_4`, text: 'Brand Reputation' },
+                        { id: `${uuidv4()}_5`, text: 'Innovation' }
                     ];
                 case 'demographic':
                     return [
-                        { id: `${Date.now()}_1`, text: '18-24 years' },
-                        { id: `${Date.now()}_2`, text: '25-34 years' },
-                        { id: `${Date.now()}_3`, text: '35-44 years' },
-                        { id: `${Date.now()}_4`, text: '45-54 years' },
-                        { id: `${Date.now()}_5`, text: '55+ years' }
+                        { id: `${uuidv4()}_1`, text: '18-24 years' },
+                        { id: `${uuidv4()}_2`, text: '25-34 years' },
+                        { id: `${uuidv4()}_3`, text: '35-44 years' },
+                        { id: `${uuidv4()}_4`, text: '45-54 years' },
+                        { id: `${uuidv4()}_5`, text: '55+ years' }
                     ];
                 case 'text':
                 case 'date':
                     return []; // No answer options for text/date questions
                 default:
                     return [
-                        { id: `${Date.now()}_1`, text: 'Option 1' },
-                        { id: `${Date.now()}_2`, text: 'Option 2' }
+                        { id: `${uuidv4()}_1`, text: 'Option 1' },
+                        { id: `${uuidv4()}_2`, text: 'Option 2' }
                     ];
             }
         };
 
-        const nextId = `${Date.now()}`;
+        const nextId = uuidv4();
         const newItem = {
             id: nextId,
             content: getEnhancedTemplate(type),
             type: type === 'short' ? 'text' : type,
             description: getDefaultDescription(type),
-            questionType: questionType[type] || 'Custom',
+            questionType: getQuestionTypeDisplayName(type) || questionType[type] || 'Custom',
             isDraggable: true,
             answerOptions: getDefaultOptions(type)
         };
 
-        addQuestion(newItem);
-        setAddPopoverActive(false);
-        setSelectedQuestionId(nextId);
+        // Add validation using surveyHelpers
+        const validationErrors = validateQuestion(newItem);
+        if (validationErrors.length === 0) {
+            addQuestion(newItem);
+            setAddPopoverActive(false);
+            setSelectedQuestionId(nextId);
+        } else {
+            console.error('Question validation failed:', validationErrors);
+            // TODO: Show validation errors to user via toast or alert
+            // For now, we'll still add the question but log the errors
+            addQuestion(newItem);
+            setAddPopoverActive(false);
+            setSelectedQuestionId(nextId);
+        }
     };
 
     // Get default description based on question type
@@ -330,19 +344,38 @@ export function ContentTab() {
             <Box
                 key={item.id}
                 padding="200"
-                background={selectedQuestionId === item.id ? "bg-fill" : "bg-fill-secondary"}
+                background={(selectedQuestionId === item.id ||
+                    (currentQuestionIndex !== undefined &&
+                        questions[currentQuestionIndex]?.id === item.id)) ? "bg-fill" : "bg-fill-secondary"}
                 borderRadius="200"
                 shadow="xs"
-                borderWidth={selectedQuestionId === item.id ? "025" : "0"}
-                borderColor={selectedQuestionId === item.id ? "border" : "transparent"}
+                borderWidth={(selectedQuestionId === item.id ||
+                    (currentQuestionIndex !== undefined &&
+                        questions[currentQuestionIndex]?.id === item.id)) ? "025" : "0"}
+                borderColor={(selectedQuestionId === item.id ||
+                    (currentQuestionIndex !== undefined &&
+                        questions[currentQuestionIndex]?.id === item.id)) ? "border" : "transparent"}
+                style={{
+                    backgroundColor: (selectedQuestionId === item.id ||
+                        (currentQuestionIndex !== undefined &&
+                            questions[currentQuestionIndex]?.id === item.id)) ? '#f6f6f7' : undefined,
+                    transition: 'all 0.2s ease'
+                }}
             >
                 <div
-                    className="th-sf-question-row"
+                    className={`th-sf-question-row ${(currentQuestionIndex !== undefined &&
+                        questions[currentQuestionIndex]?.id === item.id) ? 'active-slide' : ''}`}
                     draggable={isDraggable}
                     onDragStart={isDraggable ? handleDragStart(item.id) : undefined}
                     onDragOver={isDraggable ? handleDragOver : undefined}
                     onDrop={isDraggable ? handleDrop(item.id) : undefined}
                     onClick={() => handleSelectItem(item.id)}
+                    style={{
+                        cursor: 'pointer',
+                        borderRadius: '6px',
+                        padding: '4px',
+                        transition: 'all 0.2s ease'
+                    }}
                 >
                     <InlineStack
                         gap="150"
@@ -355,8 +388,17 @@ export function ContentTab() {
                             <Text
                                 as="span"
                                 variant="bodySm"
-                                fontWeight={selectedQuestionId === item.id ? "semibold" : "regular"}
-                                color={selectedQuestionId === item.id ? "base" : "subdued"}
+                                fontWeight={(selectedQuestionId === item.id ||
+                                    (currentQuestionIndex !== undefined &&
+                                        questions[currentQuestionIndex]?.id === item.id)) ? "semibold" : "regular"}
+                                color={(selectedQuestionId === item.id ||
+                                    (currentQuestionIndex !== undefined &&
+                                        questions[currentQuestionIndex]?.id === item.id)) ? "base" : "subdued"}
+                                style={{
+                                    color: (selectedQuestionId === item.id ||
+                                        (currentQuestionIndex !== undefined &&
+                                            questions[currentQuestionIndex]?.id === item.id)) ? '#202223' : undefined
+                                }}
                             >
                                 {item.content}
                             </Text>
@@ -376,6 +418,49 @@ export function ContentTab() {
                     ))}
                 </BlockStack>
             </Box>
+
+            <style>
+                {`
+                    .th-sf-question-row:hover {
+                        background-color: #f8f9fa;
+                        transform: translateY(-1px);
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    }
+                    
+                    .th-sf-question-row:active {
+                        transform: translateY(0);
+                        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+                    }
+                    
+                    /* Enhanced highlighting for active slide */
+                    .th-sf-question-row.active-slide {
+                        background-color: #e1f5fe !important;
+                        border-left: 4px solid #2196f3 !important;
+                        animation: slideHighlight 0.5s ease-in-out;
+                    }
+                    
+                    @keyframes slideHighlight {
+                        0% { 
+                            background-color: #f6f6f7;
+                            border-left-width: 0px;
+                        }
+                        50% { 
+                            background-color: #e3f2fd;
+                            border-left-width: 6px;
+                        }
+                        100% { 
+                            background-color: #e1f5fe;
+                            border-left-width: 4px;
+                        }
+                    }
+                    
+                    /* Smooth transitions for all highlighting changes */
+                    .th-sf-question-row,
+                    .th-sf-question-row * {
+                        transition: all 0.3s ease;
+                    }
+                `}
+            </style>
         </BlockStack>
     );
 }

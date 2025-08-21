@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { v4 as uuidv4 } from 'uuid';
 
 const useStore = create((set, get) => ({
     // TabsContent state
@@ -60,6 +61,10 @@ const useStore = create((set, get) => ({
     // SurveyModalContent state
     selectedQuestionId: '1',
     setSelectedQuestionId: (id) => set({ selectedQuestionId: id }),
+    
+    // Survey preview state
+    currentQuestionIndex: 0,
+    setCurrentQuestionIndex: (index) => set({ currentQuestionIndex: index }),
     
     // ModalHeader state
     selectedView: 'desktop',
@@ -243,7 +248,7 @@ const useStore = create((set, get) => ({
         
         const question = state.questions[questionIndex];
         const newOption = {
-            id: `opt${Date.now()}`,
+            id: uuidv4(),
             text: optionText || 'New option'
         };
         

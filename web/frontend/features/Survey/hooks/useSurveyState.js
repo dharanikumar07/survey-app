@@ -57,6 +57,10 @@ export const useSurveyState = () => {
         deleteAnswerOption,
         updateAnswerOption,
         reorderAnswerOptions,
+        
+        // Survey preview state
+        currentQuestionIndex,
+        setCurrentQuestionIndex,
     } = useStore();
 
     return {
@@ -115,5 +119,9 @@ export const useSurveyState = () => {
         deleteAnswerOption,
         updateAnswerOption,
         reorderAnswerOptions,
+        
+        // Survey preview state
+        currentQuestionIndex,
+        setCurrentQuestionIndex,
     };
 };

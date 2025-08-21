@@ -1,6 +1,8 @@
+import { v4 as uuidv4 } from 'uuid';
+
 // Helper function to generate unique IDs for questions and options
 export const generateId = (prefix = 'item') => {
-    return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `${prefix}_${uuidv4()}`;
 };
 
 // Helper function to validate question data
