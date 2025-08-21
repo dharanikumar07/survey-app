@@ -1,7 +1,6 @@
 import React, { useRef, forwardRef, useImperativeHandle, useEffect, useState } from 'react';
 import { Box, Text } from '@shopify/polaris';
 import { useSurveyState } from '../../hooks/useSurveyState';
-import { generateSurveyJavaScript } from '../../utils/surveyTransitions';
 
 /**
  * SurveyPreview Component
@@ -25,7 +24,6 @@ import { generateSurveyJavaScript } from '../../utils/surveyTransitions';
 const SurveyPreview = forwardRef((props, ref) => {
     const { questions, selectedQuestionId, selectedView } = useSurveyState();
     const previewRef = useRef(null);
-    const jsContentRef = useRef('');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState({});
 
@@ -43,18 +41,7 @@ const SurveyPreview = forwardRef((props, ref) => {
 
     const surveyCardStyle = getSurveyCardWidth();
 
-    // Generate JavaScript content when questions change
-    useEffect(() => {
-        if (questions.length > 0) {
-            const surveyData = {
-                questions,
-                selectedQuestionId,
-            };
 
-            // Generate JavaScript for the survey
-            jsContentRef.current = generateSurveyJavaScript(surveyData);
-        }
-    }, [questions, selectedQuestionId]);
 
     // Reset to first question when questions change
     useEffect(() => {
@@ -85,7 +72,7 @@ const SurveyPreview = forwardRef((props, ref) => {
         }
     }, [questions, selectedQuestionId]);
 
-    // Expose methods to get HTML and JavaScript content for backend storage
+    // Expose methods to get HTML content for backend storage
     useImperativeHandle(ref, () => ({
         getHTMLContent: () => {
             if (previewRef.current) {
@@ -100,10 +87,6 @@ const SurveyPreview = forwardRef((props, ref) => {
                 return mainContent ? mainContent.outerHTML : '';
             }
             return '';
-        },
-        getJavaScriptContent: () => {
-            // Return the generated JavaScript content
-            return jsContentRef.current;
         }
     }));
 
@@ -944,7 +927,7 @@ const SurveyPreview = forwardRef((props, ref) => {
                     gap: '16px',
                     alignItems: 'center',
                     height: '100%',
-                    maxHeight: 'calc(100vh - 200px)',
+                    maxHeight: 'calc(100vh - 100px)',
                     overflowY: 'auto',
                     overflowX: 'hidden'
                 }}
@@ -1211,10 +1194,8 @@ const SurveyPreview = forwardRef((props, ref) => {
                                 if (ref && ref.current) {
                                     const bodyContent = ref.current.getBodyContent();
                                     const fullHTML = ref.current.getHTMLContent();
-                                    const jsContent = ref.current.getJavaScriptContent();
                                     console.log('Body Content:', bodyContent);
                                     console.log('Full HTML:', fullHTML);
-                                    console.log('JavaScript Content:', jsContent);
 
                                     // Create a new window to preview the captured HTML
                                     const previewWindow = window.open('', '_blank');

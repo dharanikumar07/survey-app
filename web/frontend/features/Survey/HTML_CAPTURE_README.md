@@ -35,13 +35,16 @@ const fullHTML = surveyPreviewRef.current.getHTMLContent();
 Use the utility functions in `surveyHelpers.js`:
 
 ```jsx
-import { prepareSurveyForBackend, generateSurveyHTML } from '../../utils/surveyHelpers';
+import { prepareSurveyForBackend, generateCleanSurveyHTML, generateCompleteSurveyHTML } from '../../utils/surveyHelpers';
 
 // Prepare complete survey data with HTML
 const completeSurveyData = prepareSurveyForBackend(surveyData, htmlContent);
 
-// Generate complete HTML document
-const completeHTML = generateSurveyHTML(surveyData, htmlContent);
+// Generate clean HTML content (no scripts or event handlers)
+const cleanHTML = generateCleanSurveyHTML(surveyData, htmlContent);
+
+// Generate complete HTML document with meta and body tags
+const completeHTML = generateCompleteSurveyHTML(surveyData, htmlContent);
 ```
 
 ## Usage Example
@@ -81,7 +84,8 @@ The captured HTML content can be stored in your database:
     "id": "survey_123",
     "name": "Customer Satisfaction Survey",
     "htmlContent": "<div style=\"display: flex; flex-direction: column; gap: 16px;...\">...</div>",
-    "completeHTML": "<!DOCTYPE html><html>...</html>",
+    "cleanHTML": "<div style=\"display: flex; flex-direction: column; gap: 16px;...\">...</div>",
+    "completeHTML": "<!DOCTYPE html><html><head>...</head><body>...</body></html>",
     "questions": [...],
     "createdAt": "2025-01-15T10:30:00Z"
 }
@@ -100,8 +104,10 @@ In your Shopify storefront, you can render the survey using the stored HTML:
 Or for a complete standalone page:
 
 ```liquid
-<!-- Complete survey page -->
-{{ survey.completeHTML }}
+<!-- Complete survey page with wrapper -->
+<div class="survey-page">
+    {{ survey.cleanHTML }}
+</div>
 ```
 
 ## HTML Structure
@@ -144,6 +150,25 @@ All survey elements use the `th-sf-survey-` prefix to ensure:
 - **Scalability**: Consistent pattern for future features
 
 See `TH_SF_SURVEY_CLASSES.md` for a complete reference of all available classes.
+
+### HTML Output Options
+
+The system now provides three different HTML outputs for different use cases:
+
+#### 1. **`htmlContent`** - Raw HTML
+- **Purpose**: Original HTML from React component
+- **Use Case**: When you need the exact HTML structure
+- **Content**: Includes all inline styles and classes
+
+#### 2. **`cleanHTML`** - Sanitized Content
+- **Purpose**: Clean HTML content without scripts or event handlers
+- **Use Case**: Embedding in existing pages or Liquid templates
+- **Content**: Just the survey content, ready for inclusion
+
+#### 3. **`completeHTML`** - Full Document
+- **Purpose**: Complete HTML document with meta and body tags
+- **Use Case**: Standalone survey pages or iframe embedding
+- **Content**: Full HTML document with proper structure and CSS
 
 ## Benefits
 
