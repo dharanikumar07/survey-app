@@ -29,6 +29,29 @@ class Survey extends Model
         'total_impressions' => 'integer'
     ];
 
+    public function setIsActiveAttribute($value)
+    {
+        // Convert to string 'true'/'false' like in DbSessionStorage
+        if (is_bool($value)) {
+            $this->attributes['is_active'] = $value ? 'true' : 'false';
+            return;
+        }
+        if (is_int($value)) {
+            $this->attributes['is_active'] = $value === 1 ? 'true' : 'false';
+            return;
+        }
+        $stringValue = strtolower((string) $value);
+        $this->attributes['is_active'] = in_array($stringValue, ['1', 't', 'true', 'on', 'yes'], true) ? 'true' : 'false';
+    }
+
+    public function getIsActiveAttribute($value)
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        return strtolower((string) $value) === 'true';
+    }
+
     // Relationships
     public function store(): BelongsTo
     {

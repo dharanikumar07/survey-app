@@ -30,3 +30,6 @@ shopify.app.toml
 
 package-lock.json
 /frontend/index.html
+QWEN.md
+docs/
+/web/frontend/index.html
