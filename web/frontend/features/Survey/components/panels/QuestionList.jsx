@@ -31,7 +31,7 @@ function QuestionList() {
                     height: 'calc(100vh - 120px)',
                     maxHeight: 'calc(100vh - 120px)'
                 }}
-                focusable
+            // focusable
             >
                 <BlockStack gap="400" paddingBlockEnd="400" paddingInlineStart="200" paddingInlineEnd="200">
                     {/* Header Section */}

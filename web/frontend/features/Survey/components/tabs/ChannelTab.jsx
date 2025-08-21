@@ -3,9 +3,34 @@ import { Box, BlockStack, Text, Card } from '@shopify/polaris';
 // import { ChannelAccordion } from '../../../../components/Accordion';
 import { useSurveyState } from '../../hooks/useSurveyState';
 import SurveyAccordion from '../../../../components/SurveyAccordion';
+import { formatSurveyForAPI } from '../../utils/surveyHelpers';
 
 export function ChannelTab() {
-    const { channelItems, toggleChannelExpand, toggleChannelEnabled } = useSurveyState();
+    const {
+        channelItems,
+        toggleChannelExpand,
+        toggleChannelEnabled,
+        questions,
+        surveyTitle,
+        isActive
+    } = useSurveyState();
+
+    // Handle channel updates with survey formatting
+    const handleChannelUpdate = (channelId, enabled) => {
+        // Format survey data for specific channel
+        const surveyData = {
+            name: surveyTitle,
+            isActive: isActive,
+            questions: questions.filter(q => q.id !== 'thankyou'),
+            channels: [channelId]
+        };
+
+        const channelFormattedData = formatSurveyForAPI(surveyData);
+        console.log(`Channel ${channelId} ${enabled ? 'enabled' : 'disabled'}:`, channelFormattedData);
+
+        // Update channel settings
+        toggleChannelEnabled(channelId);
+    };
 
     return (
         <BlockStack gap="400">
@@ -22,7 +47,7 @@ export function ChannelTab() {
                                 key={item.id}
                                 item={item}
                                 onToggleExpand={toggleChannelExpand}
-                                onToggleEnabled={toggleChannelEnabled}
+                                onToggleEnabled={(channelId) => handleChannelUpdate(channelId, !item.isEnabled)}
                             />
                         ))}
                     </Card>

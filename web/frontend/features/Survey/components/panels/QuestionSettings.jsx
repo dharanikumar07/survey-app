@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, Text, BlockStack, Divider, Button, TextField, Icon, InlineStack, Checkbox, Scrollable, Popover, Card, DatePicker } from '@shopify/polaris';
 import { DeleteIcon, DragHandleIcon, ArrowUpIcon, ArrowDownIcon, CalendarIcon } from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
+import { validateQuestion, getQuestionTypeDisplayName } from '../../utils/surveyHelpers';
 
 function QuestionSettings() {
     const {
@@ -73,14 +74,36 @@ function QuestionSettings() {
 
     // Update the heading when input changes
     const handleHeadingChange = (value) => {
-        setHeadingValue(value);
-        updateQuestion(selectedQuestionId, { content: value });
+        const updatedQuestion = { ...selectedQuestion, content: value };
+        const errors = validateQuestion(updatedQuestion);
+
+        if (errors.length === 0) {
+            setHeadingValue(value);
+            updateQuestion(selectedQuestionId, { content: value });
+        } else {
+            console.error('Validation errors:', errors);
+            // TODO: Show validation errors to user
+            // For now, still update but log errors
+            setHeadingValue(value);
+            updateQuestion(selectedQuestionId, { content: value });
+        }
     };
 
     // Update the description when input changes
     const handleDescriptionChange = (value) => {
-        setDescriptionValue(value);
-        updateQuestion(selectedQuestionId, { description: value });
+        const updatedQuestion = { ...selectedQuestion, description: value };
+        const errors = validateQuestion(updatedQuestion);
+
+        if (errors.length === 0) {
+            setDescriptionValue(value);
+            updateQuestion(selectedQuestionId, { description: value });
+        } else {
+            console.error('Validation errors:', errors);
+            // TODO: Show validation errors to user
+            // For now, still update but log errors
+            setDescriptionValue(value);
+            updateQuestion(selectedQuestionId, { description: value });
+        }
     };
 
     // Handle checkbox change for allowing skipping questions
@@ -225,7 +248,7 @@ function QuestionSettings() {
                     height: 'calc(100vh - 120px)',
                     maxHeight: 'calc(100vh - 120px)'
                 }}
-                focusable
+            // focusable
             >
                 <BlockStack gap="400">
                     <Text variant="headingMd" as="h2">Question</Text>
@@ -233,7 +256,7 @@ function QuestionSettings() {
                         <Text variant="bodySm" as="h3">Question type</Text>
                         <div className="th-sf-question-type-display">
                             <Text variant="bodySm" fontWeight="medium">
-                                {selectedQuestion.questionType || 'Custom'}
+                                {getQuestionTypeDisplayName(selectedQuestion.type)}
                             </Text>
                         </div>
                     </BlockStack>

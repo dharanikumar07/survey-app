@@ -4,6 +4,7 @@ import SectionRow from '../../../../components/section/SectionRow';
 import CustomToggle from '../common/CustomToggle';
 import { useSurveyState } from '../../hooks/useSurveyState';
 import { PageAddIcon, EmailIcon } from '@shopify/polaris-icons';
+import { formatSurveyForAPI } from '../../utils/surveyHelpers';
 
 export function DiscountTab() {
     const {
@@ -13,7 +14,31 @@ export function DiscountTab() {
         setDiscountSettings,
         discountSections,
         toggleDiscountSection,
+        questions,
+        surveyTitle,
+        isActive
     } = useSurveyState();
+
+    // Handle discount settings update with survey formatting
+    const handleDiscountUpdate = (updates) => {
+        const newSettings = { ...discountSettings, ...updates };
+        setDiscountSettings(newSettings);
+
+        // Format survey data for discount configuration
+        const surveyData = {
+            name: surveyTitle,
+            isActive: isActive,
+            questions: questions.filter(q => q.id !== 'thankyou'),
+            discount: {
+                enabled: discountEnabled,
+                ...newSettings
+            }
+        };
+
+        const discountFormattedData = formatSurveyForAPI(surveyData);
+        console.log('Discount settings updated:', newSettings);
+        console.log('Survey data for discount:', discountFormattedData);
+    };
 
     const displayOptions = [
         { label: 'Email', value: 'email' },
@@ -46,7 +71,7 @@ export function DiscountTab() {
                                 <TextField
                                     label="Discount code"
                                     value={discountSettings.code}
-                                    onChange={(value) => setDiscountSettings({ code: value })}
+                                    onChange={(value) => handleDiscountUpdate({ code: value })}
                                     autoComplete="off"
                                 />
 
@@ -58,7 +83,7 @@ export function DiscountTab() {
                                     label="Display discount code on"
                                     options={displayOptions}
                                     value={discountSettings.displayOn}
-                                    onChange={(value) => setDiscountSettings({ displayOn: value })}
+                                    onChange={(value) => handleDiscountUpdate({ displayOn: value })}
                                 />
                                 {discountSettings.displayOn === 'email' ? (
                                     <Text tone="subdued">
@@ -69,7 +94,7 @@ export function DiscountTab() {
                                 <Checkbox
                                     label="Limit one discount code per email address"
                                     checked={discountSettings.limitPerEmail}
-                                    onChange={(checked) => setDiscountSettings({ limitPerEmail: checked })}
+                                    onChange={(checked) => handleDiscountUpdate({ limitPerEmail: checked })}
                                 />
 
                                 <Card padding="000">
