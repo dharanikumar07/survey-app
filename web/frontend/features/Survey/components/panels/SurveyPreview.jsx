@@ -25,6 +25,7 @@ import { generateCleanSurveyHTML, generateCompleteSurveyHTML } from '../../utils
 const SurveyPreview = forwardRef((props, ref) => {
     const { questions, selectedQuestionId, selectedView, currentQuestionIndex, setCurrentQuestionIndex } = useSurveyState();
     const previewRef = useRef(null);
+    const jsContentRef = useRef('');
     const [answers, setAnswers] = useState({});
 
     // Get survey card width based on view mode
