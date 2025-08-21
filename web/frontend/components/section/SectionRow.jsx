@@ -19,7 +19,7 @@ export default function SectionRow({
             borderColor="border-disabled"
         >
             <InlineStack blockAlign="center" gap="200" wrap={false}>
-                <Box onClick={onToggle} style={{ cursor: 'pointer', flex: 1 }}>
+                <Box onClick={onToggle} className="th-sf-section-row-header">
                     <InlineStack blockAlign="center" gap="300">
                         <Box>
                             <Icon source={isExpanded ? ChevronUpIcon : ChevronDownIcon} color="subdued" />

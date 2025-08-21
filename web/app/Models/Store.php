@@ -9,13 +9,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Store extends Model
 {
-    use UuidTrait, SoftDeletes;
+    use SoftDeletes, UuidTrait;
 
     protected $casts = [
         'sync_status' => 'json',
         'shopify_data' => 'array',
         'extra' => 'array'
     ];
+
     protected $fillable = [
         'store_id',
         'name',
@@ -34,6 +35,11 @@ class Store extends Model
     public function getStoreUrl()
     {
         return $this->store_url;
+    }
+
+    public function getStoreUuidByDomain(string $shop): ?string
+    {
+        return self::where('domain', $shop)->value('uuid');
     }
     // Relationships
     public function surveys(): HasMany

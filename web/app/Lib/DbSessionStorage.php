@@ -7,7 +7,7 @@ namespace App\Lib;
 use App\Api\Shopify\Shop;
 use App\Api\Shopify\Traits\ShopifyHelper;
 use App\Jobs\sync\SyncCustomers;
-use App\Jobs\WebHook;
+use App\Jobs\webhook\WebHook;
 use App\Models\Store;
 use Exception;
 use Illuminate\Support\Facades\Log;

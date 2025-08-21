@@ -54,7 +54,10 @@ class SyncCustomers implements ShouldQueue
         try {
             foreach ($customersData as $customerData) {
                 Customer::updateOrCreate(
-                    ['platform_customer_id' => $customerData['platform_customer_id']],
+                    [
+                        'platform_customer_id' => $customerData['platform_customer_id'],
+                        'store_uuid'    => $this->store->uuid
+                    ],
                     $customerData
                 );
             }

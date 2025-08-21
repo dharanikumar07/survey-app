@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-const useStore = create((set) => ({
+const useStore = create((set, get) => ({
     // TabsContent state
     selectedTab: 0,
     setSelectedTab: (index) => set({ selectedTab: index }),
@@ -22,14 +22,16 @@ const useStore = create((set) => ({
 
     // Discount tab state
     discountEnabled: false,
-    setDiscountEnabled: (enabled) => set({ discountEnabled: enabled }),
+    setDiscountEnabled: (enabled) => set({ 
+        discountEnabled: enabled
+    }),
     discountSettings: {
         code: '',
         displayOn: 'email',
         limitPerEmail: false,
     },
     setDiscountSettings: (updates) => set((state) => ({
-        discountSettings: { ...state.discountSettings, ...updates },
+        discountSettings: { ...state.discountSettings, ...updates }
     })),
     discountSections: [
         { id: 'banner', title: 'Discount banner', icon: 'page', isExpanded: false },
@@ -39,7 +41,7 @@ const useStore = create((set) => ({
     toggleDiscountSection: (id) => set((state) => ({
         discountSections: state.discountSections.map((s) =>
             s.id === id ? { ...s, isExpanded: !s.isExpanded } : s
-        ),
+        )
     })),
     toggleChannelEnabled: (id) => set((state) => ({
         channelItems: state.channelItems.map(item => 
@@ -51,7 +53,9 @@ const useStore = create((set) => ({
     editModalOpen: false,
     setEditModalOpen: (isOpen) => set({ editModalOpen: isOpen }),
     surveyTitle: 'Survey #1',
-    setSurveyTitle: (title) => set({ surveyTitle: title }),
+    setSurveyTitle: (title) => set({ 
+        surveyTitle: title
+    }),
     
     // SurveyModalContent state
     selectedQuestionId: '1',
@@ -61,17 +65,23 @@ const useStore = create((set) => ({
     selectedView: 'desktop',
     setSelectedView: (view) => set({ selectedView: view }),
     isActive: true,
-    setIsActive: (active) => set({ isActive: active }),
+    setIsActive: (active) => set({ 
+        isActive: active
+    }),
     selectedTheme: 'default',
-    setSelectedTheme: (theme) => set({ selectedTheme: theme }),
+    setSelectedTheme: (theme) => set({ 
+        selectedTheme: theme
+    }),
     themePopoverActive: false,
     setThemePopoverActive: (active) => set({ themePopoverActive: active }),
     statusPopoverActive: false,
     setStatusPopoverActive: (active) => set({ statusPopoverActive: active }),
     surveyPagePopoverActive: false,
     setSurveyPagePopoverActive: (active) => set({ surveyPagePopoverActive: active }),
-    selectedSurveyPage: 'branded',
-    setSelectedSurveyPage: (page) => set({ selectedSurveyPage: page }),
+    selectedSurveyPage: 'page',
+    setSelectedSurveyPage: (page) => set({ 
+        selectedSurveyPage: page
+    }),
     
     // Questions state
     questions: [
@@ -80,36 +90,75 @@ const useStore = create((set) => ({
             content: 'How likely are you to recommend us to a friend?', 
             type: 'rating', 
             description: '', 
-            questionType: 'Number scale', 
+            questionType: 'Star rating', 
             isDraggable: true,
             answerOptions: [
-                { id: 'opt1', text: 'Word of mouth' },
-                { id: 'opt2', text: 'Instagram' },
-                { id: 'opt3', text: 'Tiktok' },
-                { id: 'opt4', text: 'Facebook' },
-                { id: 'opt5', text: 'Youtube' },
-                { id: 'opt6', text: 'Google' },
+                { id: 'opt1', text: '1 - Not likely' },
+                { id: 'opt2', text: '2 - Somewhat likely' },
+                { id: 'opt3', text: '3 - Likely' },
+                { id: 'opt4', text: '4 - Very likely' },
+                { id: 'opt5', text: '5 - Extremely likely' },
             ]
         },
         { 
             id: '2', 
             content: 'How easy was it to purchase from our online store?', 
-            type: 'rating', 
+            type: 'number-scale', 
             description: '', 
             questionType: 'Number scale', 
             isDraggable: true,
             answerOptions: [
-                { id: 'opt7', text: 'Very difficult' },
-                { id: 'opt8', text: 'Somewhat difficult' },
-                { id: 'opt9', text: 'Neutral' },
-                { id: 'opt10', text: 'Somewhat easy' },
-                { id: 'opt11', text: 'Very easy' },
+                { id: 'opt7', text: '1 - Very difficult' },
+                { id: 'opt8', text: '2 - Somewhat difficult' },
+                { id: 'opt9', text: '3 - Neutral' },
+                { id: 'opt10', text: '4 - Somewhat easy' },
+                { id: 'opt11', text: '5 - Very easy' },
             ]
         },
-        { id: '3', content: 'How could we improve?', type: 'text', description: '', questionType: 'Short answer', isDraggable: true, answerOptions: [] },
+        { 
+            id: '3', 
+            content: 'How could we improve?', 
+            type: 'text', 
+            description: 'Please provide your feedback in detail.', 
+            questionType: 'Short answer', 
+            isDraggable: true, 
+            answerOptions: [] 
+        },
+        { 
+            id: '4', 
+            content: 'How did you hear about us?', 
+            type: 'single-choice', 
+            description: 'Select the option that best describes your answer.', 
+            questionType: 'Single choice', 
+            isDraggable: true,
+            answerOptions: [
+                { id: 'opt12', text: 'Word of mouth' },
+                { id: 'opt13', text: 'Social media' },
+                { id: 'opt14', text: 'Search engine' },
+                { id: 'opt15', text: 'Advertisement' },
+                { id: 'opt16', text: 'Other' },
+            ]
+        },
+        { 
+            id: '5', 
+            content: 'Which of our products have you used?', 
+            type: 'multiple-choice', 
+            description: 'Select all options that apply to you.', 
+            questionType: 'Multiple choice', 
+            isDraggable: true,
+            answerOptions: [
+                { id: 'opt17', text: 'Product A' },
+                { id: 'opt18', text: 'Product B' },
+                { id: 'opt19', text: 'Product C' },
+                { id: 'opt20', text: 'Service X' },
+                { id: 'opt21', text: 'Service Y' },
+            ]
+        },
         { id: 'thankyou', content: 'Thank You Card', type: 'card', description: '', questionType: 'Card', isDraggable: false, answerOptions: [] },
     ],
-    setQuestions: (newQuestions) => set({ questions: newQuestions }),
+    setQuestions: (newQuestions) => set({ 
+        questions: newQuestions
+    }),
     
     // Add a new question
     addQuestion: (question) => set((state) => {
@@ -119,7 +168,9 @@ const useStore = create((set) => ({
         
         const newQuestions = [...state.questions];
         newQuestions.splice(insertIndex, 0, question);
-        return { questions: newQuestions };
+        return { 
+            questions: newQuestions
+        };
     }),
     
     // Update a question
@@ -129,7 +180,9 @@ const useStore = create((set) => ({
         
         const newQuestions = [...state.questions];
         newQuestions[questionIndex] = { ...newQuestions[questionIndex], ...updates };
-        return { questions: newQuestions };
+        return { 
+            questions: newQuestions
+        };
     }),
     
     // Delete a question
@@ -162,7 +215,9 @@ const useStore = create((set) => ({
         const [moved] = current.splice(fromIndex, 1);
         current.splice(toIndex, 0, moved);
         
-        return { questions: current };
+        return { 
+            questions: current
+        };
     }),
     
     // Update answer options
@@ -176,7 +231,9 @@ const useStore = create((set) => ({
             answerOptions: answerOptions 
         };
         
-        return { questions: newQuestions };
+        return { 
+            questions: newQuestions
+        };
     }),
     
     // Add a new answer option
@@ -196,7 +253,9 @@ const useStore = create((set) => ({
             answerOptions: [...(question.answerOptions || []), newOption]
         };
         
-        return { questions: newQuestions };
+        return { 
+            questions: newQuestions
+        };
     }),
     
     // Delete an answer option
@@ -213,7 +272,9 @@ const useStore = create((set) => ({
             answerOptions: newOptions
         };
         
-        return { questions: newQuestions };
+        return { 
+            questions: newQuestions
+        };
     }),
     
     // Update a single answer option
@@ -232,7 +293,9 @@ const useStore = create((set) => ({
             answerOptions: newOptions
         };
         
-        return { questions: newQuestions };
+        return { 
+            questions: newQuestions
+        };
     }),
     
     // Reorder answer options via drag and drop
@@ -252,8 +315,12 @@ const useStore = create((set) => ({
             answerOptions: options
         };
         
-        return { questions: newQuestions };
+        return { 
+            questions: newQuestions
+        };
     }),
+
+
 }));
 
 export default useStore;

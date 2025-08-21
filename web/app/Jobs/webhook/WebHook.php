@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\webhook;
 
 use App\Models\Store;
 use Illuminate\Contracts\Queue\ShouldQueue;

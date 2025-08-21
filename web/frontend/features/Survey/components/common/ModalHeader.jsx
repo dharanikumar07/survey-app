@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
     Box,
     InlineStack,
@@ -25,8 +25,9 @@ import {
     CodeIcon
 } from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
+import { prepareSurveyForBackend } from '../../utils/surveyHelpers';
 
-function ModalHeader({ title = "Survey #1" }) {
+function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
     const {
         selectedView,
         setSelectedView,
@@ -41,8 +42,80 @@ function ModalHeader({ title = "Survey #1" }) {
         surveyPagePopoverActive,
         setSurveyPagePopoverActive,
         selectedSurveyPage,
-        setSelectedSurveyPage
+        setSelectedSurveyPage,
+        questions,
+        channelItems,
+        discountEnabled,
+        discountSettings,
+        surveyTitle
     } = useSurveyState();
+
+    // Handle save functionality
+    const handleSave = () => {
+        // Build survey data using only what exists in store
+        const surveyData = {
+            name: surveyTitle,
+            isActive: isActive,
+            questions: questions
+                .filter(q => q.id !== 'thankyou')
+                .map((q, index) => ({
+                    type: q.type,
+                    heading: q.content,
+                    description: q.description || "",
+                    position: index,
+                    answers: q.answerOptions?.map(opt => ({
+                        content: opt.text,
+                        id: opt.id
+                    })) || [],
+                    id: q.id
+                })),
+            thankYou: {
+                type: "thank_you",
+                heading: questions.find(q => q.id === 'thankyou')?.content || "Thank You Card",
+                description: questions.find(q => q.id === 'thankyou')?.description || ""
+            },
+            channels: {
+                // Only include channels that exist in your store
+                ...(channelItems.find(c => c.id === 'branded') && {
+                    dedicatedPageSurvey: {
+                        type: "dedicatedPageSurvey",
+                        enabled: channelItems.find(c => c.id === 'branded')?.isEnabled || false
+                    }
+                })
+            },
+            discount: {
+                enabled: discountEnabled,
+                code: discountSettings.code || "",
+                displayOn: discountSettings.displayOn || "email",
+                limitOnePerEmail: discountSettings.limitPerEmail || false
+            },
+            channelTypes: channelItems
+                .filter(channel => channel.isEnabled)
+                .map(channel => channel.id),
+            totalResponses: 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        // Capture HTML and JavaScript content from the survey preview
+        let htmlContent = '';
+        let jsContent = '';
+        if (surveyPreviewRef && surveyPreviewRef.current) {
+            htmlContent = surveyPreviewRef.current.getBodyContent();
+            jsContent = surveyPreviewRef.current.getJavaScriptContent();
+        }
+
+        // Prepare complete survey data with HTML and JavaScript for backend storage
+        const completeSurveyData = prepareSurveyForBackend(surveyData, htmlContent, jsContent);
+
+        console.log('Complete Survey Data with HTML and JS:', completeSurveyData);
+        console.log('HTML Content for Storefront:', completeSurveyData.htmlContent);
+        console.log('JavaScript Content for Storefront:', completeSurveyData.jsContent);
+        console.log('Complete HTML Document with JS:', completeSurveyData.completeHTML);
+
+        // Here you would typically send the data to your backend
+        // Example: await saveSurveyToBackend(completeSurveyData);
+    };
 
     const themes = [
         { label: 'Default Theme', value: 'default' },
@@ -162,7 +235,7 @@ function ModalHeader({ title = "Survey #1" }) {
                 </InlineStack>
 
                 {/* Center Section - Theme Selection and Preview Switch */}
-                <Box style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                <Box className="th-sf-modal-header-center">
                     <InlineStack gap="400" blockAlign="center">
                         {/* Branded Survey Page Popover */}
                         <Popover
@@ -223,8 +296,16 @@ function ModalHeader({ title = "Survey #1" }) {
                     </InlineStack>
                 </Box>
 
-                {/* Right Section - Status */}
+                {/* Right Section - Status and Save Button */}
                 <InlineStack gap="200" blockAlign="center" wrap={false}>
+                    {/* Save Button */}
+                    <Button
+                        variant="primary"
+                        size="slim"
+                        onClick={handleSave}
+                    >
+                        Save
+                    </Button>
                     <Popover
                         active={statusPopoverActive}
                         activator={
@@ -236,15 +317,6 @@ function ModalHeader({ title = "Survey #1" }) {
                                 tone={isActive ? "success" : "attention"}
                             >
                                 <InlineStack gap="200" blockAlign="center">
-                                    {/* <div
-                                        style={{
-                                            width: '12px',
-                                            height: '12px',
-                                            backgroundColor: isActive ? '#007f5f' : '#d9d9d9',
-                                            borderRadius: '50%',
-                                            transition: 'background-color 0.2s ease'
-                                        }}
-                                    /> */}
                                     {isActive ? 'Active' : 'Inactive'}
                                 </InlineStack>
                             </Button>

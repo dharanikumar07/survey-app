@@ -53,7 +53,10 @@ class SyncOrders implements ShouldQueue
                 $orderData = $shopifyOrderHelper->handleOrders($node);
 
                 $order = Orders::updateOrCreate(
-                    ['platform_order_id' => $orderData['platform_order_id']],
+                    [
+                        'platform_order_id' => $orderData['platform_order_id'],
+                        'store_uuid'    => $this->store->uuid
+                    ],
                     $orderData
                 );
 
@@ -61,7 +64,10 @@ class SyncOrders implements ShouldQueue
                     $itemData = $shopifyOrderHelper->handleOrderItems($lineItemNode, $order);
 
                     OrderItems::updateOrCreate(
-                        ['platform_order_item_id' => $itemData['platform_order_item_id']],
+                        [
+                            'platform_order_item_id' => $itemData['platform_order_item_id'],
+                            'store_uuid'    => $this->store->uuid
+                        ],
                         $itemData
                     );
                 }
