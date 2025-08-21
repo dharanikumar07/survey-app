@@ -108,7 +108,8 @@ const SurveyPreview = forwardRef((props, ref) => {
     }));
 
     // Get the current question to display (for preview mode)
-    const currentQuestion = questions.find(q => q.id === selectedQuestionId) || questions[currentQuestionIndex];
+    // FIXED: Always use currentQuestionIndex for navigation, not selectedQuestionId
+    const currentQuestion = questions[currentQuestionIndex];
 
     // If no question is found, show a message
     if (!currentQuestion) {
@@ -154,8 +155,9 @@ const SurveyPreview = forwardRef((props, ref) => {
     const handleNext = () => {
         console.log('Next clicked. Current:', currentQuestionIndex, 'Total:', questions.length);
         if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(prev => prev + 1);
-            console.log('Moving to next question:', currentQuestionIndex + 1);
+            const nextIndex = currentQuestionIndex + 1;
+            setCurrentQuestionIndex(nextIndex);
+            // console.log('Moving to next question:', nextIndex, 'Question type:', questions[nextIndex]?.type, 'Content:', questions[nextIndex]?.content);
         } else if (currentQuestionIndex === questions.length - 1) {
             // Show thank you card
             setCurrentQuestionIndex(questions.length);
@@ -175,8 +177,9 @@ const SurveyPreview = forwardRef((props, ref) => {
     const handlePrevious = () => {
         console.log('Previous clicked. Current:', currentQuestionIndex);
         if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(prev => prev - 1);
-            console.log('Moving to previous question:', currentQuestionIndex - 1);
+            const prevIndex = currentQuestionIndex - 1;
+            setCurrentQuestionIndex(prevIndex);
+            console.log('Moving to previous question:', prevIndex, 'Question type:', questions[prevIndex]?.type, 'Content:', questions[prevIndex]?.content);
         }
     };
 
@@ -1003,7 +1006,7 @@ const SurveyPreview = forwardRef((props, ref) => {
                             {/* Enhanced transition with slide effect */}
                             <div
                                 className="th-sf-survey-question-content"
-                                key={`question-${currentQuestionIndex}`}
+                                key={`question-${currentQuestionIndex}-${currentQuestion?.id}-${currentQuestion?.type}`}
                                 style={{
                                     opacity: 1,
                                     transform: 'translateX(0)',
