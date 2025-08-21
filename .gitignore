@@ -16,6 +16,7 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+package-lock.json
 
 **/node_modules
 
@@ -31,5 +32,6 @@ shopify.app.toml
 package-lock.json
 /frontend/index.html
 QWEN.md
-docs/
+# docs/
 /web/frontend/index.html
+index.html

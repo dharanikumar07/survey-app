@@ -1,7 +1,11 @@
 import React, { useRef, forwardRef, useImperativeHandle, useEffect, useState } from 'react';
 import { Box, Text } from '@shopify/polaris';
 import { useSurveyState } from '../../hooks/useSurveyState';
-import { generateCleanSurveyHTML, generateCompleteSurveyHTML } from '../../utils/surveyHelpers';
+import {
+    generateCleanSurveyHTML,
+    generateCompleteSurveyHTML,
+    generateSurveyJavaScriptContent
+} from '../../utils/surveyHelpers';
 
 /**
  * SurveyPreview Component
@@ -107,6 +111,15 @@ const SurveyPreview = forwardRef((props, ref) => {
                 return generateCleanSurveyHTML({ name: 'Survey' }, htmlContent);
             }
             return '';
+        },
+        getJavaScriptContent: () => {
+            // Generate JavaScript content for the survey using the current questions
+            const surveyData = {
+                name: 'Survey',
+                questions,
+                id: 'survey_' + Date.now() // Generate a temporary ID for the survey
+            };
+            return generateSurveyJavaScriptContent(surveyData);
         }
     }));
 

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { generateSurveyJavaScript } from './surveyStorefront';
 
 // Helper function to generate unique IDs for questions and options
 export const generateId = (prefix = 'item') => {
@@ -261,6 +262,7 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
         htmlContent: sanitizedHTML,
         cleanHTML: generateCleanSurveyHTML(surveyData, sanitizedHTML),
         completeHTML: generateCompleteSurveyHTML(surveyData, sanitizedHTML),
+        // No JavaScript content included in API
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
@@ -333,4 +335,12 @@ export const mapIsActiveToStatus = (isActive) => {
     return isActive ? 'active' : 'inactive';
 };
 
+/**
+ * Generates JavaScript content for the survey to be used in the storefront
+ * @param {Object} surveyData - The survey data object
+ * @returns {string} - JavaScript code as a string
+ */
+export const generateSurveyJavaScriptContent = (surveyData) => {
+    return generateSurveyJavaScript(surveyData);
+};
 
