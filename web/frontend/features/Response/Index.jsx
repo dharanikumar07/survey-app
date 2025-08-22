@@ -276,6 +276,7 @@ export default function Response() {
                 </InlineStack>
             }
             subtitle="All responses"
+            fullWidth
         >
             <BlockStack gap="4">
                 {/* Main Content Card */}
