@@ -33,4 +33,4 @@ package-lock.json
 QWEN.md
 docs/
 /web/frontend/index.html
-/extensions/*/dist
+/extensions/*/dist/
