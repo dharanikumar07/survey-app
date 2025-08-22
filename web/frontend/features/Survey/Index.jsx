@@ -15,7 +15,8 @@ import {
     Tooltip,
     ButtonGroup,
     Popover,
-    ActionList
+    ActionList,
+    Pagination
 } from "@shopify/polaris";
 import { Modal, TitleBar } from '@shopify/app-bridge-react';
 import {
@@ -38,6 +39,8 @@ export default function Survey() {
     const [currentPage, setCurrentPage] = useState(1);
     const [modalTitle, setModalTitle] = useState("Create new survey");
     const [popoverActive, setPopoverActive] = useState({});
+
+
 
     // Ref for accessing the SurveyPreview component
     const surveyPreviewRef = useRef(null);
@@ -74,6 +77,10 @@ export default function Survey() {
         },
     ];
 
+    // Pagination settings
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(mockSurveys.length / itemsPerPage);
+
     // Filter surveys based on active tab
     const filteredSurveys = mockSurveys.filter(survey => {
         if (activeTab === 0) return true; // All
@@ -81,6 +88,11 @@ export default function Survey() {
         if (activeTab === 2) return survey.status === "Inactive"; // Inactive
         return true;
     });
+
+    // Paginate the filtered surveys
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedSurveys = filteredSurveys.slice(startIndex, endIndex);
 
     const tabs = [
         {
@@ -103,7 +115,22 @@ export default function Survey() {
         },
     ];
 
-    const handleTabChange = (selectedTabIndex) => setActiveTab(selectedTabIndex);
+    const handleTabChange = (selectedTabIndex) => {
+        setActiveTab(selectedTabIndex);
+        setCurrentPage(1); // Reset to first page when changing tabs
+    };
+
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
 
     const handleCreateSurvey = () => {
         setModalTitle("Create new survey");
@@ -183,11 +210,11 @@ export default function Survey() {
                     The most recently activated survey will be displayed first on the store. Once it stops showing according to its Widget recurrence settings, other surveys in the same position will be shown subsequently
                 </Banner>
 
-                <Card>
+                <Card padding="200">
                     <Tabs tabs={tabs} selected={activeTab} onSelect={handleTabChange} />
                     <IndexTable
                         resourceName={resourceName}
-                        itemCount={filteredSurveys.length}
+                        itemCount={paginatedSurveys.length}
                         headings={[
                             { title: "Survey name" },
                             { title: "Status" },
@@ -198,7 +225,7 @@ export default function Survey() {
                         ]}
                         selectable={false}
                     >
-                        {filteredSurveys.map((survey, index) => (
+                        {paginatedSurveys.map((survey, index) => (
                             <IndexTable.Row
                                 id={survey.id}
                                 key={survey.id}
@@ -224,11 +251,11 @@ export default function Survey() {
                                     {survey.created}
                                 </IndexTable.Cell>
                                 <IndexTable.Cell>
-                                    <BlockStack gap="100">
+                                    <InlineStack gap="200">
                                         {survey.channels.map((channel, idx) => (
                                             <Badge key={idx} tone="info">{channel}</Badge>
                                         ))}
-                                    </BlockStack>
+                                    </InlineStack>
                                 </IndexTable.Cell>
                                 <IndexTable.Cell>
                                     <Text variant="bodyMd" fontWeight="bold">
@@ -239,7 +266,7 @@ export default function Survey() {
                                     <Popover
                                         active={popoverActive[survey.id]}
                                         activator={
-                                            <Button plain monochrome icon={MenuVerticalIcon} onClick={(e) => {
+                                            <Button variant="plain" icon={MenuVerticalIcon} onClick={(e) => {
                                                 e.stopPropagation();
                                                 togglePopover(survey.id);
                                             }} />
@@ -288,13 +315,16 @@ export default function Survey() {
                         <InlineStack align="space-between" blockAlign="center">
                             <div className="th-sf-survey-margin-left">
                                 <Text variant="bodySm" color="subdued">
-                                    {filteredSurveys.length} surveys
+                                    Showing {startIndex + 1}-{Math.min(endIndex, filteredSurveys.length)} of {filteredSurveys.length} surveys
                                 </Text>
                             </div>
                             <div className="th-sf-survey-margin-right">
-                                <Text variant="bodySm" color="subdued">
-                                    {filteredSurveys.reduce((total, survey) => total + (survey.responses || 0), 0)} total responses
-                                </Text>
+                                <Pagination
+                                    hasPrevious={currentPage > 1}
+                                    onPrevious={handlePrevious}
+                                    hasNext={currentPage < Math.ceil(filteredSurveys.length / itemsPerPage)}
+                                    onNext={handleNext}
+                                />
                             </div>
                         </InlineStack>
                     </Box>
