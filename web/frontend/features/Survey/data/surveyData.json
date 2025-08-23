@@ -1,0 +1,183 @@
+{
+  "channelItems": [
+    { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
+    { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
+    { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
+    { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
+    { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
+    { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+  ],
+  "discountSettings": {
+    "code": "",
+    "displayOn": "email",
+    "limitPerEmail": false
+  },
+  "discountSections": [
+    { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
+    { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
+    { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+  ],
+  "defaultValues": {
+    "surveyTitle": "Survey #1",
+    "selectedTab": 0,
+    "selectedQuestionId": "1",
+    "currentQuestionIndex": 0,
+    "selectedView": "desktop",
+    "isActive": true,
+    "selectedTheme": "default",
+    "themePopoverActive": false,
+    "statusPopoverActive": false,
+    "surveyPagePopoverActive": false,
+    "selectedSurveyPage": "page",
+    "discountEnabled": false,
+    "editModalOpen": false
+  },
+  "questions": [
+    { 
+      "id": "1", 
+      "content": "How likely are you to recommend us to a friend?", 
+      "type": "rating", 
+      "description": "", 
+      "questionType": "Star rating", 
+      "isDraggable": true,
+      "answerOptions": [
+        { "id": "opt1", "text": "1 - Not likely" },
+        { "id": "opt2", "text": "2 - Somewhat likely" },
+        { "id": "opt3", "text": "3 - Likely" },
+        { "id": "opt4", "text": "4 - Very likely" },
+        { "id": "opt5", "text": "5 - Extremely likely" }
+      ]
+    },
+    { "id": "thankyou", "content": "Thank You Card", "type": "card", "description": "", "questionType": "Card", "isDraggable": false, "answerOptions": [] }
+  ],
+  "questionTemplates": {
+    "text": {
+      "content": "How could we improve our service?",
+      "type": "text",
+      "description": "Please provide your feedback in detail.",
+      "questionType": "Short answer",
+      "isDraggable": true,
+      "answerOptions": []
+    },
+    "rating": {
+      "content": "How likely are you to recommend us to a friend?",
+      "type": "rating",
+      "description": "Rate your likelihood on a scale from 1 (Not likely) to 5 (Extremely likely).",
+      "questionType": "Star rating",
+      "isDraggable": true,
+      "answerOptions": [
+        { "id": "template_opt1", "text": "1 - Not likely" },
+        { "id": "template_opt2", "text": "2 - Somewhat likely" },
+        { "id": "template_opt3", "text": "3 - Likely" },
+        { "id": "template_opt4", "text": "4 - Very likely" },
+        { "id": "template_opt5", "text": "5 - Extremely likely" }
+      ]
+    },
+    "number-scale": {
+      "content": "How easy was it to purchase from our online store?",
+      "type": "number-scale",
+      "description": "Rate your experience on a scale from 1 (Poor) to 5 (Excellent).",
+      "questionType": "Number scale",
+      "isDraggable": true,
+      "answerOptions": [
+        { "id": "template_opt7", "text": "1 - Very difficult" },
+        { "id": "template_opt8", "text": "2 - Somewhat difficult" },
+        { "id": "template_opt9", "text": "3 - Neutral" },
+        { "id": "template_opt10", "text": "4 - Somewhat easy" },
+        { "id": "template_opt11", "text": "5 - Very easy" }
+      ]
+    },
+    "single-choice": {
+      "content": "How did you hear about us?",
+      "type": "single-choice",
+      "description": "Select the option that best describes your answer.",
+      "questionType": "Single choice",
+      "isDraggable": true,
+      "answerOptions": [
+        { "id": "template_opt12", "text": "Word of mouth" },
+        { "id": "template_opt13", "text": "Social media" },
+        { "id": "template_opt14", "text": "Search engine" },
+        { "id": "template_opt15", "text": "Advertisement" },
+        { "id": "template_opt16", "text": "Other" }
+      ]
+    },
+    "multiple-choice": {
+      "content": "Which of our products have you used?",
+      "type": "multiple-choice",
+      "description": "Select all options that apply to you.",
+      "questionType": "Multiple choice",
+      "isDraggable": true,
+      "answerOptions": [
+        { "id": "template_opt17", "text": "Product A" },
+        { "id": "template_opt18", "text": "Product B" },
+        { "id": "template_opt19", "text": "Product C" },
+        { "id": "template_opt20", "text": "Service X" },
+        { "id": "template_opt21", "text": "Service Y" }
+      ]
+    },
+    "satisfaction": {
+      "content": "How satisfied are you with your recent purchase?",
+      "type": "satisfaction",
+      "description": "Please indicate your level of satisfaction with our service.",
+      "questionType": "Satisfaction",
+      "isDraggable": true,
+      "answerOptions": [
+        { "id": "template_opt22", "text": "Very Dissatisfied" },
+        { "id": "template_opt23", "text": "Dissatisfied" },
+        { "id": "template_opt24", "text": "Neutral" },
+        { "id": "template_opt25", "text": "Satisfied" },
+        { "id": "template_opt26", "text": "Very Satisfied" }
+      ]
+    },
+    "date": {
+      "content": "When did you first visit our website?",
+      "type": "date",
+      "description": "Please select a date from the calendar.",
+      "questionType": "Date",
+      "isDraggable": true,
+      "answerOptions": []
+    },
+    "matrix": {
+      "content": "Rate our services across different aspects",
+      "type": "matrix",
+      "description": "Rate each aspect on a scale from 1 (Poor) to 5 (Excellent).",
+      "questionType": "Matrix",
+      "isDraggable": true,
+      "answerOptions": [
+        { "id": "template_opt27", "text": "Product Quality" },
+        { "id": "template_opt28", "text": "Customer Service" },
+        { "id": "template_opt29", "text": "Value for Money" },
+        { "id": "template_opt30", "text": "Ease of Use" },
+        { "id": "template_opt31", "text": "Overall Experience" }
+      ]
+    },
+    "ranking": {
+      "content": "Rank these features by importance",
+      "type": "ranking",
+      "description": "Drag and drop to rank these items in order of importance to you.",
+      "questionType": "Ranking",
+      "isDraggable": true,
+      "answerOptions": [
+        { "id": "template_opt32", "text": "Price" },
+        { "id": "template_opt33", "text": "Quality" },
+        { "id": "template_opt34", "text": "Customer Service" },
+        { "id": "template_opt35", "text": "Brand Reputation" },
+        { "id": "template_opt36", "text": "Innovation" }
+      ]
+    },
+    "demographic": {
+      "content": "What is your age group?",
+      "type": "demographic",
+      "description": "This information helps us better understand our customer base.",
+      "questionType": "Demographic",
+      "isDraggable": true,
+      "answerOptions": [
+        { "id": "template_opt37", "text": "18-24 years" },
+        { "id": "template_opt38", "text": "25-34 years" },
+        { "id": "template_opt39", "text": "35-44 years" },
+        { "id": "template_opt40", "text": "45-54 years" },
+        { "id": "template_opt41", "text": "55+ years" }
+      ]
+    }
+  }
+}

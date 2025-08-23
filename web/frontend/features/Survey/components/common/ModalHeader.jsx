@@ -335,8 +335,22 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                     </InlineStack>
                 </Box>
 
-                {/* Right Section - Status and Save Button */}
+                {/* Right Section - Buttons and Status */}
                 <InlineStack gap="200" blockAlign="center" wrap={false}>
+                    {/* Generate HTML Button */}
+                    <Button
+                        size="slim"
+                        onClick={() => {
+                            if (surveyPreviewRef && surveyPreviewRef.current) {
+                                const htmlContent = surveyPreviewRef.current.getBodyContent();
+                                console.log('Survey HTML Content:', htmlContent);
+                                alert('Survey HTML generated! Check console for details.');
+                            }
+                        }}
+                    >
+                        Generate HTML
+                    </Button>
+
                     {/* Save Button */}
                     <Button
                         variant="primary"
@@ -345,6 +359,8 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                     >
                         Save
                     </Button>
+
+                    {/* Status Dropdown */}
                     <Popover
                         active={statusPopoverActive}
                         activator={
