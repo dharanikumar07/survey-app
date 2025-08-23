@@ -34,8 +34,8 @@
 </head>
 <body>
 <div class="th-sf-survey-container" style="padding: 32px; background: #f6f6f7; min-height: 100vh;">
-    <h3 style="text-align:center;">How likely are you to recommend us to a friend?</h3>
-    <!-- Your survey form here -->
+    {!! $survey->getSurveyHtmlContent() !!}
 </div>
+<script src="{{ asset('assets/js/survey-widget.js') }}"></script>
 </body>
 </html>
