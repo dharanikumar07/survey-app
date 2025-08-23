@@ -1,9 +1,9 @@
 import React, { forwardRef } from 'react';
 import { Box, Grid } from '@shopify/polaris';
 import QuestionList from '../panels/QuestionList';
-import SurveyPreview from '../panels/SurveyPreview';
 import QuestionSettings from '../panels/QuestionSettings';
 import { useSurveyState } from '../../hooks/useSurveyState';
+import SurveyIframeProduction from '../panels/SurveyIframeProduction';
 
 /**
  * SurveyLayout - A three-panel layout for survey builder
@@ -59,7 +59,7 @@ const SurveyLayout = forwardRef((props, ref) => {
 
                 {/* Center Panel - Survey Preview */}
                 <Grid.Cell columnSpan={columnSpans.center}>
-                    <SurveyPreview ref={ref} />
+                    <SurveyIframeProduction ref={ref} />
                 </Grid.Cell>
 
                 {/* Right Panel - Question Settings */}

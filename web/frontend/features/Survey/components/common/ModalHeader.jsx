@@ -335,8 +335,16 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                     </InlineStack>
                 </Box>
 
-                {/* Right Section - Status and Save Button */}
+                {/* Right Section - Status, Refresh and Save Button */}
                 <InlineStack gap="200" blockAlign="center" wrap={false}>
+                    {/* Refresh Button */}
+                    <Button
+                        variant="secondary"
+                        size="slim"
+                        onClick={() => surveyPreviewRef?.current?.refreshIframe()}
+                    >
+                        Refresh
+                    </Button>
                     {/* Save Button */}
                     <Button
                         variant="primary"
