@@ -23,8 +23,8 @@ Route::middleware('shopify.auth')->group(function () {
     Route::get('/products', [\App\Http\Controllers\ShopController::class, 'getProducts']);
 
     // Survey CRUD
-    Route::get('/surveys', [SurveyController::class, 'index']);
-    Route::post('/surveys', [SurveyController::class, 'store']);
+    Route::get('/surveys', [SurveyController::class, 'getSurvey']);
+    Route::post('/surveys', [SurveyController::class, 'saveSurvey']);
     Route::get('/surveys/{uuid}', [SurveyController::class, 'show']);
     Route::put('/surveys/{uuid}', [SurveyController::class, 'update']);
     Route::patch('/surveys/{uuid}', [SurveyController::class, 'update']);
