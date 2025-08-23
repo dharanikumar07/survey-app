@@ -35,3 +35,4 @@ QWEN.md
 # docs/
 /web/frontend/index.html
 index.html
+/extensions/*/dist/

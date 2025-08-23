@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\webhook\AppUninstallListener;
 use App\Jobs\webhook\OrderListener;
 use App\Models\WebhookEvents;
 use Illuminate\Support\Facades\Log;
@@ -35,7 +36,7 @@ class WebhookTriggerHandler
     ];
 
     protected $appUninstalled = [
-        Topics::APP_UNINSTALLED
+        'app/uninstalled'
     ];
 
     public function triggerWebhook(WebhookEvents $webhookEvent)
@@ -45,14 +46,9 @@ class WebhookTriggerHandler
             OrderListener::dispatch($webhookEvent);
         }
 
-//        } elseif (in_array($topic, $this->customerTopics, true)) {
-//            Log::info("Customer Event [$topic] from $shop", ['data' => $body]);
-//            SyncCustomers::dispatch($topic, $shop, $body);
-//        } elseif (in_array($topic, $this->productTopics, true)) {
-//            Log::info("Product Event [$topic] from $shop", ['data' => $body]);
-//            SyncProducts::dispatch($topic, $shop, $body);
-//        } else {
-//            Log::info("Unhandled Event [$topic] from $shop", ['data' => $body]);
-//        }
+        if (in_array($webhookEvent->topic, $this->appUninstalled, true)) {
+            Log::info("Uninstall Event [$webhookEvent->topic]", ['data' => $webhookEvent->webhook_data]);
+            AppUninstallListener::dispatch($webhookEvent);
+        }
     }
 }

@@ -37,10 +37,16 @@ class Store extends Model
         return $this->store_url;
     }
 
-    public function getStoreUuidByDomain(string $shop): ?string
+    public static function getStoreUuidByDomain(string $shop): ?string
     {
-        return self::where('domain', $shop)->value('uuid');
+        return self::where('store_url', $shop)->value('uuid');
     }
+
+    public static function getStoreByDomain(string $shop)
+    {
+        return self::where('store_url', $shop)->firstOrFail();
+    }
+
     // Relationships
     public function surveys(): HasMany
     {

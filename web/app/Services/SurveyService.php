@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Helper\Helper;
 use App\Models\Store;
 use App\Models\Survey;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,8 @@ class SurveyService
 			return $survey;
 		} catch (\Throwable $e) {
 			DB::rollBack();
-			throw $e;
+            Helper::logError("Error Occurred", [__CLASS__, __FUNCTION__], $e);
+            throw new \Exception('Failed to delete survey.');
 		}
 	}
 
@@ -33,7 +35,6 @@ class SurveyService
 	{
 		DB::beginTransaction();
 		try {
-			// Lock the row to avoid concurrent lost updates
 			$locked = Survey::where('uuid', $survey->uuid)->lockForUpdate()->firstOrFail();
 			$locked->fill($data);
 			$locked->save();
@@ -41,7 +42,8 @@ class SurveyService
 			return $locked;
 		} catch (\Throwable $e) {
 			DB::rollBack();
-			throw $e;
+            Helper::logError("Error Occurred", [__CLASS__, __FUNCTION__], $e);
+            throw new \Exception('Failed to update survey.');
 		}
 	}
 
@@ -54,7 +56,8 @@ class SurveyService
 			DB::commit();
 		} catch (\Throwable $e) {
 			DB::rollBack();
-			throw $e;
+            Helper::logError("Error Occurred", [__CLASS__, __FUNCTION__], $e);
+            throw new \Exception('Failed to delete survey.');
 		}
 	}
 }
