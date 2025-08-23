@@ -1,5 +1,7 @@
 (function(){
+    console.log("hiiiiii");
     const target = document.querySelector('.th-sf-survey-card');
+    console.log(target);
     if (!target) return;
 
     if ("ResizeObserver" in window) {
@@ -18,14 +20,12 @@
         const height = target.scrollHeight;
         console.log(height);
 
-        // Prepare the message
         const messageData = {
             type: "yuko-survey-widget-height",
             message: "Sending survey widget height",
-            value: height + 50 // Add extra space if needed
+            value: height + 50
         };
 
-        // Send to parent
         window.parent.postMessage(messageData, "*");
     }
 })();
