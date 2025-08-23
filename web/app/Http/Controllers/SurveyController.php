@@ -24,10 +24,9 @@ class SurveyController extends Controller
 	/**
 	 * List surveys for the current store (scoped by Shopify session)
 	 */
-	public function index(Request $request)
+	public function getSurvey(Request $request)
 	{
 		try {
-			/** @var \Shopify\Auth\Session $session */
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
 
@@ -59,10 +58,9 @@ class SurveyController extends Controller
 	/**
 	 * Create a new survey
 	 */
-	public function store(StoreSurveyRequest $request)
+	public function saveSurvey(StoreSurveyRequest $request)
 	{
 		try {
-			/** @var \Shopify\Auth\Session $session */
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
 
@@ -88,7 +86,6 @@ class SurveyController extends Controller
 	public function show(Request $request, string $uuid)
 	{
 		try {
-			/** @var \Shopify\Auth\Session $session */
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
 
@@ -116,7 +113,6 @@ class SurveyController extends Controller
 	public function update(UpdateSurveyRequest $request, string $uuid)
 	{
 		try {
-			/** @var \Shopify\Auth\Session $session */
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
 
@@ -150,7 +146,6 @@ class SurveyController extends Controller
 	public function destroy(Request $request, string $uuid)
 	{
 		try {
-			/** @var \Shopify\Auth\Session $session */
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
 
