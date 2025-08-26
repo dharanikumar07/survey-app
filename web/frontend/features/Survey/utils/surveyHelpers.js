@@ -87,10 +87,10 @@ export const generateCleanSurveyHTML = (surveyData, htmlContent) => {
 };
 
 /**
- * Generates complete HTML document with meta and body tags (no JavaScript)
+ * Generates container div content for survey storage (no full HTML document)
  * @param {Object} surveyData - The survey data object
  * @param {string} htmlContent - The HTML content from the preview component
- * @returns {string} Complete HTML document ready for standalone use
+ * @returns {string} Container div content only, wrapped in th-sf-survey-container
  */
 export const generateCompleteSurveyHTML = (surveyData, htmlContent) => {
     // Extract the main content from the preview (excluding outer wrapper)
@@ -112,98 +112,14 @@ export const generateCompleteSurveyHTML = (surveyData, htmlContent) => {
         .replace(/onMouseDown\s*=/gi, '')
         .replace(/onMouseUp\s*=/gi, '');
     
-    // Create complete HTML document with body tag
-    const completeHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="${surveyData.name || 'Survey'} - Customer feedback form">
-    <meta name="robots" content="noindex, nofollow">
-    <title>${surveyData.name || 'Survey'}</title>
-    <style>
-        /* Reset and base styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.5;
-            color: #202223;
-            background: #f6f6f7;
-            margin: 0;
-            padding: 0;
-        }
-        
-        /* Ensure all interactive elements are accessible */
-        button:focus,
-        input:focus,
-        textarea:focus {
-            outline: 2px solid #2c6ecb;
-            outline-offset: 2px;
-        }
-        
-        /* Survey-specific styles */
-        .th-sf-survey-container {
-            padding: 32px;
-            background: #f6f6f7;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .th-sf-survey-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            margin-bottom: 32px;
-        }
-        
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .th-sf-survey-container {
-                padding: 16px;
-            }
-            
-            .th-sf-survey-card {
-                max-width: 100%;
-            }
-        }
-        
-        /* Print styles */
-        @media print {
-            .th-sf-survey-container {
-                background: white;
-                padding: 0;
-            }
-            
-            .th-sf-survey-card {
-                box-shadow: none;
-                border: 1px solid #ccc;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="th-sf-survey-container">
-        ${cleanHTML}
-    </div>
-</body>
-</html>`;
-    
-    return completeHTML;
+    // Return only the container div content, not the full HTML document
+    return `<div class="th-sf-survey-container">${cleanHTML}</div>`;
 };
 
 /**
- * Generates just the body content for embedding in existing pages
+ * Generates container div content for embedding in existing pages
  * @param {string} htmlContent - The HTML content from the preview component
- * @returns {string} Body content only
+ * @returns {string} Container div content wrapped in th-sf-survey-container
  */
 export const generateSurveyBodyContent = (htmlContent) => {
     const tempDiv = document.createElement('div');
@@ -211,7 +127,10 @@ export const generateSurveyBodyContent = (htmlContent) => {
     
     // Get the content inside data-preview-content attribute
     const mainContent = tempDiv.querySelector('[data-preview-content]');
-    return mainContent ? mainContent.innerHTML : htmlContent;
+    const content = mainContent ? mainContent.innerHTML : htmlContent;
+    
+    // Return wrapped in th-sf-survey-container div
+    return `<div class="th-sf-survey-container">${content}</div>`;
 };
 
 /**
@@ -259,9 +178,9 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
             limitOnePerEmail: false
         },
         channelTypes: surveyData.channelTypes || ['thankyou'],
-        htmlContent: sanitizedHTML,
-        cleanHTML: generateCleanSurveyHTML(surveyData, sanitizedHTML),
-        completeHTML: generateCompleteSurveyHTML(surveyData, sanitizedHTML),
+        htmlContent: sanitizedHTML, // Raw HTML content wrapped in th-sf-survey-container
+        cleanHTML: generateCleanSurveyHTML(surveyData, sanitizedHTML), // Clean HTML wrapped in th-sf-survey-container
+        completeHTML: generateCompleteSurveyHTML(surveyData, sanitizedHTML), // Complete HTML wrapped in th-sf-survey-container
         // No JavaScript content included in API
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()

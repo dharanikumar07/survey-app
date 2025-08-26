@@ -136,9 +136,9 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
         console.log('Status:', completeSurveyData.status);
         console.log('Is Active:', completeSurveyData.is_active);
         console.log('Survey Meta Data:', completeSurveyData.survey_meta_data);
-        console.log('HTML Content for Storefront:', completeSurveyData.survey_meta_data?.htmlContent);
-        console.log('Clean HTML Content:', completeSurveyData.survey_meta_data?.cleanHTML);
-        console.log('Complete HTML Document:', completeSurveyData.survey_meta_data?.completeHTML);
+        console.log('Container HTML Content (th-sf-survey-container):', completeSurveyData.survey_meta_data?.htmlContent);
+        console.log('Clean Container HTML:', completeSurveyData.survey_meta_data?.cleanHTML);
+        console.log('Complete Container HTML:', completeSurveyData.survey_meta_data?.completeHTML);
 
         // Validate the data structure before sending to API
         const validation = validateSurveyForAPI(completeSurveyData);
