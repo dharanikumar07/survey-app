@@ -122,6 +122,10 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
             htmlContent = surveyPreviewRef.current.getBodyContent();
             cleanHTML = surveyPreviewRef.current.getCleanHTML();
             completeHTML = surveyPreviewRef.current.getCompleteHTML();
+
+            // Simple debugging
+            console.log('HTML Content Length:', htmlContent?.length);
+            console.log('Complete HTML Length:', completeHTML?.length);
         }
 
         // Use helper for API formatting
@@ -130,15 +134,19 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
         // Prepare complete survey data with HTML for backend storage
         const completeSurveyData = prepareSurveyForBackend(surveyData, htmlContent);
 
-        console.log('API Formatted Data (New Structure):', apiFormattedData);
-        console.log('Complete Survey Data with HTML (New Structure):', completeSurveyData);
-        console.log('Survey Type:', completeSurveyData.survey_type);
-        console.log('Status:', completeSurveyData.status);
-        console.log('Is Active:', completeSurveyData.is_active);
-        console.log('Survey Meta Data:', completeSurveyData.survey_meta_data);
-        console.log('Container HTML Content (th-sf-survey-container):', completeSurveyData.survey_meta_data?.htmlContent);
-        console.log('Clean Container HTML:', completeSurveyData.survey_meta_data?.cleanHTML);
-        console.log('Complete Container HTML:', completeSurveyData.survey_meta_data?.completeHTML);
+        // console.log('API Formatted Data (New Structure):', apiFormattedData);
+        // console.log('Complete Survey Data with HTML (New Structure):', completeSurveyData);
+        // console.log('Survey Type:', completeSurveyData.survey_type);
+        // console.log('Status:', completeSurveyData.status);
+        // console.log('Is Active:', completeSurveyData.is_active);
+        // console.log('Survey Meta Data:', completeSurveyData.survey_meta_data);
+        // console.log('Container HTML Content (th-sf-survey-container):', completeSurveyData.survey_meta_data?.htmlContent);
+        // console.log('Clean Container HTML:', completeSurveyData.survey_meta_data?.cleanHTML);
+        // console.log('Complete Container HTML:', completeSurveyData.survey_meta_data?.completeHTML);
+        // console.log('Complete HTML:', completeHTML);
+        // console.log('Clean HTML:', cleanHTML);
+        // console.log('HTML Content:', htmlContent);
+        console.log('Complete Survey Data:', completeSurveyData);
 
         // Validate the data structure before sending to API
         const validation = validateSurveyForAPI(completeSurveyData);

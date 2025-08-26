@@ -87,30 +87,48 @@ const SurveyPreview = forwardRef((props, ref) => {
         },
         getBodyContent: () => {
             if (previewRef.current) {
-                // Get only the content inside the main preview area (excluding the outer wrapper)
+                // Get the actual rendered survey content
                 const mainContent = previewRef.current.querySelector('[data-preview-content]');
-                const htmlContent = mainContent ? mainContent.outerHTML : '';
-                // Use helper for clean HTML
-                return generateCleanSurveyHTML({ name: 'Survey' }, htmlContent);
+                if (mainContent) {
+                    // Return the actual HTML content that's currently rendered
+                    return mainContent.outerHTML;
+                }
+                // Fallback: return the entire preview content
+                return previewRef.current.outerHTML;
             }
             return '';
         },
         getCompleteHTML: () => {
             if (previewRef.current) {
-                const htmlContent = previewRef.current.outerHTML;
-                // Use helper for complete HTML document
-                return generateCompleteSurveyHTML({ name: 'Survey' }, htmlContent);
+                // Get the actual rendered survey content
+                const mainContent = previewRef.current.querySelector('[data-preview-content]');
+                if (mainContent) {
+                    // Return the actual HTML content that's currently rendered
+                    return mainContent.outerHTML;
+                }
+                // Fallback: return the entire preview content
+                return previewRef.current.outerHTML;
             }
             return '';
         },
         getCleanHTML: () => {
             if (previewRef.current) {
+                // Get the actual rendered survey content
                 const mainContent = previewRef.current.querySelector('[data-preview-content]');
-                const htmlContent = mainContent ? mainContent.outerHTML : '';
-                // Use helper for clean HTML
-                return generateCleanSurveyHTML({ name: 'Survey' }, htmlContent);
+                if (mainContent) {
+                    // Return the actual HTML content that's currently rendered
+                    return mainContent.outerHTML;
+                }
+                // Fallback: return the entire preview content
+                return previewRef.current.outerHTML;
             }
             return '';
+        },
+        // Add a method to refresh the iframe
+        refreshIframe: () => {
+            console.log('Refreshing iframe...');
+            // Force a re-render by setting a state variable
+            setCurrentQuestionIndex(currentQuestionIndex);
         },
         getJavaScriptContent: () => {
             // Generate JavaScript content for the survey using the current questions

@@ -64,26 +64,20 @@ export const getQuestionTypeDisplayName = (type) => {
  * @returns {string} Clean HTML content ready for backend storage
  */
 export const generateCleanSurveyHTML = (surveyData, htmlContent) => {
-    // Extract the main content from the preview (excluding outer wrapper)
+    // Extract the main content from the preview
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlContent;
     
     // Get the content inside data-preview-content attribute
     const mainContent = tempDiv.querySelector('[data-preview-content]');
-    const surveyContent = mainContent ? mainContent.innerHTML : htmlContent;
     
-    // Clean the HTML content - remove any scripts, event handlers, and console logs
-    const cleanHTML = surveyContent
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
-        .replace(/on\w+\s*=/gi, '') // Remove event handlers
-        .replace(/console\.log\([^)]*\)/g, '') // Remove console logs
-        .replace(/onClick\s*=/gi, '') // Remove React onClick handlers
-        .replace(/onMouseOver\s*=/gi, '') // Remove mouse event handlers
-        .replace(/onMouseOut\s*=/gi, '') // Remove mouse event handlers
-        .replace(/onMouseDown\s*=/gi, '') // Remove mouse event handlers
-        .replace(/onMouseUp\s*=/gi, ''); // Remove mouse event handlers
+    // If we found the preview content, use it, otherwise use the original content
+    if (mainContent) {
+        return mainContent.outerHTML;
+    }
     
-    return cleanHTML;
+    // If no preview content found, return the original with minimal cleaning
+    return htmlContent;
 };
 
 /**
@@ -93,27 +87,20 @@ export const generateCleanSurveyHTML = (surveyData, htmlContent) => {
  * @returns {string} Container div content only, wrapped in th-sf-survey-container
  */
 export const generateCompleteSurveyHTML = (surveyData, htmlContent) => {
-    // Extract the main content from the preview (excluding outer wrapper)
+    // Extract the main content from the preview
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlContent;
     
     // Get the content inside data-preview-content attribute
     const mainContent = tempDiv.querySelector('[data-preview-content]');
-    const surveyContent = mainContent ? mainContent.innerHTML : htmlContent;
     
-    // Clean the HTML content first
-    const cleanHTML = surveyContent
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/on\w+\s*=/gi, '')
-        .replace(/console\.log\([^)]*\)/g, '')
-        .replace(/onClick\s*=/gi, '')
-        .replace(/onMouseOver\s*=/gi, '')
-        .replace(/onMouseOut\s*=/gi, '')
-        .replace(/onMouseDown\s*=/gi, '')
-        .replace(/onMouseUp\s*=/gi, '');
+    // If we found the preview content, use it
+    if (mainContent) {
+        return mainContent.outerHTML;
+    }
     
-    // Return only the container div content, not the full HTML document
-    return `<div class="th-sf-survey-container">${cleanHTML}</div>`;
+    // If no preview content found, wrap the original content in a container
+    return `<div class="th-sf-survey-container">${htmlContent}</div>`;
 };
 
 /**
@@ -127,10 +114,14 @@ export const generateSurveyBodyContent = (htmlContent) => {
     
     // Get the content inside data-preview-content attribute
     const mainContent = tempDiv.querySelector('[data-preview-content]');
-    const content = mainContent ? mainContent.innerHTML : htmlContent;
     
-    // Return wrapped in th-sf-survey-container div
-    return `<div class="th-sf-survey-container">${content}</div>`;
+    // If we found the preview content, use it
+    if (mainContent) {
+        return mainContent.outerHTML;
+    }
+    
+    // If no preview content found, wrap the original content in a container
+    return `<div class="th-sf-survey-container">${htmlContent}</div>`;
 };
 
 /**
@@ -139,16 +130,12 @@ export const generateSurveyBodyContent = (htmlContent) => {
  * @returns {string} Sanitized HTML content
  */
 export const sanitizeHTML = (htmlContent) => {
-    // Basic HTML sanitization - in production, use a library like DOMPurify
-    const allowedTags = ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'button', 'a', 'img'];
-    const allowedAttributes = ['style', 'class', 'id', 'href', 'src', 'alt'];
-    
-    // This is a basic implementation - consider using DOMPurify for production
+    // Only remove potentially dangerous scripts and event handlers
+    // but preserve all other content including styles and form elements
     return htmlContent
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-        .replace(/javascript:/gi, '')
-        .replace(/on\w+\s*=/gi, '');
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
+        .replace(/javascript:/gi, '') // Remove javascript: protocol
+        .replace(/on\w+\s*=/gi, ''); // Remove event handlers
 };
 
 /**
@@ -158,7 +145,11 @@ export const sanitizeHTML = (htmlContent) => {
  * @returns {Object} Formatted data for backend
  */
 export const prepareSurveyForBackend = (surveyData, htmlContent) => {
-    const sanitizedHTML = sanitizeHTML(htmlContent);
+    // Simple debugging to see what's happening
+    console.log('Original HTML length:', htmlContent?.length);
+    
+    // Use the original HTML content directly without aggressive sanitization
+    // This preserves all the form styles and content
     
     // Prepare the existing complete survey data structure
     const existingCompleteData = {
@@ -178,9 +169,9 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
             limitOnePerEmail: false
         },
         channelTypes: surveyData.channelTypes || ['thankyou'],
-        htmlContent: sanitizedHTML, // Raw HTML content wrapped in th-sf-survey-container
-        cleanHTML: generateCleanSurveyHTML(surveyData, sanitizedHTML), // Clean HTML wrapped in th-sf-survey-container
-        completeHTML: generateCompleteSurveyHTML(surveyData, sanitizedHTML), // Complete HTML wrapped in th-sf-survey-container
+        htmlContent: htmlContent, // Use original HTML content directly
+        cleanHTML: generateCleanSurveyHTML(surveyData, htmlContent), // Clean HTML with minimal sanitization
+        completeHTML: generateCompleteSurveyHTML(surveyData, htmlContent), // Complete HTML with minimal sanitization
         // No JavaScript content included in API
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
