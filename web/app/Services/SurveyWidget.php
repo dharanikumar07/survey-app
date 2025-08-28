@@ -7,20 +7,24 @@ use App\Models\Survey;
 class SurveyWidget
 {
     public $storeUuid;
+    public $surveyUuid;
     public $settings;
-    public function __construct($storeUuid)
+    public function __construct($storeUuid, $surveyUuid)
     {
         $this->storeUuid = $storeUuid;
+        $this->surveyUuid = $surveyUuid;
         $this->settings = $this->getSettings();
     }
 
     public function getSettings()
     {
-        return  Survey::where('store_uuid', $this->storeUuid)->firstOrFail();
+        return Survey::where('store_uuid', $this->storeUuid)
+            ->where('uuid', $this->surveyUuid)
+            ->firstOrFail();
     }
 
     public function getSurveyHtmlContent()
     {
-        return $this->settings['survey_meta_data']['htmlContent'];
+        return $this->settings['survey_meta_data']['completeHTML'];
     }
 }
