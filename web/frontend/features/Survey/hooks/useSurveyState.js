@@ -61,6 +61,11 @@ export const useSurveyState = () => {
         // Survey preview state
         currentQuestionIndex,
         setCurrentQuestionIndex,
+        
+        // API related functions
+        resetSurveyToDefault,
+        loadSurveyFromApi,
+        saveSurveyToApi,
     } = useStore();
 
     return {
@@ -123,5 +128,10 @@ export const useSurveyState = () => {
         // Survey preview state
         currentQuestionIndex,
         setCurrentQuestionIndex,
+        
+        // API related functions
+        resetSurveyToDefault,
+        loadSurveyFromApi,
+        saveSurveyToApi,
     };
 };
