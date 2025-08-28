@@ -285,7 +285,7 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                 <Box className="th-sf-modal-header-center">
                     <InlineStack gap="400" blockAlign="center">
                         {/* Branded Survey Page Popover */}
-                        <Popover
+                        {/* <Popover
                             active={surveyPagePopoverActive}
                             activator={
                                 <Button
@@ -311,7 +311,7 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                                     active: selectedSurveyPage === option.value
                                 }))}
                             />
-                        </Popover>
+                        </Popover> */}
 
                         {/* Device View Controls */}
                         <ButtonGroup variant='segmented'>
