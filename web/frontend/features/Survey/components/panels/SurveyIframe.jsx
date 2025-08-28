@@ -1001,29 +1001,34 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
 
         // HTML content methods (for backward compatibility)
         getHTMLContent: () => {
-            if (iframeRef.current) {
-                return iframeRef.current.outerHTML;
+            if (iframeRef.current && (iframeRef.current.contentDocument || iframeRef.current.contentWindow)) {
+                const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+                return doc.documentElement.outerHTML;
             }
             return '';
         },
 
         getBodyContent: () => {
-            if (iframeRef.current) {
-                return iframeRef.current.outerHTML;
+            if (iframeRef.current && (iframeRef.current.contentDocument || iframeRef.current.contentWindow)) {
+                const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+                return doc.body ? doc.body.innerHTML : '';
             }
             return '';
         },
 
         getCompleteHTML: () => {
-            if (iframeRef.current) {
-                return iframeRef.current.outerHTML;
+            if (iframeRef.current && (iframeRef.current.contentDocument || iframeRef.current.contentWindow)) {
+                const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+                return doc.documentElement.outerHTML;
             }
             return '';
         },
 
         getCleanHTML: () => {
-            if (iframeRef.current) {
-                return iframeRef.current.outerHTML;
+            if (iframeRef.current && (iframeRef.current.contentDocument || iframeRef.current.contentWindow)) {
+                const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+                const container = doc.querySelector('.th-sf-survey-container');
+                return container ? container.outerHTML : '';
             }
             return '';
         },
@@ -1031,6 +1036,25 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         getJavaScriptContent: () => {
             // Return the iframe's JavaScript content
             return generateIframeContent();
+        },
+
+        // Precise helpers to fetch only specific inner HTML chunks
+        getContainerDivHTML: () => {
+            if (iframeRef.current && (iframeRef.current.contentDocument || iframeRef.current.contentWindow)) {
+                const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+                const container = doc.querySelector('.th-sf-survey-container');
+                return container ? container.outerHTML : '';
+            }
+            return '';
+        },
+
+        getQuestionContentHTML: () => {
+            if (iframeRef.current && (iframeRef.current.contentDocument || iframeRef.current.contentWindow)) {
+                const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+                const questionContentEl = doc.getElementById('question-content');
+                return questionContentEl ? questionContentEl.outerHTML : '';
+            }
+            return '';
         }
     }));
 
