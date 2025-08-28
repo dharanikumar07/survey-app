@@ -1,55 +1,284 @@
 {
-  "channelItems": [
-    { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
-    { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-    { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-    { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-    { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
-    { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
-  ],
-  "discountSettings": {
-    "code": "",
-    "displayOn": "email",
-    "limitPerEmail": false
-  },
-  "discountSections": [
-    { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
-    { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
-    { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
-  ],
-  "defaultValues": {
-    "surveyTitle": "Survey #1",
-    "selectedTab": 0,
-    "selectedQuestionId": "1",
-    "currentQuestionIndex": 0,
-    "selectedView": "desktop",
-    "isActive": true,
-    "selectedTheme": "default",
-    "themePopoverActive": false,
-    "statusPopoverActive": false,
-    "surveyPagePopoverActive": false,
-    "selectedSurveyPage": "page",
-    "discountEnabled": false,
-    "editModalOpen": false
-  },
-  "questions": [
-    { 
-      "id": "1", 
-      "content": "How likely are you to recommend us to a friend?", 
-      "type": "rating", 
-      "description": "", 
-      "questionType": "Star rating", 
-      "isDraggable": true,
-      "answerOptions": [
-        { "id": "opt1", "text": "1 - Not likely" },
-        { "id": "opt2", "text": "2 - Somewhat likely" },
-        { "id": "opt3", "text": "3 - Likely" },
-        { "id": "opt4", "text": "4 - Very likely" },
-        { "id": "opt5", "text": "5 - Extremely likely" }
+  "templates": {
+    "blank": {
+      "title": "Blank survey",
+      "description": "Tell us your needs - we'll take care of everything.",
+      "channelItems": [
+        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
+        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
+        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
+        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+      ],
+      "discountSettings": {
+        "code": "",
+        "displayOn": "email",
+        "limitPerEmail": false
+      },
+      "discountSections": [
+        { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
+        { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+      ],
+      "defaultValues": {
+        "surveyTitle": "Blank Survey",
+        "selectedTab": 0,
+        "selectedQuestionId": "1",
+        "currentQuestionIndex": 0,
+        "selectedView": "desktop",
+        "isActive": true,
+        "selectedTheme": "default",
+        "themePopoverActive": false,
+        "statusPopoverActive": false,
+        "surveyPagePopoverActive": false,
+        "selectedSurveyPage": "page",
+        "discountEnabled": false,
+        "editModalOpen": false
+      },
+      "questions": [
+        { 
+          "id": "1", 
+          "content": "What would you like to ask?", 
+          "type": "text", 
+          "description": "", 
+          "questionType": "Short answer", 
+          "isDraggable": true,
+          "answerOptions": []
+        },
+        { "id": "thankyou", "content": "Thank You Card", "type": "card", "description": "", "questionType": "Card", "isDraggable": false, "answerOptions": [] }
       ]
     },
-    { "id": "thankyou", "content": "Thank You Card", "type": "card", "description": "", "questionType": "Card", "isDraggable": false, "answerOptions": [] }
-  ],
+    "marketing_attribution": {
+      "title": "Marketing attribution",
+      "description": "Find out which marketing channels are most effective.",
+      "channelItems": [
+        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
+        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
+        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
+        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+      ],
+      "discountSettings": {
+        "code": "",
+        "displayOn": "email",
+        "limitPerEmail": false
+      },
+      "discountSections": [
+        { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
+        { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+      ],
+      "defaultValues": {
+        "surveyTitle": "Marketing Attribution Survey",
+        "selectedTab": 0,
+        "selectedQuestionId": "1",
+        "currentQuestionIndex": 0,
+        "selectedView": "desktop",
+        "isActive": true,
+        "selectedTheme": "default",
+        "themePopoverActive": false,
+        "statusPopoverActive": false,
+        "surveyPagePopoverActive": false,
+        "selectedSurveyPage": "page",
+        "discountEnabled": false,
+        "editModalOpen": false
+      },
+      "questions": [
+        { 
+          "id": "1", 
+          "content": "How did you hear about us?", 
+          "type": "single-choice", 
+          "description": "Select the option that best describes your answer.", 
+          "questionType": "Single choice", 
+          "isDraggable": true,
+          "answerOptions": [
+            { "id": "opt1", "text": "Word of mouth" },
+            { "id": "opt2", "text": "Social media" },
+            { "id": "opt3", "text": "Search engine" },
+            { "id": "opt4", "text": "Advertisement" },
+            { "id": "opt5", "text": "Other" }
+          ]
+        },
+        { "id": "thankyou", "content": "Thank You Card", "type": "card", "description": "", "questionType": "Card", "isDraggable": false, "answerOptions": [] }
+      ]
+    },
+    "customer_experience": {
+      "title": "Customer experience survey",
+      "description": "Gauge general customer experience.",
+      "channelItems": [
+        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
+        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
+        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
+        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+      ],
+      "discountSettings": {
+        "code": "",
+        "displayOn": "email",
+        "limitPerEmail": false
+      },
+      "discountSections": [
+        { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
+        { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+      ],
+      "defaultValues": {
+        "surveyTitle": "Customer Experience Survey",
+        "selectedTab": 0,
+        "selectedQuestionId": "1",
+        "currentQuestionIndex": 0,
+        "selectedView": "desktop",
+        "isActive": true,
+        "selectedTheme": "default",
+        "themePopoverActive": false,
+        "statusPopoverActive": false,
+        "surveyPagePopoverActive": false,
+        "selectedSurveyPage": "page",
+        "discountEnabled": false,
+        "editModalOpen": false
+      },
+      "questions": [
+        { 
+          "id": "1", 
+          "content": "How likely are you to recommend us to a friend?", 
+          "type": "rating", 
+          "description": "Rate your likelihood on a scale from 1 (Not likely) to 5 (Extremely likely).", 
+          "questionType": "Star rating", 
+          "isDraggable": true,
+          "answerOptions": [
+            { "id": "opt1", "text": "1 - Not likely" },
+            { "id": "opt2", "text": "2 - Somewhat likely" },
+            { "id": "opt3", "text": "3 - Likely" },
+            { "id": "opt4", "text": "4 - Very likely" },
+            { "id": "opt5", "text": "5 - Extremely likely" }
+          ]
+        },
+        { 
+          "id": "2", 
+          "content": "How satisfied are you with your recent purchase?", 
+          "type": "satisfaction", 
+          "description": "Please indicate your level of satisfaction with our service.", 
+          "questionType": "Satisfaction", 
+          "isDraggable": true,
+          "answerOptions": [
+            { "id": "opt6", "text": "Very Dissatisfied" },
+            { "id": "opt7", "text": "Dissatisfied" },
+            { "id": "opt8", "text": "Neutral" },
+            { "id": "opt9", "text": "Satisfied" },
+            { "id": "opt10", "text": "Very Satisfied" }
+          ]
+        },
+        { "id": "thankyou", "content": "Thank You Card", "type": "card", "description": "", "questionType": "Card", "isDraggable": false, "answerOptions": [] }
+      ]
+    },
+    "not_purchasing": {
+      "title": "Reason for not purchasing",
+      "description": "Understand what's stopping users from purchasing on your site.",
+      "channelItems": [
+        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
+        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
+        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": true, "isEnabled": true },
+        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+      ],
+      "discountSettings": {
+        "code": "",
+        "displayOn": "email",
+        "limitPerEmail": false
+      },
+      "discountSections": [
+        { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
+        { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+      ],
+      "defaultValues": {
+        "surveyTitle": "Exit Survey",
+        "selectedTab": 0,
+        "selectedQuestionId": "1",
+        "currentQuestionIndex": 0,
+        "selectedView": "desktop",
+        "isActive": true,
+        "selectedTheme": "default",
+        "themePopoverActive": false,
+        "statusPopoverActive": false,
+        "surveyPagePopoverActive": false,
+        "selectedSurveyPage": "page",
+        "discountEnabled": false,
+        "editModalOpen": false
+      },
+      "questions": [
+        { 
+          "id": "1", 
+          "content": "What stopped you from making a purchase today?", 
+          "type": "single-choice", 
+          "description": "Select the option that best describes your reason.", 
+          "questionType": "Single choice", 
+          "isDraggable": true,
+          "answerOptions": [
+            { "id": "opt1", "text": "Price too high" },
+            { "id": "opt2", "text": "Shipping costs" },
+            { "id": "opt3", "text": "Just browsing" },
+            { "id": "opt4", "text": "Payment issues" },
+            { "id": "opt5", "text": "Other" }
+          ]
+        },
+        { "id": "thankyou", "content": "Thank You Card", "type": "card", "description": "", "questionType": "Card", "isDraggable": false, "answerOptions": [] }
+      ]
+    },
+    "exit_intent": {
+      "title": "Exit intent",
+      "description": "Understand what's stopping users from purchasing on your site.",
+      "channelItems": [
+        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
+        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
+        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": true, "isEnabled": true },
+        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+      ],
+      "discountSettings": {
+        "code": "",
+        "displayOn": "email",
+        "limitPerEmail": false
+      },
+      "discountSections": [
+        { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
+        { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+      ],
+      "defaultValues": {
+        "surveyTitle": "Exit Intent Survey",
+        "selectedTab": 0,
+        "selectedQuestionId": "1",
+        "currentQuestionIndex": 0,
+        "selectedView": "desktop",
+        "isActive": true,
+        "selectedTheme": "default",
+        "themePopoverActive": false,
+        "statusPopoverActive": false,
+        "surveyPagePopoverActive": false,
+        "selectedSurveyPage": "page",
+        "discountEnabled": true,
+        "editModalOpen": false
+      },
+      "questions": [
+        { 
+          "id": "1", 
+          "content": "You're leaving?", 
+          "type": "text", 
+          "description": "Before you go, we'd love to know what we could improve.", 
+          "questionType": "Short answer", 
+          "isDraggable": true,
+          "answerOptions": []
+        },
+        { "id": "thankyou", "content": "Thank You Card", "type": "card", "description": "", "questionType": "Card", "isDraggable": false, "answerOptions": [] }
+      ]
+    }
+  },
   "questionTemplates": {
     "text": {
       "content": "How could we improve our service?",
