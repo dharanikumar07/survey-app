@@ -23,7 +23,7 @@ class Survey extends Model
     ];
 
     protected $casts = [
-        'survey_meta_data' => 'array',
+        'survey_meta_data' => 'json',
         'is_active' => 'boolean',
         'total_responses' => 'integer',
         'total_impressions' => 'integer'
@@ -31,7 +31,6 @@ class Survey extends Model
 
     public function setIsActiveAttribute($value)
     {
-        // Convert to string 'true'/'false' like in DbSessionStorage
         if (is_bool($value)) {
             $this->attributes['is_active'] = $value ? 'true' : 'false';
             return;

@@ -99,182 +99,22 @@ export function ContentTab() {
 
     const toggleAddPopover = () => setAddPopoverActive((v) => !v);
 
+    // Fixed to use the store's addQuestion method that uses templates
     const insertQuestionByType = (type) => {
-        const templates = {
-            'single-choice': 'How did you hear about us?',
-            'multiple-choice': 'Which of our products have you used?',
-            'number-scale': 'How would you rate our customer service?',
-            'rating': 'How likely are you to recommend us to a friend?',
-            'satisfaction': 'How satisfied are you with your recent purchase?',
-            'text': 'What could we do to improve our service?',
-            'date': 'When did you first visit our website?',
-            'matrix': 'Rate our services across different aspects',
-            'ranking': 'Rank these features by importance',
-            'demographic': 'What is your age group?',
-        };
-
-        // Additional templates for common survey scenarios
-        const getEnhancedTemplate = (type) => {
-            const enhancedTemplates = {
-                'single-choice': 'How did you hear about us?',
-                'multiple-choice': 'Which of our products have you used?',
-                'number-scale': 'How would you rate our customer service?',
-                'rating': 'How likely are you to recommend us to a friend?',
-                'satisfaction': 'How satisfied are you with your recent purchase?',
-                'text': 'What could we do to improve our service?',
-                'date': 'When did you first visit our website?',
-                'matrix': 'Rate our services across different aspects',
-                'ranking': 'Rank these features by importance',
-                'demographic': 'What is your age group?',
-            };
-            return enhancedTemplates[type] || 'New question';
-        };
-
-        const questionType = {
-            'single-choice': 'Single choice',
-            'multiple-choice': 'Multiple choice',
-            'number-scale': 'Number scale',
-            'rating': 'Star rating',
-            'satisfaction': 'Satisfaction',
-            'text': 'Short answer',
-            'date': 'Date',
-            'matrix': 'Matrix',
-            'ranking': 'Ranking',
-            'demographic': 'Demographic',
-        };
-
-        // Default answer options for each question type based on web best practices
-        const getDefaultOptions = (type) => {
-            switch (type) {
-                case 'single-choice':
-                    return [
-                        { id: `${uuidv4()}_1`, text: 'Word of mouth' },
-                        { id: `${uuidv4()}_2`, text: 'Social media' },
-                        { id: `${uuidv4()}_3`, text: 'Search engine' },
-                        { id: `${uuidv4()}_4`, text: 'Advertisement' },
-                        { id: `${uuidv4()}_5`, text: 'Other' }
-                    ];
-                case 'multiple-choice':
-                    return [
-                        { id: `${uuidv4()}_1`, text: 'Product A' },
-                        { id: `${uuidv4()}_2`, text: 'Product B' },
-                        { id: `${uuidv4()}_3`, text: 'Product C' },
-                        { id: `${uuidv4()}_4`, text: 'Service X' },
-                        { id: `${uuidv4()}_5`, text: 'Service Y' }
-                    ];
-                case 'number-scale':
-                    return [
-                        { id: `${uuidv4()}_1`, text: '1 - Poor' },
-                        { id: `${uuidv4()}_2`, text: '2 - Fair' },
-                        { id: `${uuidv4()}_3`, text: '3 - Good' },
-                        { id: `${uuidv4()}_4`, text: '4 - Very Good' },
-                        { id: `${uuidv4()}_5`, text: '5 - Excellent' }
-                    ];
-                case 'rating':
-                    return [
-                        { id: `${uuidv4()}_1`, text: '1 - Not likely' },
-                        { id: `${uuidv4()}_2`, text: '2 - Somewhat likely' },
-                        { id: `${uuidv4()}_3`, text: '3 - Likely' },
-                        { id: `${uuidv4()}_4`, text: '4 - Very likely' },
-                        { id: `${uuidv4()}_5`, text: '5 - Extremely likely' }
-                    ];
-                case 'satisfaction':
-                    return [
-                        { id: `${uuidv4()}_1`, text: 'Very Dissatisfied' },
-                        { id: `${uuidv4()}_2`, text: 'Dissatisfied' },
-                        { id: `${uuidv4()}_3`, text: 'Neutral' },
-                        { id: `${uuidv4()}_4`, text: 'Satisfied' },
-                        { id: `${uuidv4()}_5`, text: 'Very Satisfied' }
-                    ];
-                case 'matrix':
-                    return [
-                        { id: `${uuidv4()}_1`, text: 'Product Quality' },
-                        { id: `${uuidv4()}_2`, text: 'Customer Service' },
-                        { id: `${uuidv4()}_3`, text: 'Value for Money' },
-                        { id: `${uuidv4()}_4`, text: 'Ease of Use' },
-                        { id: `${uuidv4()}_5`, text: 'Overall Experience' }
-                    ];
-                case 'ranking':
-                    return [
-                        { id: `${uuidv4()}_1`, text: 'Price' },
-                        { id: `${uuidv4()}_2`, text: 'Quality' },
-                        { id: `${uuidv4()}_3`, text: 'Customer Service' },
-                        { id: `${uuidv4()}_4`, text: 'Brand Reputation' },
-                        { id: `${uuidv4()}_5`, text: 'Innovation' }
-                    ];
-                case 'demographic':
-                    return [
-                        { id: `${uuidv4()}_1`, text: '18-24 years' },
-                        { id: `${uuidv4()}_2`, text: '25-34 years' },
-                        { id: `${uuidv4()}_3`, text: '35-44 years' },
-                        { id: `${uuidv4()}_4`, text: '45-54 years' },
-                        { id: `${uuidv4()}_5`, text: '55+ years' }
-                    ];
-                case 'text':
-                case 'date':
-                    return []; // No answer options for text/date questions
-                default:
-                    return [
-                        { id: `${uuidv4()}_1`, text: 'Option 1' },
-                        { id: `${uuidv4()}_2`, text: 'Option 2' }
-                    ];
-            }
-        };
-
-        const nextId = uuidv4();
-        const newItem = {
-            id: nextId,
-            content: getEnhancedTemplate(type),
-            type: type === 'short' ? 'text' : type,
-            description: getDefaultDescription(type),
-            questionType: getQuestionTypeDisplayName(type) || questionType[type] || 'Custom',
-            isDraggable: true,
-            answerOptions: getDefaultOptions(type)
-        };
-
-        // Add validation using surveyHelpers
-        const validationErrors = validateQuestion(newItem);
-        if (validationErrors.length === 0) {
-            addQuestion(newItem);
-            setAddPopoverActive(false);
-            setSelectedQuestionId(nextId);
-        } else {
-            console.error('Question validation failed:', validationErrors);
-            // TODO: Show validation errors to user via toast or alert
-            // For now, we'll still add the question but log the errors
-            addQuestion(newItem);
-            setAddPopoverActive(false);
-            setSelectedQuestionId(nextId);
-        }
+        // Call the store's addQuestion with just the type
+        // This will use our template system from JSON
+        addQuestion(type);
+        setAddPopoverActive(false);
     };
 
-    // Get default description based on question type
+    // This function is no longer needed since we use templates from JSON
+    // but we'll keep it here as a reference for future use
+    /*
     const getDefaultDescription = (type) => {
-        switch (type) {
-            case 'single-choice':
-                return 'Select the option that best describes your answer.';
-            case 'multiple-choice':
-                return 'Select all options that apply to you.';
-            case 'number-scale':
-                return 'Rate your experience on a scale from 1 (Poor) to 5 (Excellent).';
-            case 'rating':
-                return 'Rate your likelihood on a scale from 1 (Not likely) to 5 (Extremely likely).';
-            case 'satisfaction':
-                return 'Please indicate your level of satisfaction with our service.';
-            case 'text':
-                return 'Please provide your feedback in detail.';
-            case 'date':
-                return 'Please select the date from the calendar.';
-            case 'matrix':
-                return 'Rate each aspect on a scale from 1 (Poor) to 5 (Excellent).';
-            case 'ranking':
-                return 'Drag and drop to rank these items in order of importance to you.';
-            case 'demographic':
-                return 'This information helps us better understand our customer base.';
-            default:
-                return 'Please provide your response.';
-        }
+        // Description is now handled by templates in surveyData.json
+        return '';
     };
+    */
 
     const handleSelectItem = (id) => {
         if (id !== 'add') {

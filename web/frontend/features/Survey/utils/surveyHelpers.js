@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { generateSurveyJavaScript } from './surveyStorefront';
 
 // Helper function to generate unique IDs for questions and options
 export const generateId = (prefix = 'item') => {
@@ -63,146 +64,49 @@ export const getQuestionTypeDisplayName = (type) => {
  * @returns {string} Clean HTML content ready for backend storage
  */
 export const generateCleanSurveyHTML = (surveyData, htmlContent) => {
-    // Extract the main content from the preview (excluding outer wrapper)
+    // Extract the main content from the preview
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlContent;
     
     // Get the content inside data-preview-content attribute
     const mainContent = tempDiv.querySelector('[data-preview-content]');
-    const surveyContent = mainContent ? mainContent.innerHTML : htmlContent;
     
-    // Clean the HTML content - remove any scripts, event handlers, and console logs
-    const cleanHTML = surveyContent
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
-        .replace(/on\w+\s*=/gi, '') // Remove event handlers
-        .replace(/console\.log\([^)]*\)/g, '') // Remove console logs
-        .replace(/onClick\s*=/gi, '') // Remove React onClick handlers
-        .replace(/onMouseOver\s*=/gi, '') // Remove mouse event handlers
-        .replace(/onMouseOut\s*=/gi, '') // Remove mouse event handlers
-        .replace(/onMouseDown\s*=/gi, '') // Remove mouse event handlers
-        .replace(/onMouseUp\s*=/gi, ''); // Remove mouse event handlers
+    // If we found the preview content, use it, otherwise use the original content
+    if (mainContent) {
+        return mainContent.outerHTML;
+    }
     
-    return cleanHTML;
+    // If no preview content found, return the original with minimal cleaning
+    return htmlContent;
 };
 
 /**
- * Generates complete HTML document with meta and body tags (no JavaScript)
+ * Generates container div content for survey storage (no full HTML document)
  * @param {Object} surveyData - The survey data object
  * @param {string} htmlContent - The HTML content from the preview component
- * @returns {string} Complete HTML document ready for standalone use
+ * @returns {string} Container div content only, wrapped in th-sf-survey-container
  */
 export const generateCompleteSurveyHTML = (surveyData, htmlContent) => {
-    // Extract the main content from the preview (excluding outer wrapper)
+    // Extract the main content from the preview
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlContent;
     
     // Get the content inside data-preview-content attribute
     const mainContent = tempDiv.querySelector('[data-preview-content]');
-    const surveyContent = mainContent ? mainContent.innerHTML : htmlContent;
     
-    // Clean the HTML content first
-    const cleanHTML = surveyContent
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/on\w+\s*=/gi, '')
-        .replace(/console\.log\([^)]*\)/g, '')
-        .replace(/onClick\s*=/gi, '')
-        .replace(/onMouseOver\s*=/gi, '')
-        .replace(/onMouseOut\s*=/gi, '')
-        .replace(/onMouseDown\s*=/gi, '')
-        .replace(/onMouseUp\s*=/gi, '');
+    // If we found the preview content, use it
+    if (mainContent) {
+        return mainContent.outerHTML;
+    }
     
-    // Create complete HTML document with body tag
-    const completeHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="${surveyData.name || 'Survey'} - Customer feedback form">
-    <meta name="robots" content="noindex, nofollow">
-    <title>${surveyData.name || 'Survey'}</title>
-    <style>
-        /* Reset and base styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.5;
-            color: #202223;
-            background: #f6f6f7;
-            margin: 0;
-            padding: 0;
-        }
-        
-        /* Ensure all interactive elements are accessible */
-        button:focus,
-        input:focus,
-        textarea:focus {
-            outline: 2px solid #2c6ecb;
-            outline-offset: 2px;
-        }
-        
-        /* Survey-specific styles */
-        .th-sf-survey-container {
-            padding: 32px;
-            background: #f6f6f7;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .th-sf-survey-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            margin-bottom: 32px;
-        }
-        
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .th-sf-survey-container {
-                padding: 16px;
-            }
-            
-            .th-sf-survey-card {
-                max-width: 100%;
-            }
-        }
-        
-        /* Print styles */
-        @media print {
-            .th-sf-survey-container {
-                background: white;
-                padding: 0;
-            }
-            
-            .th-sf-survey-card {
-                box-shadow: none;
-                border: 1px solid #ccc;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="th-sf-survey-container">
-        ${cleanHTML}
-    </div>
-</body>
-</html>`;
-    
-    return completeHTML;
+    // If no preview content found, wrap the original content in a container
+    return `<div class="th-sf-survey-container">${htmlContent}</div>`;
 };
 
 /**
- * Generates just the body content for embedding in existing pages
+ * Generates container div content for embedding in existing pages
  * @param {string} htmlContent - The HTML content from the preview component
- * @returns {string} Body content only
+ * @returns {string} Container div content wrapped in th-sf-survey-container
  */
 export const generateSurveyBodyContent = (htmlContent) => {
     const tempDiv = document.createElement('div');
@@ -210,7 +114,14 @@ export const generateSurveyBodyContent = (htmlContent) => {
     
     // Get the content inside data-preview-content attribute
     const mainContent = tempDiv.querySelector('[data-preview-content]');
-    return mainContent ? mainContent.innerHTML : htmlContent;
+    
+    // If we found the preview content, use it
+    if (mainContent) {
+        return mainContent.outerHTML;
+    }
+    
+    // If no preview content found, wrap the original content in a container
+    return `<div class="th-sf-survey-container">${htmlContent}</div>`;
 };
 
 /**
@@ -219,16 +130,12 @@ export const generateSurveyBodyContent = (htmlContent) => {
  * @returns {string} Sanitized HTML content
  */
 export const sanitizeHTML = (htmlContent) => {
-    // Basic HTML sanitization - in production, use a library like DOMPurify
-    const allowedTags = ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'button', 'a', 'img'];
-    const allowedAttributes = ['style', 'class', 'id', 'href', 'src', 'alt'];
-    
-    // This is a basic implementation - consider using DOMPurify for production
+    // Only remove potentially dangerous scripts and event handlers
+    // but preserve all other content including styles and form elements
     return htmlContent
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-        .replace(/javascript:/gi, '')
-        .replace(/on\w+\s*=/gi, '');
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
+        .replace(/javascript:/gi, '') // Remove javascript: protocol
+        .replace(/on\w+\s*=/gi, ''); // Remove event handlers
 };
 
 /**
@@ -238,7 +145,11 @@ export const sanitizeHTML = (htmlContent) => {
  * @returns {Object} Formatted data for backend
  */
 export const prepareSurveyForBackend = (surveyData, htmlContent) => {
-    const sanitizedHTML = sanitizeHTML(htmlContent);
+    // Simple debugging to see what's happening
+    console.log('Original HTML length:', htmlContent?.length);
+    
+    // Use the original HTML content directly without aggressive sanitization
+    // This preserves all the form styles and content
     
     // Prepare the existing complete survey data structure
     const existingCompleteData = {
@@ -258,9 +169,10 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
             limitOnePerEmail: false
         },
         channelTypes: surveyData.channelTypes || ['thankyou'],
-        htmlContent: sanitizedHTML,
-        cleanHTML: generateCleanSurveyHTML(surveyData, sanitizedHTML),
-        completeHTML: generateCompleteSurveyHTML(surveyData, sanitizedHTML),
+        htmlContent: htmlContent, // Use original HTML content directly
+        cleanHTML: generateCleanSurveyHTML(surveyData, htmlContent), // Clean HTML with minimal sanitization
+        completeHTML: generateCompleteSurveyHTML(surveyData, htmlContent), // Complete HTML with minimal sanitization
+        // No JavaScript content included in API
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
@@ -333,4 +245,12 @@ export const mapIsActiveToStatus = (isActive) => {
     return isActive ? 'active' : 'inactive';
 };
 
+/**
+ * Generates JavaScript content for the survey to be used in the storefront
+ * @param {Object} surveyData - The survey data object
+ * @returns {string} - JavaScript code as a string
+ */
+export const generateSurveyJavaScriptContent = (surveyData) => {
+    return generateSurveyJavaScript(surveyData);
+};
 

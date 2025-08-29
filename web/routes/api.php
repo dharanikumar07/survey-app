@@ -32,4 +32,4 @@ Route::middleware('shopify.auth')->group(function () {
 
 });
 
-Route::get('/get-survey/{store_uuid}', [SurveyViewController::class, 'getSurveyWidget']);
+Route::get('/get-survey/{store_uuid}/{survey_uuid}', [SurveyViewController::class, 'getSurveyWidget']);
