@@ -13,6 +13,9 @@ const useStore = create((set, get) => ({
     setSelectedTab: (index) => set({ selectedTab: index }),
     
     // Channel tab state
+    setChannelItems: (items) => set({ 
+        channelItems: items 
+    }),
     toggleChannelExpand: (id) => set((state) => ({
         channelItems: state.channelItems.map(item => 
             item.id === id ? { ...item, isExpanded: !item.isExpanded } : item
@@ -26,6 +29,9 @@ const useStore = create((set, get) => ({
     setDiscountSettings: (updates) => set((state) => ({
         discountSettings: { ...state.discountSettings, ...updates }
     })),
+    setDiscountSections: (sections) => set({
+        discountSections: sections
+    }),
     toggleDiscountSection: (id) => set((state) => ({
         discountSections: state.discountSections.map((s) =>
             s.id === id ? { ...s, isExpanded: !s.isExpanded } : s

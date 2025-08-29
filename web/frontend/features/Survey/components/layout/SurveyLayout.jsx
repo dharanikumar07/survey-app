@@ -54,11 +54,11 @@ const SurveyLayout = forwardRef(({ surveyId }, ref) => {
     const columnSpans = getColumnSpans();
 
     return (
-        <SurveyLoader surveyId={surveyId}>
+        <SurveyLoader >
             <div className="th-sf-survey-editor">
                 {/* <ModalHeader surveyPreviewRef={surveyPreviewRef} /> */}
 
-                <div style={{ height: 'calc(100vh - 125px)', overflow: 'hidden' }}>
+                <div style={{ overflow: 'hidden' }}>
                     <Box padding="0" height="100%" overflow="hidden" className="th-sf-survey-layout">
                         <Grid>
                             {/* Left Panel - Question List */}
