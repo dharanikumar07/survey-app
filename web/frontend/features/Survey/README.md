@@ -1,103 +1,78 @@
-# Survey System
+# Survey App Data Structure
 
-This directory contains the survey system for the Shopify app. It includes components for creating, editing, previewing, and embedding surveys in Shopify storefronts.
+This document outlines the data structure and flow for the survey application.
 
-## Directory Structure
+## Overview
 
-```
-Survey/
-├── components/            # React components
-│   ├── panels/            # Main panel components
-│   │   └── SurveyPreview.jsx  # Survey preview component
-│   └── ...
-├── docs/                  # Documentation
-│   ├── IMPLEMENTATION_GUIDE.md    # Implementation guide
-│   ├── STOREFRONT_EXAMPLE.md      # Storefront integration examples
-│   └── SURVEY_TRANSITIONS.md      # Architecture documentation
-├── features/              # Feature-specific components
-│   └── ...
-├── hooks/                 # React hooks
-│   └── useSurveyState.js  # Survey state management hook
-├── utils/                 # Utility functions
-│   ├── surveyHelpers.js   # Helper functions for surveys
-│   ├── surveyStorefront.js # Vanilla JS implementation for storefront
-│   └── surveyTransitions.js # Legacy transitions file
-└── README.md              # This file
-```
+The survey app uses a centralized JSON file for survey data management. This approach offers several advantages:
+- Separation of data and UI components
+- Easy maintenance and updates to question templates
+- Consistent question structure across the application
+- Fallback data when API is not available
 
-## Key Components
+## Key Files
 
-### SurveyPreview.jsx
+### 1. `data/surveyData.json`
+Contains all survey data including:
+- Default questions
+- Question templates for each question type
+- Channel settings
+- Discount settings
+- UI state defaults
 
-This component renders a preview of the survey with pure HTML and inline styles. It's designed to be easily captured as HTML content for backend storage and later rendering in Shopify storefronts.
+### 2. `utils/surveyStoreHelpers.js`
+Helper functions for:
+- Loading data from JSON
+- Creating new questions based on templates
+- Preparing data for API submission
+- Handling API responses
 
-```jsx
-// Usage
-const surveyPreviewRef = useRef(null);
+### 3. `State/store.js`
+Zustand store that:
+- Loads initial data from JSON
+- Manages all survey state
+- Provides methods for updating questions and settings
+- Handles API integration
 
-// To get the HTML content for backend storage:
-const htmlContent = surveyPreviewRef.current.getBodyContent();
-const fullHTML = surveyPreviewRef.current.getHTMLContent();
+## Data Flow
 
-// Render
-<SurveyPreview ref={surveyPreviewRef} />
-```
+1. **Initial Load**: When the application starts, `loadSurveyData()` in `surveyStoreHelpers.js` loads data from `surveyData.json` 
+2. **Adding Questions**: When a user adds a new question, the app:
+   - Gets the question template from `questionTemplates` in the JSON
+   - Creates a new question with unique IDs
+   - Adds it to the store
+   - Updates the UI
+3. **Saving Survey**: When saving, the app:
+   - Collects all data from the store
+   - Formats it for API submission
+   - Sends to API (or logs for development)
+4. **Error Handling**: If templates aren't found, the app falls back to basic templates
 
-### surveyStorefront.js
+## Question Templates
 
-This file provides a vanilla JavaScript implementation for survey transitions in the storefront. It handles:
+The `questionTemplates` section in `surveyData.json` contains templates for all question types:
+- Text questions
+- Rating scales
+- Multiple choice questions
+- Date pickers
+- Number scales
+- And more
 
-- Question transitions
-- Option selection
-- Progress tracking
-- Answer storage
+Each template includes:
+- Default content
+- Description
+- Answer options (where applicable)
+- Question type information
 
-```javascript
-// Usage in storefront
-const survey = initSurveyStorefront('survey-container');
-survey.init();
-```
+## Adding New Question Types
 
-### surveyHelpers.js
-
-This file contains utility functions for surveys, including:
-
-- HTML generation
-- Survey validation
-- API formatting
-- JavaScript generation
-
-```javascript
-// Generate clean HTML
-const cleanHTML = generateCleanSurveyHTML(surveyData, htmlContent);
-
-// Prepare for backend
-const apiData = prepareSurveyForBackend(surveyData, htmlContent);
-```
-
-## Implementation
-
-See the documentation files in the `docs/` directory for detailed implementation guides:
-
-- [Implementation Guide](./docs/IMPLEMENTATION_GUIDE.md)
-- [Storefront Examples](./docs/STOREFRONT_EXAMPLE.md)
-- [Survey Transitions Architecture](./docs/SURVEY_TRANSITIONS.md)
-
-## Key Features
-
-- **Clean HTML Generation**: Generate clean HTML without JavaScript
-- **Separate JavaScript**: JavaScript is deployed as a static asset for better performance and security
-- **Identical UX**: Same user experience in admin preview and storefront
-- **Multiple Question Types**: Support for rating, multiple choice, text, etc.
-- **Responsive Design**: Works on all devices and screen sizes
-- **Customizable**: Configurable options for animations, styling, etc.
-- **Best Practices**: Follows web standards by keeping HTML and JavaScript separate
+To add a new question type:
+1. Add a template to the `questionTemplates` section in `surveyData.json`
+2. Update the ContentTab.jsx ActionList to include the new question type
+3. Handle any special rendering in SurveyPreview.jsx if needed
 
 ## Best Practices
 
-1. Keep HTML and JavaScript separate
-2. Use the `getBodyContent()` method for clean HTML
-3. Deploy JavaScript as a static asset (not via API)
-4. Test in different environments and devices
-5. Follow the implementation guide for proper integration
-6. Use a CDN for JavaScript when possible for better performance
+- Always use the templates from JSON instead of hardcoding default values
+- When updating templates, ensure consistency with existing question structures
+- Use the helper functions for creating and manipulating questions

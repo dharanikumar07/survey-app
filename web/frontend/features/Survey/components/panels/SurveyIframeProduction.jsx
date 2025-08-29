@@ -200,7 +200,7 @@ const SurveyIframeProduction = forwardRef((props, ref) => {
     return (
         <Box>
             {/* Iframe with key for refresh */}
-            <Box paddingTop="400">
+            <Box paddingTop="200">
                 <SurveyIframe
                     key={iframeKey}
                     ref={iframeRef}
