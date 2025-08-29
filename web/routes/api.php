@@ -15,6 +15,7 @@ use App\Http\Controllers\SurveyController;
 |
 */
 
+
 // Protected API routes (require Shopify authentication)
 Route::middleware('shopify.auth')->group(function () {
 
@@ -24,10 +25,8 @@ Route::middleware('shopify.auth')->group(function () {
 
     // Survey CRUD
     Route::get('/surveys', [SurveyController::class, 'getSurvey']);
-    Route::post('/surveys', [SurveyController::class, 'saveSurvey']);
+    Route::post('/surveys/{uuid?}', [SurveyController::class, 'saveSurvey']);
     Route::get('/surveys/{uuid}', [SurveyController::class, 'show']);
-    Route::put('/surveys/{uuid}', [SurveyController::class, 'update']);
-    Route::patch('/surveys/{uuid}', [SurveyController::class, 'update']);
     Route::delete('/surveys/{uuid}', [SurveyController::class, 'destroy']);
 
 });
