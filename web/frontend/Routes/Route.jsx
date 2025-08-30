@@ -5,6 +5,7 @@ import Survey from "../features/Survey/Index.jsx";
 import Response from "../features/Response/Index.jsx";
 import TemplateSelection from "../features/Survey/TemplateSelection.jsx";
 import SurveyForm from "../features/Survey/SurveyForm.jsx";
+import Analytics from "../features/Analytics/Index.jsx";
 
 const router = createBrowserRouter([
     {
@@ -33,7 +34,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/analytics",
-        element: <Response />,
+        element: <Analytics />,
     },
     {
         path: "/ExitIframe",

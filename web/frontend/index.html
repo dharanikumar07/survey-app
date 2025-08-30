@@ -14,7 +14,12 @@
             script.setAttribute('type', "module");
             script.setAttribute('src', "./dev_embed.js");
             document.getElementsByTagName('head')[0].append(script);
-            // document.getElementById('shopify-api-key').content = import.meta.env.VITE_SHOPIFY_API_KEY;
+            
+            // Safely set the API key
+            const apiKeyElement = document.getElementById('shopify-api-key');
+            if (apiKeyElement && import.meta.env.VITE_SHOPIFY_API_KEY) {
+                apiKeyElement.content = import.meta.env.VITE_SHOPIFY_API_KEY;
+            }
         }
     </script>
 
