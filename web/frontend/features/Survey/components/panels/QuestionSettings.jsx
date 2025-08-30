@@ -17,6 +17,45 @@ function QuestionSettings() {
         reorderAnswerOptions
     } = useSurveyState();
 
+    // ALL hooks must be called before any conditional returns
+    const [headingValue, setHeadingValue] = useState('');
+    const [descriptionValue, setDescriptionValue] = useState('');
+    const [allowSkip, setAllowSkip] = useState(false);
+
+    // Date picker state for date-type questions
+    const [datePickerVisible, setDatePickerVisible] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [{ month, year }, setDate] = useState({
+        month: new Date().getMonth(),
+        year: new Date().getFullYear(),
+    });
+    const datePickerRef = useRef(null);
+
+    // SINGLE useEffect hook that handles all state updates
+    // This replaces the three separate useEffect hooks
+    useEffect(() => {
+        console.log('QuestionSettings: selectedQuestionId changed to:', selectedQuestionId);
+
+        if (selectedQuestionId && questions.length > 0) {
+            const question = questions.find(q => q.id === selectedQuestionId);
+            if (question) {
+                console.log('QuestionSettings: selectedQuestion changed, updating local state');
+                setHeadingValue(question.content);
+                setDescriptionValue(question.description || '');
+
+                // Handle date updates (previously in a separate useEffect)
+                if (question.selectedDate) {
+                    const newDate = new Date(question.selectedDate);
+                    setSelectedDate(newDate);
+                    setDate({
+                        month: newDate.getMonth(),
+                        year: newDate.getFullYear(),
+                    });
+                }
+            }
+        }
+    }, [selectedQuestionId, questions]);
+
     // Find the currently selected question
     const selectedQuestion = questions.find(q => q.id === selectedQuestionId);
 
@@ -45,32 +84,6 @@ function QuestionSettings() {
     console.log('QuestionSettings: selectedQuestionId:', selectedQuestionId);
     console.log('QuestionSettings: selectedQuestion:', selectedQuestion);
     console.log('QuestionSettings: all questions:', questions);
-
-    const [headingValue, setHeadingValue] = useState(selectedQuestion.content);
-    const [descriptionValue, setDescriptionValue] = useState(selectedQuestion.description || '');
-    const [allowSkip, setAllowSkip] = useState(false);
-
-    // Date picker state for date-type questions
-    const [datePickerVisible, setDatePickerVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(selectedQuestion.selectedDate ? new Date(selectedQuestion.selectedDate) : new Date());
-    const [{ month, year }, setDate] = useState({
-        month: selectedDate.getMonth(),
-        year: selectedDate.getFullYear(),
-    });
-    const datePickerRef = useRef(null);
-
-    // Update local state when selected question changes
-    useEffect(() => {
-        console.log('QuestionSettings: selectedQuestion changed, updating local state');
-        setHeadingValue(selectedQuestion.content);
-        setDescriptionValue(selectedQuestion.description || '');
-        // Reset other local state as needed
-    }, [selectedQuestion]);
-
-    // Also update when selectedQuestionId changes
-    useEffect(() => {
-        console.log('QuestionSettings: selectedQuestionId changed to:', selectedQuestionId);
-    }, [selectedQuestionId]);
 
     // Update the heading when input changes
     const handleHeadingChange = (value) => {
@@ -131,17 +144,7 @@ function QuestionSettings() {
         updateQuestion(selectedQuestionId, { selectedDate: newSelectedDate.toISOString() });
     };
 
-    // Update date state when selected question changes
-    useEffect(() => {
-        if (selectedQuestion.selectedDate) {
-            const newDate = new Date(selectedQuestion.selectedDate);
-            setSelectedDate(newDate);
-            setDate({
-                month: newDate.getMonth(),
-                year: newDate.getFullYear(),
-            });
-        }
-    }, [selectedQuestion.selectedDate]);
+
 
     // Delete the current question
     const handleDeleteQuestion = () => {
