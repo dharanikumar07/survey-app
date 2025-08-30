@@ -283,7 +283,7 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
 
                 {/* Center Section - Theme Selection and Preview Switch */}
                 <Box className="th-sf-modal-header-center">
-                    <InlineStack gap="400" blockAlign="center">
+                    <InlineStack>
                         {/* Branded Survey Page Popover */}
                         {/* <Popover
                             active={surveyPagePopoverActive}
@@ -346,7 +346,7 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                 {/* Right Section - Buttons, Refresh and Status */}
                 <InlineStack gap="200" blockAlign="center" wrap={false}>
                     {/* Generate HTML Button */}
-                    <Button
+                    {/* <Button
                         size="slim"
                         onClick={() => {
                             if (surveyPreviewRef && surveyPreviewRef.current) {
@@ -357,7 +357,7 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                         }}
                     >
                         Generate HTML
-                    </Button>
+                    </Button> */}
 
                     {/* Refresh Button */}
                     <Button

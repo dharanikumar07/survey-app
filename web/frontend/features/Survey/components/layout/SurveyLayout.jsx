@@ -30,12 +30,12 @@ const SurveyLayout = forwardRef(({ surveyId }, ref) => {
     // Determine column spans based on view mode
     const getColumnSpans = () => {
         switch (selectedView) {
-            case 'mobile':
-                return {
-                    left: { xs: 12, sm: 12, md: 2, lg: 2, xl: 2 },
-                    center: { xs: 12, sm: 12, md: 8, lg: 8, xl: 8 },
-                    right: { xs: 12, sm: 12, md: 2, lg: 2, xl: 2 }
-                };
+            // case 'mobile':
+            //     return {
+            //         left: { xs: 12, sm: 12, md: 2, lg: 2, xl: 2 },
+            //         center: { xs: 12, sm: 12, md: 8, lg: 8, xl: 8 },
+            //         right: { xs: 12, sm: 12, md: 2, lg: 2, xl: 2 }
+            //     };
             case 'maximize':
                 return {
                     left: { xs: 0, sm: 0, md: 0, lg: 0, xl: 0 },
@@ -54,11 +54,11 @@ const SurveyLayout = forwardRef(({ surveyId }, ref) => {
     const columnSpans = getColumnSpans();
 
     return (
-        <SurveyLoader surveyId={surveyId}>
+        <SurveyLoader >
             <div className="th-sf-survey-editor">
                 {/* <ModalHeader surveyPreviewRef={surveyPreviewRef} /> */}
 
-                <div style={{ height: 'calc(100vh - 125px)', overflow: 'hidden' }}>
+                <div style={{ overflow: 'hidden' }}>
                     <Box padding="0" height="100%" overflow="hidden" className="th-sf-survey-layout">
                         <Grid>
                             {/* Left Panel - Question List */}
