@@ -37,7 +37,7 @@ export default function TemplateSelection() {
             description: templates.marketing_attribution.description,
             image: marketingSurveyImg,
             buttonText: "Create",
-            badge: { status: "info", content: "Most popular" },
+            badge: { status: "magic", content: "Most popular" },
         },
         {
             key: "customer_experience",
@@ -61,7 +61,7 @@ export default function TemplateSelection() {
             description: templates.exit_intent.description,
             image: exitSurveyImg,
             buttonText: "Create",
-            badge: { status: "new", content: "New" },
+            badge: { status: "success", content: "New" },
         },
         {
             key: "ai_creation",
@@ -129,7 +129,7 @@ export default function TemplateSelection() {
                                     <div className="flex justify-between items-center">
                                         <Text variant="headingMd" as="h3">{template.title}</Text>
                                         {template.badge && (
-                                            <Badge status={template.badge.status}>{template.badge.content}</Badge>
+                                            <Badge tone={template.badge.status}>{template.badge.content}</Badge>
                                         )}
                                     </div>
                                     <Text variant="bodyMd" as="p" color="subdued">{template.description}</Text>
