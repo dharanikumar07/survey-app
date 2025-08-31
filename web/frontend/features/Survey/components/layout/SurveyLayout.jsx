@@ -56,7 +56,7 @@ const SurveyLayout = forwardRef(({ surveyId }, ref) => {
     return (
         <SurveyLoader >
             <div className="th-sf-survey-editor">
-                {/* <ModalHeader surveyPreviewRef={surveyPreviewRef} /> */}
+                <ModalHeader surveyPreviewRef={surveyPreviewRef} />
 
                 <div style={{ overflow: 'hidden' }}>
                     <Box padding="0" height="100%" overflow="hidden" className="th-sf-survey-layout">

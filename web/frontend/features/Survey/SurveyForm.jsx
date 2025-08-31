@@ -6,7 +6,6 @@ import {
     InlineStack,
 } from "@shopify/polaris";
 import SurveyModalContent from "./components/modal/SurveyModalContent";
-import ModalHeader from "./components/common/ModalHeader";
 import { PolarisProvider } from "../../components/providers";
 import { PortalsManager } from "@shopify/polaris";
 import { Modal, TitleBar } from '@shopify/app-bridge-react';
@@ -59,7 +58,6 @@ export default function SurveyForm() {
             <PolarisProvider>
                 <PortalsManager>
                     <div style={{ overflow: 'auto' }}>
-                        {!uuid && <ModalHeader surveyPreviewRef={surveyPreviewRef} />}
                         <SurveyModalContent
                             templateKey={templateKey}
                             uuid={uuid}

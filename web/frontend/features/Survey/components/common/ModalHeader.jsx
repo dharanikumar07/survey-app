@@ -55,7 +55,7 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
 
     const { saveSurvey } = useSurveyApi();
     const { showToast } = useToast();
-    const { mutate: saveSurveyMutation } = useMutation({
+    const { mutate: saveSurveyMutation, isPending } = useMutation({
         mutationFn: saveSurvey,
         onSuccess: () => {
             showToast({ message: "Survey saved successfully", type: "success" });
@@ -372,6 +372,7 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                         variant="primary"
                         size="slim"
                         onClick={handleSave}
+                        loading={isPending}
                     >
                         Save
                     </Button>
