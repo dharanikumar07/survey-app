@@ -454,6 +454,13 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Initialize the survey
         function initSurvey() {
+            // Check if surveyData is initialized
+            if (!surveyData) {
+                console.log('Survey data not yet initialized, waiting...');
+                setTimeout(initSurvey, 100);
+                return;
+            }
+            
             // Get DOM elements after they're available
             questionContent = document.getElementById('question-content');
             prevButton = document.getElementById('prev-button');
@@ -476,7 +483,7 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Render progress indicators
         function renderProgressIndicators() {
-            if (!progressIndicators || !surveyData) return;
+            if (!progressIndicators || !surveyData || !surveyData.questions) return;
             
             progressIndicators.innerHTML = '';
             surveyData.questions.forEach((_, index) => {
@@ -488,7 +495,7 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Render current question
         function renderQuestion() {
-            if (!questionContent || !surveyData) return;
+            if (!questionContent || !surveyData || !surveyData.questions) return;
             
             if (currentQuestionIndex >= surveyData.questions.length) {
                 renderThankYou();
@@ -496,8 +503,10 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             }
             
             const question = surveyData.questions[currentQuestionIndex];
+            if (!question) return;
+            
             let questionHTML = \`
-                <h3 class="th-sf-survey-question-heading">\${question.content}</h3>
+                <h3 class="th-sf-survey-question-heading">\${question.content || 'Question'}</h3>
             \`;
             
             if (question.description) {
@@ -745,6 +754,8 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Update navigation buttons
         function updateNavigationButtons() {
+            if (!nextButton || !prevButton || !surveyData) return;
+            
             const canGoNext = isQuestionComplete();
             const canGoPrev = currentQuestionIndex > 0;
             
@@ -762,12 +773,14 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Check if current question is complete
         function isQuestionComplete() {
+            if (!surveyData || !surveyData.questions) return false;
             if (currentQuestionIndex >= surveyData.questions.length) return true;
             
             const answer = answers[currentQuestionIndex];
             if (!answer) return false;
             
             const question = surveyData.questions[currentQuestionIndex];
+            if (!question) return false;
             
             if (question.type === 'rating') {
                 return answer.rating || answer.option || answer.multipleChoice;
@@ -1075,7 +1088,7 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
                 srcDoc={iframeContent}
                 style={{
                     width: '100%',
-                    height: '600px',
+                    height: '800px',
                     border: 'none',
                     borderRadius: '8px',
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'

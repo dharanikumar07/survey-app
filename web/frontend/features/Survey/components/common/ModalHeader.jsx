@@ -122,6 +122,10 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
             htmlContent = surveyPreviewRef.current.getBodyContent();
             cleanHTML = surveyPreviewRef.current.getCleanHTML();
             completeHTML = surveyPreviewRef.current.getCompleteHTML();
+
+            // Simple debugging
+            console.log('HTML Content Length:', htmlContent?.length);
+            console.log('Complete HTML Length:', completeHTML?.length);
         }
 
         // Use helper for API formatting
@@ -130,15 +134,19 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
         // Prepare complete survey data with HTML for backend storage
         const completeSurveyData = prepareSurveyForBackend(surveyData, htmlContent);
 
-        console.log('API Formatted Data (New Structure):', apiFormattedData);
-        console.log('Complete Survey Data with HTML (New Structure):', completeSurveyData);
-        console.log('Survey Type:', completeSurveyData.survey_type);
-        console.log('Status:', completeSurveyData.status);
-        console.log('Is Active:', completeSurveyData.is_active);
-        console.log('Survey Meta Data:', completeSurveyData.survey_meta_data);
-        console.log('Container HTML Content (th-sf-survey-container):', completeSurveyData.survey_meta_data?.htmlContent);
-        console.log('Clean Container HTML:', completeSurveyData.survey_meta_data?.cleanHTML);
-        console.log('Complete Container HTML:', completeSurveyData.survey_meta_data?.completeHTML);
+        // console.log('API Formatted Data (New Structure):', apiFormattedData);
+        // console.log('Complete Survey Data with HTML (New Structure):', completeSurveyData);
+        // console.log('Survey Type:', completeSurveyData.survey_type);
+        // console.log('Status:', completeSurveyData.status);
+        // console.log('Is Active:', completeSurveyData.is_active);
+        // console.log('Survey Meta Data:', completeSurveyData.survey_meta_data);
+        // console.log('Container HTML Content (th-sf-survey-container):', completeSurveyData.survey_meta_data?.htmlContent);
+        // console.log('Clean Container HTML:', completeSurveyData.survey_meta_data?.cleanHTML);
+        // console.log('Complete Container HTML:', completeSurveyData.survey_meta_data?.completeHTML);
+        // console.log('Complete HTML:', completeHTML);
+        // console.log('Clean HTML:', cleanHTML);
+        // console.log('HTML Content:', htmlContent);
+        console.log('Complete Survey Data:', completeSurveyData);
 
         // Validate the data structure before sending to API
         const validation = validateSurveyForAPI(completeSurveyData);
@@ -275,9 +283,9 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
 
                 {/* Center Section - Theme Selection and Preview Switch */}
                 <Box className="th-sf-modal-header-center">
-                    <InlineStack gap="400" blockAlign="center">
+                    <InlineStack>
                         {/* Branded Survey Page Popover */}
-                        <Popover
+                        {/* <Popover
                             active={surveyPagePopoverActive}
                             activator={
                                 <Button
@@ -303,7 +311,7 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                                     active: selectedSurveyPage === option.value
                                 }))}
                             />
-                        </Popover>
+                        </Popover> */}
 
                         {/* Device View Controls */}
                         <ButtonGroup variant='segmented'>
@@ -335,8 +343,22 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                     </InlineStack>
                 </Box>
 
-                {/* Right Section - Status, Refresh and Save Button */}
+                {/* Right Section - Buttons, Refresh and Status */}
                 <InlineStack gap="200" blockAlign="center" wrap={false}>
+                    {/* Generate HTML Button */}
+                    {/* <Button
+                        size="slim"
+                        onClick={() => {
+                            if (surveyPreviewRef && surveyPreviewRef.current) {
+                                const htmlContent = surveyPreviewRef.current.getBodyContent();
+                                console.log('Survey HTML Content:', htmlContent);
+                                alert('Survey HTML generated! Check console for details.');
+                            }
+                        }}
+                    >
+                        Generate HTML
+                    </Button> */}
+
                     {/* Refresh Button */}
                     <Button
                         variant="secondary"
@@ -353,6 +375,8 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
                     >
                         Save
                     </Button>
+
+                    {/* Status Dropdown */}
                     <Popover
                         active={statusPopoverActive}
                         activator={

@@ -3,6 +3,8 @@ import ExitIframe from "../pages/ExitIframe.jsx";
 import Dashboard from "../features/Dashboard/Index.jsx";
 import Survey from "../features/Survey/Index.jsx";
 import Response from "../features/Response/Index.jsx";
+import TemplateSelection from "../features/Survey/TemplateSelection.jsx";
+import SurveyForm from "../features/Survey/SurveyForm.jsx";
 
 const router = createBrowserRouter([
     {
@@ -12,6 +14,18 @@ const router = createBrowserRouter([
     {
         path: "/survey",
         element: <Survey />,
+    },
+    {
+        path: "/survey/templates",
+        element: <TemplateSelection />,
+    },
+    {
+        path: "/survey/create",
+        element: <SurveyForm />,
+    },
+    {
+        path: "/survey/edit/:uuid",
+        element: <SurveyForm />,
     },
     {
         path: "/response",

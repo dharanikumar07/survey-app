@@ -9,7 +9,7 @@ class SurveyWidget
     public $storeUuid;
     public $surveyUuid;
     public $settings;
-    public function __construct($storeUuid, $surveyUuid)
+    public function __construct($storeUuid, $surveyUuid = null)
     {
         $this->storeUuid = $storeUuid;
         $this->surveyUuid = $surveyUuid;
@@ -19,7 +19,8 @@ class SurveyWidget
     public function getSettings()
     {
         return Survey::where('store_uuid', $this->storeUuid)
-            ->where('uuid', $this->surveyUuid)
+            ->where('status', 'active')
+            ->latest('created_at')
             ->firstOrFail();
     }
 
