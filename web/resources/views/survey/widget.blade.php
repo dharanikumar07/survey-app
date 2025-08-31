@@ -653,13 +653,11 @@
         });
     }
 
-    // Handle multiple choice selection
     function handleMultipleChoiceSelect(optionText) {
         answers[currentQuestionIndex] = {...answers[currentQuestionIndex], multipleChoice: optionText};
         updateQuestionDisplay();
         updateNavigationButtons();
 
-        // Sync with parent
         sendMessageToParent('ANSWER_SELECTED', {
             questionIndex: currentQuestionIndex,
             answer: answers[currentQuestionIndex],
@@ -667,12 +665,10 @@
         });
     }
 
-    // Handle text input
     function handleTextInput(value) {
         answers[currentQuestionIndex] = value;
         updateNavigationButtons();
 
-        // Sync with parent
         sendMessageToParent('ANSWER_SELECTED', {
             questionIndex: currentQuestionIndex,
             answer: value,
@@ -680,12 +676,10 @@
         });
     }
 
-    // Update question display after selection
     function updateQuestionDisplay() {
         renderQuestion();
     }
 
-    // Update navigation buttons
     function updateNavigationButtons() {
         const canGoNext = isQuestionComplete();
         const canGoPrev = currentQuestionIndex > 0;
@@ -702,7 +696,6 @@
         }
     }
 
-    // Check if current question is complete
     function isQuestionComplete() {
         if (currentQuestionIndex >= surveyData.questions.length) return true;
 
@@ -718,7 +711,6 @@
         return true;
     }
 
-    // Render thank you message
     function renderThankYou() {
         if (!questionContent) return;
 
@@ -738,11 +730,9 @@
             prevButton.style.display = 'none';
         }
 
-        // Send message to parent about survey completion
         sendMessageToParent('SURVEY_COMPLETE', {answers});
     }
 
-    // Navigation functions
     function goToNext() {
         if (currentQuestionIndex < surveyData.questions.length) {
             currentQuestionIndex++;
@@ -750,17 +740,14 @@
             renderProgressIndicators();
             updateNavigationButtons();
 
-            // Sync with parent
             sendMessageToParent('NAVIGATION_CHANGED', {
                 currentQuestionIndex,
                 direction: 'next',
                 question: surveyData.questions[currentQuestionIndex]
             });
         } else if (currentQuestionIndex === surveyData.questions.length) {
-            // Submit survey
             alert('Survey submitted! Thank you for your feedback.');
 
-            // Send completion message to parent
             sendMessageToParent('SURVEY_COMPLETE', {answers});
 
             // Reset to first question
@@ -793,17 +780,14 @@
         }
     }
 
-    // Initialize when DOM is ready
     function initializeSurvey() {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initSurvey);
         } else {
-            // DOM is already ready
             setTimeout(initSurvey, 100);
         }
     }
 
-    // Start initialization
     initializeSurvey();
 </script>
 <script src="{{ asset('assets/js/survey-widget.js') }}"></script>

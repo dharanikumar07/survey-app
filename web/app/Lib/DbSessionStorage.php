@@ -6,6 +6,7 @@ namespace App\Lib;
 
 use App\Api\Shopify\Shop;
 use App\Api\Shopify\Traits\ShopifyHelper;
+use App\Jobs\CreateMetaObjectDefinition;
 use App\Jobs\sync\SyncCustomers;
 use App\Jobs\webhook\WebHook;
 use App\Models\Store;
@@ -110,6 +111,7 @@ class DbSessionStorage implements SessionStorage
                 ]
             );
             WebHook::dispatch($store);
+            CreateMetaObjectDefinition::dispatch($store);
             SyncCustomers::dispatch($store);
             return $dbSession->save();
         } catch (Exception $err) {
