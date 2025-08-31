@@ -82,8 +82,13 @@ export default function TemplateSelection() {
     ];
 
     const handleTemplateSelect = (templateKey) => {
-        // Navigate to the create route with template parameter
-        navigate(`/survey/create?template=${templateKey}`);
+        // Navigate to the AI creation page for AI template, otherwise to regular create route
+        if (templateKey === "ai_creation") {
+            navigate("/survey/ai-create");
+        } else {
+            // Navigate to the create route with template parameter
+            navigate(`/survey/create?template=${templateKey}`);
+        }
     };
 
     const handleBack = () => {
