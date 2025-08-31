@@ -69,7 +69,7 @@ export default function TemplateSelection() {
             description: "Tell us what you're looking for and our AI will create a custom survey for you.",
             image: null,
             buttonText: "Create with AI",
-            badge: null,
+            badge: { status: "magic", content: "AI-assisted", progress: "complete" },
             customContent: (
                 <div className="text-center">
                     <div className="text-5xl mb-4">✨</div>
@@ -129,7 +129,7 @@ export default function TemplateSelection() {
                                     <div className="flex justify-between items-center">
                                         <Text variant="headingMd" as="h3">{template.title}</Text>
                                         {template.badge && (
-                                            <Badge tone={template.badge.status}>{template.badge.content}</Badge>
+                                            <Badge tone={template.badge.status} progress={template.badge?.progress}>{template.badge.content}</Badge>
                                         )}
                                     </div>
                                     <Text variant="bodyMd" as="p" color="subdued">{template.description}</Text>
