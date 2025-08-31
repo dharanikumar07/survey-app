@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     Page,
     Card,
@@ -18,7 +19,6 @@ import {
     ActionList,
     Pagination
 } from "@shopify/polaris";
-import { Modal, TitleBar } from '@shopify/app-bridge-react';
 import {
     MenuVerticalIcon,
     InfoIcon,
@@ -28,22 +28,12 @@ import {
     ViewIcon,
     DisabledIcon
 } from "@shopify/polaris-icons";
-import ModalHeader from "./components/common/ModalHeader";
-import SurveyModalContent from "./components/modal/SurveyModalContent";
-import { PolarisProvider } from "../../components/providers";
-import { PortalsManager } from "@shopify/polaris";
 
 export default function Survey() {
-    const [modalOpen, setModalOpen] = useState(false);
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const [modalTitle, setModalTitle] = useState("Create new survey");
     const [popoverActive, setPopoverActive] = useState({});
-
-
-
-    // Ref for accessing the SurveyPreview component
-    const surveyPreviewRef = useRef(null);
 
     const resourceName = {
         singular: "survey",
@@ -133,13 +123,11 @@ export default function Survey() {
     };
 
     const handleCreateSurvey = () => {
-        setModalTitle("Create new survey");
-        setModalOpen(true);
+        navigate("/survey/templates");
     };
 
     const handleEditSurvey = (surveyId) => {
-        setModalTitle(`Edit survey #${surveyId}`);
-        setModalOpen(true);
+        navigate(`/survey/edit/${surveyId}`);
     };
 
     const togglePopover = (id) => {
@@ -329,23 +317,6 @@ export default function Survey() {
                         </InlineStack>
                     </Box>
                 </Card>
-
-                <Modal
-                    id="survey-modal"
-                    open={modalOpen}
-                    variant="max"
-                    onHide={() => setModalOpen(false)}
-                >
-                    <TitleBar title={modalTitle} />
-                    <PolarisProvider>
-                        <PortalsManager>
-                            <div>
-                                <ModalHeader surveyPreviewRef={surveyPreviewRef} />
-                                <SurveyModalContent ref={surveyPreviewRef} />
-                            </div>
-                        </PortalsManager>
-                    </PolarisProvider>
-                </Modal>
             </BlockStack>
         </Page>
     );
