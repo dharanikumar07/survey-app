@@ -23,6 +23,11 @@ class SurveyService
                 $data['status'] = $data['status'] ?? 'draft';
             }
 
+            $data['meta'] = [
+                'schema_version' => '1.0.0',
+                'name' => 'Post Purchase Survey'
+            ];
+
             $survey = Survey::updateOrCreate($attributes, $data);
 
 			DB::commit();

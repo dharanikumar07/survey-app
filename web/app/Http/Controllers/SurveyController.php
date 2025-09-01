@@ -57,12 +57,13 @@ class SurveyController extends Controller
 	/**
 	 * Create a new survey
 	 */
-	public function saveSurvey(StoreSurveyRequest $request)
+	public function saveSurvey(StoreSurveyRequest $request, string $uuid = null)
 	{
 		try {
-			$session = $request->input('shopifySession');
+			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
-            $survey_uuid = $request->input('survey_uuid');
+
+            $survey_uuid = $request->get('survey_uuid');
 
             $survey = $this->surveyService->saveOrUpdate($request->validated(), $store, $survey_uuid);
 
