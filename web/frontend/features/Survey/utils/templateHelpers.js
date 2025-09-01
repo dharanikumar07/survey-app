@@ -1,11 +1,14 @@
 import surveyData from '../data/surveyData.json';
 
 /**
- * Load survey data from a specific template
+ * Load survey data from a specific template with optional AI overrides
  * @param {String} templateKey The key of the template to load (e.g., 'blank', 'marketing_attribution', etc.)
- * @returns {Object} Survey data initialized from the template
+ * @param {Object} aiOverrides Optional AI-generated data to override template defaults
+ * @param {String} aiOverrides.surveyTitle AI-generated survey title
+ * @param {Array} aiOverrides.questions AI-generated questions (future use)
+ * @returns {Object} Survey data initialized from the template with AI overrides applied
  */
-export const loadTemplateData = (templateKey) => {
+export const loadTemplateData = (templateKey, aiOverrides = {}) => {
   try {
     // Get the template data from the JSON file
     const templateData = surveyData.templates[templateKey];
@@ -15,7 +18,8 @@ export const loadTemplateData = (templateKey) => {
       return null;
     }
     
-    return {
+    // Base template data
+    const baseData = {
       // Channel data
       channelItems: templateData.channelItems || [],
       
@@ -41,6 +45,17 @@ export const loadTemplateData = (templateKey) => {
       // Question data
       questions: templateData.questions || [],
     };
+
+    // Apply AI overrides if provided
+    const finalData = {
+      ...baseData,
+      // Override survey title if AI-generated title is provided
+      surveyTitle: aiOverrides.surveyTitle || baseData.surveyTitle,
+      // Future: questions can be overridden here
+      // questions: aiOverrides.questions ? processAIQuestions(aiOverrides.questions) : baseData.questions
+    };
+
+    return finalData;
   } catch (error) {
     console.error('Error loading template data:', error);
     return null;

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SurveyAssistantController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SurveyViewController;
 use App\Http\Controllers\SurveyController;
@@ -29,6 +30,8 @@ Route::middleware('shopify.auth')->group(function () {
     Route::get('/surveys/{uuid}', [SurveyController::class, 'show']);
     Route::delete('/surveys/{uuid}', [SurveyController::class, 'destroy']);
 
+    //AI Assistance
+    Route::post('/assistant/generate-title', [SurveyAssistantController::class, 'generateTitle']);
 });
 
 Route::get('/get-survey/{store_uuid}/{survey_uuid?}', [SurveyViewController::class, 'getSurveyWidget']);
