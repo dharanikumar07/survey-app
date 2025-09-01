@@ -30,7 +30,7 @@ import { useSurveyApi } from '../../action/use-survey-api';
 import { useToast } from '../../../../components/helper/toast-helper';
 import { useMutation } from '@tanstack/react-query';
 
-function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
+function ModalHeader({ title = "Survey #1", surveyPreviewRef, onClose }) {
     const {
         selectedView,
         setSelectedView,
@@ -59,6 +59,7 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef }) {
         mutationFn: saveSurvey,
         onSuccess: () => {
             showToast({ message: "Survey saved successfully", type: "success" });
+            onClose();
         },
         onError: () => {
             showToast({ message: "Failed to save survey", type: "error" });

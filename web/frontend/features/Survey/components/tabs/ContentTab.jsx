@@ -166,9 +166,6 @@ export function ContentTab() {
                                         { content: 'Number scale', onAction: () => insertQuestionByType('number-scale') },
                                         { content: 'Star rating', onAction: () => insertQuestionByType('rating') },
                                         { content: 'Satisfaction', onAction: () => insertQuestionByType('satisfaction') },
-                                        { content: 'Matrix', onAction: () => insertQuestionByType('matrix') },
-                                        { content: 'Ranking', onAction: () => insertQuestionByType('ranking') },
-                                        { content: 'Demographic', onAction: () => insertQuestionByType('demographic') },
                                         { content: 'Short answer', onAction: () => insertQuestionByType('text') },
                                         { content: 'Date', onAction: () => insertQuestionByType('date') },
                                     ]}

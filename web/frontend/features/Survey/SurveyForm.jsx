@@ -62,6 +62,7 @@ export default function SurveyForm() {
                             templateKey={templateKey}
                             uuid={uuid}
                             ref={surveyPreviewRef}
+                            onClose={handleClose}
                         />
                     </div>
                 </PortalsManager>

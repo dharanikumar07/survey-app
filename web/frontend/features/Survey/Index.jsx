@@ -65,7 +65,7 @@ export default function Survey() {
     // Pagination settings
     const itemsPerPage = 10;
     const totalPages = Math.ceil(surveys.length / itemsPerPage);
-    console.log(surveys, "surveys");
+    // console.log(surveys, "surveys");
 
     // Filter surveys based on active tab
     const filteredSurveys = surveys.filter(survey => {
