@@ -378,29 +378,35 @@ function QuestionSettings() {
                         </BlockStack>
                     )}
 
+                    {selectedQuestionId !== 'thankyou' &&
+                        // Only show answer options for question types that need them
+                        !['rating', 'satisfaction', 'text', 'date', 'number-scale'].includes(selectedQuestion.type) && (
+                            <BlockStack gap="300">
+                                <Text variant="bodySm" as="h3">Answer(s)</Text>
+
+                                {/* Answer options list with up/down controls instead of drag-and-drop */}
+                                {selectedQuestion.answerOptions && selectedQuestion.answerOptions.length > 0 ? (
+                                    <BlockStack gap="200">
+                                        {selectedQuestion.answerOptions.map((option, index) =>
+                                            renderAnswerOption(option, index)
+                                        )}
+                                    </BlockStack>
+                                ) : (
+                                    <Box padding="300" background="bg-surface-secondary" borderRadius="100">
+                                        <Text variant="bodyMd" alignment="center" color="subdued">No answer options yet</Text>
+                                    </Box>
+                                )}
+
+                                <Box paddingBlockStart="300">
+                                    <Button onClick={handleAddAnswerOption}>
+                                        Add option
+                                    </Button>
+                                </Box>
+                            </BlockStack>
+                        )}
+
                     {selectedQuestionId !== 'thankyou' && (
                         <BlockStack gap="300">
-                            <Text variant="bodySm" as="h3">Answer(s)</Text>
-
-                            {/* Answer options list with up/down controls instead of drag-and-drop */}
-                            {selectedQuestion.answerOptions && selectedQuestion.answerOptions.length > 0 ? (
-                                <BlockStack gap="200">
-                                    {selectedQuestion.answerOptions.map((option, index) =>
-                                        renderAnswerOption(option, index)
-                                    )}
-                                </BlockStack>
-                            ) : (
-                                <Box padding="300" background="bg-surface-secondary" borderRadius="100">
-                                    <Text variant="bodyMd" alignment="center" color="subdued">No answer options yet</Text>
-                                </Box>
-                            )}
-
-                            <Box paddingBlockStart="300">
-                                <Button onClick={handleAddAnswerOption}>
-                                    Add option
-                                </Button>
-                            </Box>
-
                             <Box paddingBlockStart="300">
                                 <Checkbox
                                     label="Allow customers to skip this question"
