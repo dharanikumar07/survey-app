@@ -1,5 +1,7 @@
 (function(){
-    const iframeUrl = "https://leaving-addition-informal-famous.trycloudflare.com/api/get-survey/fc2cd494-e08a-4534-b561-d40e0644b213/62efb92c-88c5-4b79-86e7-02b88cc7f28b";
+    const store_uuid = window.PostPurchaseSurveyData.data.store_uuid;
+    const url = window.PostPurchaseSurveyData.data.url;
+    const iframeUrl = `${url}api/get-survey/${store_uuid}`;
 
     const iframe = document.createElement("iframe");
     iframe.src = iframeUrl;

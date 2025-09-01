@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SurveyAssistantController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SurveyViewController;
 use App\Http\Controllers\SurveyController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\SurveyController;
 |
 */
 
+
 // Protected API routes (require Shopify authentication)
 Route::middleware('shopify.auth')->group(function () {
 
@@ -24,12 +26,12 @@ Route::middleware('shopify.auth')->group(function () {
 
     // Survey CRUD
     Route::get('/surveys', [SurveyController::class, 'getSurvey']);
-    Route::post('/surveys', [SurveyController::class, 'saveSurvey']);
+    Route::post('/surveys/{uuid?}', [SurveyController::class, 'saveSurvey']);
     Route::get('/surveys/{uuid}', [SurveyController::class, 'show']);
-    Route::put('/surveys/{uuid}', [SurveyController::class, 'update']);
-    Route::patch('/surveys/{uuid}', [SurveyController::class, 'update']);
     Route::delete('/surveys/{uuid}', [SurveyController::class, 'destroy']);
 
+    //AI Assistance
+    Route::post('/assistant/generate-title', [SurveyAssistantController::class, 'generateTitle']);
 });
 
-Route::get('/get-survey/{store_uuid}/{survey_uuid}', [SurveyViewController::class, 'getSurveyWidget']);
+Route::get('/get-survey/{store_uuid}/{survey_uuid?}', [SurveyViewController::class, 'getSurveyWidget']);

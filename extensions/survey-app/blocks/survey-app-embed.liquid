@@ -2,13 +2,23 @@
 
 </div>
 
+{% assign app_id = "272705978369" %}
+{% assign metaobject_type = "app--" | append: app_id | append: "--post_purchase_survey" %}
+{% assign metaobject_data = shop.metaobjects[metaobject_type] %}
+{% assign survey_data_json = metaobject_data.post_purchase_survey.settings | default: "{}" %}
+{% assign survey_data = survey_data_json | json %}
+
+<script>
+    const value = {{ survey_data_json }}
+    window.PostPurchaseSurveyData = value;
+</script>
+
 <script  src="{{ "survey-app-main.js" | asset_url }}" defer></script>
-<script  src="{{ "survey-app-transition-logics.js" | asset_url }}" defer></script>
 
 {% schema %}
 {
   "name": "Survey App Assets",
-  "target": "section",
+  "target": "body",
   "settings": []
 }
 {% endschema %}

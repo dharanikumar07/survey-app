@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class SurveyViewController
 {
-    public function getSurveyWidget(Request $request, string $storeUuid, string $surveyUuid)
+    public function getSurveyWidget(Request $request, string $storeUuid, string $surveyUuid = null)
     {
         $survey = new SurveyWidget($storeUuid, $surveyUuid);
 
