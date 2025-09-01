@@ -83,7 +83,7 @@ class SyncProducts implements ShouldQueue
             self::dispatch($this->store, $rawProductsData['pageInfo']['endCursor'])
                 ->delay(now()->addSeconds(2));
         } else {
-            SyncOrders::dispatch($this->store);
+            //SyncOrders::dispatch($this->store);
         }
 
     }

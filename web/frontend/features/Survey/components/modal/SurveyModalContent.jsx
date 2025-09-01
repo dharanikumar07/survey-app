@@ -48,10 +48,25 @@ const SurveyModalContent = forwardRef(({ templateKey, uuid, ...props }, ref) => 
 
         // Case 2: Creating from template
         if (templateKey) {
-            // Load template data
-            const templateData = loadTemplateData(templateKey);
+            // Get AI data if available (for ai_creation template)
+            let aiOverrides = {};
+            if (templateKey === 'ai_creation') {
+                try {
+                    const storedAIData = localStorage.getItem('aiSurveyData');
+                    if (storedAIData) {
+                        aiOverrides = JSON.parse(storedAIData);
+                        // Clear the data after use
+                        localStorage.removeItem('aiSurveyData');
+                    }
+                } catch (error) {
+                    console.error('Error loading AI data:', error);
+                }
+            }
+            
+            // Load template data with AI overrides
+            const templateData = loadTemplateData(templateKey, aiOverrides);
             if (templateData) {
-                // Update store with template data
+                // Update store with template data (including AI overrides)
                 setSurveyTitle(templateData.surveyTitle);
                 setQuestions(templateData.questions);
                 setChannelItems?.(templateData.channelItems);

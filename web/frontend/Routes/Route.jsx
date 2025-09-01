@@ -5,6 +5,7 @@ import Survey from "../features/Survey/Index.jsx";
 import Response from "../features/Response/Index.jsx";
 import TemplateSelection from "../features/Survey/TemplateSelection.jsx";
 import SurveyForm from "../features/Survey/SurveyForm.jsx";
+import AISurveyCreation from "../features/Survey/components/AI/Index.jsx";
 
 const router = createBrowserRouter([
     {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
     {
         path: "/survey/create",
         element: <SurveyForm />,
+    },
+    {
+        path: "/survey/ai-create",
+        element: <AISurveyCreation />,
     },
     {
         path: "/survey/edit/:uuid",

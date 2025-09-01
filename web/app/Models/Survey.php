@@ -19,7 +19,8 @@ class Survey extends Model
         'survey_meta_data',
         'total_responses',
         'total_impressions',
-        'is_active'
+        'is_active',
+        'store_uuid'
     ];
 
     protected $casts = [
