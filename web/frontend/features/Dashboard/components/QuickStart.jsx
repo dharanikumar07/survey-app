@@ -1,12 +1,22 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { Card, Text, ProgressBar, BlockStack, Box } from "@shopify/polaris";
 import Accordion from "../../../components/Accordion";
+import { useExtensionStatus } from "../hooks/useExtensionStatus";
 
 function wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export default function Quickstart() {
+    const { 
+        status, 
+        loading: extensionLoading, 
+        error: extensionError,
+        checkStatus, 
+        activateExtension,
+        isExtensionEnabled 
+    } = useExtensionStatus();
+
     const [statusByStep, setStatusByStep] = useState({
         activate: "idle",
         create: "idle",
@@ -39,6 +49,22 @@ export default function Quickstart() {
 
     const [activeStepId, setActiveStepId] = useState("activate");
 
+    // Check extension status on component mount
+    useEffect(() => {
+        checkStatus();
+    }, [checkStatus]);
+
+    // Update activate step status based on extension status
+    useEffect(() => {
+        if (extensionLoading) {
+            setStatusByStep(prev => ({ ...prev, activate: "loading" }));
+        } else if (isExtensionEnabled) {
+            setStatusByStep(prev => ({ ...prev, activate: "complete" }));
+        } else {
+            setStatusByStep(prev => ({ ...prev, activate: "idle" }));
+        }
+    }, [isExtensionEnabled, extensionLoading]);
+
     const completedCount = useMemo(
         () => Object.values(statusByStep).filter((s) => s === "complete").length,
         [statusByStep],
@@ -47,6 +73,12 @@ export default function Quickstart() {
     const progress = Math.round((completedCount / steps.length) * 100);
 
     const runStep = useCallback(async (id) => {
+        if (id === "activate") {
+            // For activate step, open the deeplink
+            activateExtension();
+            return;
+        }
+
         setStatusByStep((prev) => ({ ...prev, [id]: "loading" }));
         // Fake API call: simulate axios request latency
         await wait(2000);
@@ -58,12 +90,20 @@ export default function Quickstart() {
             setActiveStepId(next ? next.id : null);
             return updated;
         });
-    }, []);
+    }, [activateExtension, steps]);
 
     const refreshStep = useCallback(async (id) => {
-        // Fake recheck; keep it simple and instant for UX
-        setStatusByStep((prev) => ({ ...prev }));
-    }, []);
+        if (id === "activate") {
+            try {
+                await checkStatus(true); // Force refresh
+            } catch (error) {
+                // Error is handled by the hook
+            }
+        } else {
+            // Fake recheck; keep it simple and instant for UX
+            setStatusByStep((prev) => ({ ...prev }));
+        }
+    }, [checkStatus]);
 
     return (
         <Card>
@@ -77,6 +117,12 @@ export default function Quickstart() {
                     </Text>
                     <ProgressBar progress={progress} size="small" tone={progress === 100 ? "success" : undefined} />
                 </Box>
+
+                {extensionError && (
+                    <Text as="p" tone="critical">
+                        Error checking extension status: {extensionError}
+                    </Text>
+                )}
 
                 <Accordion
                     items={steps.map((step, index) => ({

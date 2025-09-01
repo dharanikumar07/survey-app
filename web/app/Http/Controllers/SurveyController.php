@@ -8,6 +8,7 @@ use App\Http\Resources\SurveyResource;
 use App\Models\Store;
 use App\Models\Survey;
 use App\Services\SurveyService;
+use App\Services\ShopifyExtensionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -120,6 +121,52 @@ class SurveyController extends Controller
             Helper::logError('Unable to delete the survey', [__CLASS__, __FUNCTION__], $exception, $request->toArray());
             return Response::json([
                 'error' => 'An error occurred while deleting the survey',
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	/**
+	 * Check extension status for the current store
+	 */
+	public function checkExtensionStatus(Request $request)
+	{
+		try {
+			$session = $request->get('shopifySession');
+			$store = Store::where('store_url', $session->getShop())->firstOrFail();
+			
+			$extensionService = app(ShopifyExtensionService::class);
+			$status = $extensionService->getExtensionStatus($store);
+			
+			return Response::json([
+				'data' => $status
+			], HttpResponse::HTTP_OK);
+		} catch (\Exception $exception) {
+            Helper::logError('Unable to check extension status', [__CLASS__, __FUNCTION__], $exception, $request->toArray());
+            return Response::json([
+                'error' => 'An error occurred while checking extension status',
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	/**
+	 * Refresh extension status (bypass cache)
+	 */
+	public function refreshExtensionStatus(Request $request)
+	{
+		try {
+			$session = $request->get('shopifySession');
+			$store = Store::where('store_url', $session->getShop())->firstOrFail();
+			
+			$extensionService = app(ShopifyExtensionService::class);
+			$status = $extensionService->refreshExtensionStatus($store);
+			
+			return Response::json([
+				'data' => $status
+			], HttpResponse::HTTP_OK);
+		} catch (\Exception $exception) {
+            Helper::logError('Unable to refresh extension status', [__CLASS__, __FUNCTION__], $exception, $request->toArray());
+            return Response::json([
+                'error' => 'An error occurred while refreshing extension status',
             ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
 		}
 	}
