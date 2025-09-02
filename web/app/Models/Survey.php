@@ -24,7 +24,7 @@ class Survey extends Model
     ];
 
     protected $casts = [
-        'survey_meta_data' => 'json',
+        'survey_meta_data' => 'array',
         'is_active' => 'boolean',
         'total_responses' => 'integer',
         'total_impressions' => 'integer'
