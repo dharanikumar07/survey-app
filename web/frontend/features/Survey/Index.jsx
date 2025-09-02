@@ -42,7 +42,7 @@ export default function Survey() {
     const { getSurveys, deleteSurvey } = useSurveyApi();
     const { showToast } = useToast();
     const queryClient = useQueryClient();
-    
+
     // Delete mutation
     const deleteSurveyMutation = useMutation({
         mutationFn: deleteSurvey,
@@ -66,7 +66,7 @@ export default function Survey() {
         }
     });
 
-    const { data, isLoading, isError } = useQueryEvents(
+    const { data, isLoading, isError, isPending } = useQueryEvents(
         useQuery({
             queryKey: ["surveys", activeTab, currentPage],
             queryFn: () => getSurveys({ status: activeTab, page: currentPage }),
@@ -227,7 +227,7 @@ export default function Survey() {
                     title=""
                     icon={InfoIcon}
                     status="info"
-                    onDismiss={() => {}}
+                    onDismiss={() => { }}
                 >
                     The most recently activated survey will be displayed first on the store. Once it stops showing according to its Widget recurrence settings, other surveys in the same position will be shown subsequently
                 </Banner>
@@ -236,7 +236,7 @@ export default function Survey() {
                     <Tabs tabs={tabs} selected={activeTab} onSelect={handleTabChange} />
                     <IndexTable
                         resourceName={resourceName}
-                        loading={isLoading}
+                        loading={isLoading || isPending || deleteSurveyMutation.isPending}
                         itemCount={paginatedSurveys.length}
                         headings={[
                             { title: "Survey name" },

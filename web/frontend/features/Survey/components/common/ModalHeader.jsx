@@ -166,11 +166,7 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
 
         // Here you would typically send the data to your backend
         // Example: await saveSurveyToBackend(completeSurveyData);
-        if (uuid) {
-            saveSurveyMutation({ surveyData: completeSurveyData, uuid });
-        } else {
-            saveSurveyMutation({ surveyData: completeSurveyData, uuid: null });
-        }
+        saveSurveyMutation({ surveyData: completeSurveyData, uuid: uuid });
     };
 
     const themes = [
