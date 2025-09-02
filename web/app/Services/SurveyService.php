@@ -9,11 +9,12 @@ use Illuminate\Support\Facades\DB;
 
 class SurveyService
 {
-	public function saveOrUpdate(array $data, Store $store, ?string $survey_uuid = null): Survey
-	{
-		DB::beginTransaction();
-		try {
-            $attributes = ['store_uuid' => $store->uuid];
+    public function saveOrUpdate(array $data, Store $store, ?string $survey_uuid = null): Survey
+    {
+        DB::beginTransaction();
+
+        try {
+            $attributes = [];
 
             if ($survey_uuid) {
                 $attributes['uuid'] = $survey_uuid;
@@ -21,25 +22,46 @@ class SurveyService
                 $data['total_responses'] = 0;
                 $data['total_impressions'] = 0;
                 $data['status'] = $data['status'] ?? 'draft';
+                $data['store_uuid'] = $store->uuid;
             }
 
-            $data['meta'] = [
-                'schema_version' => '1.0.0',
-                'name' => 'Post Purchase Survey'
+            $metaData = $data['survey_meta_data'] ?? [];
+
+            if (is_string($metaData)) {
+                $metaData = json_decode($metaData, true) ?? [];
+            }
+
+            $metaBlock = [
+                'meta' => [
+                    'schema_version' => '1.0.0',
+                    'name' => 'Post Purchase Survey'
+                ]
             ];
 
-            $survey = Survey::updateOrCreate($attributes, $data);
+            $metaData = $metaBlock + $metaData;
 
-			DB::commit();
-			return $survey;
-		} catch (\Throwable $e) {
-			DB::rollBack();
+            $data['survey_meta_data'] = $metaData;
+
+            if ($attributes) {
+                $survey = Survey::updateOrCreate($attributes, $data);
+            } else {
+                $survey = Survey::create($data);
+            }
+
+            DB::commit();
+
+            return $survey;
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
             Helper::logError("Error Occurred", [__CLASS__, __FUNCTION__], $e);
-            throw new \Exception('Failed to delete survey.');
-		}
-	}
+            throw new \Exception('Failed to save survey.');
+        }
+    }
 
-	public function deleteSurvey(Survey $survey): void
+
+
+    public function deleteSurvey(Survey $survey): void
 	{
 		DB::beginTransaction();
 		try {
