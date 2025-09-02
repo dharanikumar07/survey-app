@@ -4,12 +4,8 @@
       "title": "Blank survey",
       "description": "Tell us your needs - we'll take care of everything.",
       "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -53,12 +49,8 @@
       "title": "Marketing attribution",
       "description": "Find out which marketing channels are most effective.",
       "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -107,13 +99,9 @@
     "customer_experience": {
       "title": "Customer experience survey",
       "description": "Gauge customer experience and satisfaction across key touchpoints.",
-      "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
+     "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -177,13 +165,9 @@
     "not_purchasing": {
       "title": "Reason for not purchasing",
       "description": "Understand what's stopping users from purchasing on your site.",
-      "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
+     "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": true, "isEnabled": true },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -233,12 +217,8 @@
       "title": "Exit intent",
       "description": "Understand what's stopping users from purchasing on your site.",
       "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": true, "isEnabled": true },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -282,12 +262,8 @@
       "title": "AI-assisted survey",
       "description": "AI-generated survey with custom title and questions.",
       "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, BlockStack, Text, Card } from '@shopify/polaris';
-// import { ChannelAccordion } from '../../../../components/Accordion';
 import { useSurveyState } from '../../hooks/useSurveyState';
 import SurveyAccordion from '../../../../components/SurveyAccordion';
 import { formatSurveyForAPI } from '../../utils/surveyHelpers';
