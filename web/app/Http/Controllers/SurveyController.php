@@ -55,7 +55,7 @@ class SurveyController extends Controller
 	}
 
 	/**
-	 * Create a new survey
+	 * Create or update a survey
 	 */
 	public function saveSurvey(StoreSurveyRequest $request, string $uuid = null)
 	{
@@ -63,16 +63,19 @@ class SurveyController extends Controller
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
 
-            $survey_uuid = $request->get('survey_uuid');
+			// Use route parameter first, fallback to request body
+			$survey_uuid = $uuid ?? $request->get('survey_uuid');
 
-            $survey = $this->surveyService->saveOrUpdate($request->validated(), $store, $survey_uuid);
+			$survey = $this->surveyService->saveOrUpdate($request->validated(), $store, $survey_uuid);
 
+			$resource = new SurveyResource($survey);
+			$status = $survey->wasRecentlyCreated ? HttpResponse::HTTP_CREATED : HttpResponse::HTTP_OK;
+			$message = $survey->wasRecentlyCreated ? 'Survey created successfully' : 'Survey updated successfully';
 
-            $resource = new SurveyResource($survey);
 			return Response::json([
 				'item' => $resource,
-				'message' => 'Survey created successfully'
-			], HttpResponse::HTTP_CREATED);
+				'message' => $message
+			], $status);
 		} catch (\Exception $exception) {
             Helper::logError('Unable to get the survey', [__CLASS__, __FUNCTION__], $exception, $request->toArray());
 			return Response::json([

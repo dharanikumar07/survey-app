@@ -8,17 +8,14 @@ import {
     Button,
     IndexTable,
     Badge,
-    Icon,
     Tabs,
     Box,
     Banner,
     InlineStack,
-    Tooltip,
-    ButtonGroup,
     Popover,
     ActionList,
     Pagination,
-    Spinner
+    Modal
 } from "@shopify/polaris";
 import {
     MenuVerticalIcon,
@@ -31,7 +28,8 @@ import {
 } from "@shopify/polaris-icons";
 import { useSurveyApi } from "./action/use-survey-api";
 import { useQueryEvents } from "../../components/helper/use-query-event";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "../../components/helper/toast-helper";
 
 export default function Survey() {
     const navigate = useNavigate();
@@ -39,7 +37,35 @@ export default function Survey() {
     const [surveys, setSurveys] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [popoverActive, setPopoverActive] = useState({});
-    const { getSurveys } = useSurveyApi();
+    const [deleteModalActive, setDeleteModalActive] = useState(false);
+    const [surveyToDelete, setSurveyToDelete] = useState(null);
+    const { getSurveys, deleteSurvey } = useSurveyApi();
+    const { showToast } = useToast();
+    const queryClient = useQueryClient();
+    
+    // Delete mutation
+    const deleteSurveyMutation = useMutation({
+        mutationFn: deleteSurvey,
+        onSuccess: (response) => {
+            const message = response?.data?.message || "Survey deleted successfully";
+            showToast({ message, type: "success" });
+            setDeleteModalActive(false);
+            setSurveyToDelete(null);
+            // Invalidate and refetch surveys
+            queryClient.invalidateQueries({ queryKey: ["surveys"] });
+        },
+        onError: (error) => {
+            const errorMessage = error?.data?.error || "Failed to delete survey";
+            showToast({ message: errorMessage, type: "error" });
+            setDeleteModalActive(false);
+            setSurveyToDelete(null);
+        },
+        onSettled: () => {
+            // Reset mutation state after completion (success or error)
+            deleteSurveyMutation.reset();
+        }
+    });
+
     const { data, isLoading, isError } = useQueryEvents(
         useQuery({
             queryKey: ["surveys", activeTab, currentPage],
@@ -47,11 +73,10 @@ export default function Survey() {
         }),
         {
             onSuccess: (data) => {
-                console.log(data);
                 setSurveys(data.data.data);
             },
             onError: (error) => {
-                console.log(error);
+                // Handle error silently or show toast if needed
             },
         }
     )
@@ -65,7 +90,6 @@ export default function Survey() {
     // Pagination settings
     const itemsPerPage = 10;
     const totalPages = Math.ceil(surveys.length / itemsPerPage);
-    // console.log(surveys, "surveys");
 
     // Filter surveys based on active tab
     const filteredSurveys = surveys.filter(survey => {
@@ -146,24 +170,38 @@ export default function Survey() {
                 handleEditSurvey(id);
                 break;
             case 'view':
-                // Handle view action
-                console.log(`View survey ${id}`);
+                // Handle view action - TODO: Implement view functionality
                 break;
             case 'duplicate':
-                // Handle duplicate action
-                console.log(`Duplicate survey ${id}`);
+                // Handle duplicate action - TODO: Implement duplicate functionality
                 break;
             case 'activate':
-                // Handle activate/deactivate action
-                console.log(`Activate/deactivate survey ${id}`);
+                // Handle activate/deactivate action - TODO: Implement activate/deactivate functionality
                 break;
             case 'delete':
-                // Handle delete action
-                console.log(`Delete survey ${id}`);
+                // Handle delete action - show confirmation modal
+                const survey = surveys.find(s => s.uuid === id);
+                setSurveyToDelete(survey);
+                setDeleteModalActive(true);
+                // Reset mutation state to ensure clean state
+                deleteSurveyMutation.reset();
                 break;
             default:
                 break;
         }
+    };
+
+    const handleDeleteConfirm = () => {
+        if (surveyToDelete) {
+            deleteSurveyMutation.mutate(surveyToDelete.uuid);
+        }
+    };
+
+    const handleDeleteCancel = () => {
+        setDeleteModalActive(false);
+        setSurveyToDelete(null);
+        // Reset mutation state when cancelling
+        deleteSurveyMutation.reset();
     };
 
     return (
@@ -179,7 +217,7 @@ export default function Survey() {
                     accessibilityLabel: 'Access help center',
                     icon: InfoIcon,
                     onAction: () => {
-                        // Open help center
+                        // TODO: Implement help center functionality
                     },
                 },
             ]}
@@ -189,7 +227,7 @@ export default function Survey() {
                     title=""
                     icon={InfoIcon}
                     status="info"
-                    onDismiss={() => { }}
+                    onDismiss={() => {}}
                 >
                     The most recently activated survey will be displayed first on the store. Once it stops showing according to its Widget recurrence settings, other surveys in the same position will be shown subsequently
                 </Banner>
@@ -327,6 +365,31 @@ export default function Survey() {
                     </Box>
                 </Card>
             </BlockStack>
+
+            {/* Delete Confirmation Modal */}
+            <Modal
+                open={deleteModalActive}
+                onClose={handleDeleteCancel}
+                title="Delete Survey"
+                primaryAction={{
+                    content: 'Delete',
+                    destructive: true,
+                    onAction: handleDeleteConfirm,
+                    loading: deleteSurveyMutation.isPending,
+                }}
+                secondaryActions={[
+                    {
+                        content: 'Cancel',
+                        onAction: handleDeleteCancel,
+                    },
+                ]}
+            >
+                <Modal.Section>
+                    <Text variant="bodyMd">
+                        Are you sure you want to delete "{surveyToDelete?.name}"? This action cannot be undone.
+                    </Text>
+                </Modal.Section>
+            </Modal>
         </Page>
     );
 }

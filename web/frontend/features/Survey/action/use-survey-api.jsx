@@ -24,9 +24,15 @@ export function useSurveyApi() {
         return response;
     }
 
+    const deleteSurvey = async (uuid) => {
+        const response = await apiClient("DELETE", `/surveys/${uuid}`);
+        return response;
+    }
+
     return {
         getSurveys,
         createSurvey,
         saveSurvey,
+        deleteSurvey,
     }
 }

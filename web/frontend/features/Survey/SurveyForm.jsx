@@ -9,6 +9,7 @@ import SurveyModalContent from "./components/modal/SurveyModalContent";
 import { PolarisProvider } from "../../components/providers";
 import { PortalsManager } from "@shopify/polaris";
 import { Modal, TitleBar } from '@shopify/app-bridge-react';
+import { useSurveyState } from "./hooks/useSurveyState";
 
 export default function SurveyForm() {
     const navigate = useNavigate();
@@ -17,19 +18,20 @@ export default function SurveyForm() {
     const templateKey = searchParams.get('template');
     const [title, setTitle] = useState("Create new survey");
     const surveyPreviewRef = useRef(null);
+    const { surveyTitle } = useSurveyState();
 
     useEffect(() => {
         // Handle editing existing survey
         if (uuid) {
-            setTitle(`Edit survey #${uuid}`);
-            // Fetch survey data based on uuid
-            // This would be implemented with an API call
+            // Use the survey title from the store if available, otherwise show UUID
+            const displayTitle = surveyTitle ? `Edit ${surveyTitle}` : `Edit survey #${uuid}`;
+            setTitle(displayTitle);
         }
         // Handle creating new survey from template
         else if (templateKey) {
             setTitle(`Create ${getTemplateName(templateKey)}`);
         }
-    }, [uuid, templateKey]);
+    }, [uuid, templateKey, surveyTitle]);
 
     const getTemplateName = (key) => {
         const templateNames = {

@@ -31,7 +31,7 @@ import { useToast } from '../../../../components/helper/toast-helper';
 import { useMutation } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
-function ModalHeader({ title = "Survey #1", surveyPreviewRef, onClose }) {
+function ModalHeader({ title, surveyPreviewRef, onClose }) {
     const {
         selectedView,
         setSelectedView,
@@ -59,9 +59,10 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef, onClose }) {
     const { uuid } = useParams();
 
     const { mutate: saveSurveyMutation, isPending } = useMutation({
-        mutationFn: saveSurvey,
-        onSuccess: () => {
-            showToast({ message: "Survey saved successfully", type: "success" });
+        mutationFn: ({ surveyData, uuid }) => saveSurvey(surveyData, uuid),
+        onSuccess: (response) => {
+            const message = response?.data?.message || "Survey saved successfully";
+            showToast({ message, type: "success" });
             onClose();
         },
         onError: () => {
@@ -166,9 +167,9 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef, onClose }) {
         // Here you would typically send the data to your backend
         // Example: await saveSurveyToBackend(completeSurveyData);
         if (uuid) {
-            saveSurveyMutation(completeSurveyData, uuid);
+            saveSurveyMutation({ surveyData: completeSurveyData, uuid });
         } else {
-            saveSurveyMutation(completeSurveyData);
+            saveSurveyMutation({ surveyData: completeSurveyData, uuid: null });
         }
     };
 
@@ -375,14 +376,14 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef, onClose }) {
                     >
                         Refresh
                     </Button>
-                    {/* Save Button */}
+                    {/* Save/Update Button */}
                     <Button
                         variant="primary"
                         size="slim"
                         onClick={handleSave}
                         loading={isPending}
                     >
-                        Save
+                        {uuid ? 'Update' : 'Save'}
                     </Button>
 
                     {/* Status Dropdown */}
