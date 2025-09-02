@@ -9,6 +9,7 @@ return [
     'scopes' => env('SCOPES', 'not_defined'),
     'custom_domains' => env('SHOP_CUSTOM_DOMAIN', null),
     'api_version' => env('SHOPIFY_API_VERSION', '2025-01'),
+    'app_handle' => env('SHOPIFY_APP_HANDLE', 'testing-app-1025'),
 
     /*
     |--------------------------------------------------------------------------

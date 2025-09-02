@@ -30,6 +30,10 @@ Route::middleware('shopify.auth')->group(function () {
     Route::get('/surveys/{uuid}', [SurveyController::class, 'show']);
     Route::delete('/surveys/{uuid}', [SurveyController::class, 'destroy']);
 
+    // Extension Status
+    Route::get('/extension/status', [SurveyController::class, 'checkExtensionStatus']);
+    Route::post('/extension/refresh', [SurveyController::class, 'refreshExtensionStatus']);
+
     //AI Assistance
     Route::post('/assistant/generate-title', [SurveyAssistantController::class, 'generateTitle']);
 });
