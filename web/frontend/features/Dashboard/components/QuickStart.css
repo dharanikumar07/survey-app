@@ -1,0 +1,94 @@
+/* QuickStart Component Styles */
+.QuickStartTask {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.QuickStartTask__Selected {
+    background-color: var(--p-color-bg-surface-secondary);
+    padding: 8px;
+    margin: 0 -8px;
+}
+
+.QuickStartTask__Checkbox {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.QuickStartTask__CheckboxIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.QuickStartTask__Container {
+    flex: 1;
+    min-width: 0;
+}
+
+.QuickStartTask__ContainerBody {
+    width: 100%;
+}
+
+/* Pulse animation for loading state */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+/* Custom checkbox styles */
+.QuickStartIcon__CircleNotCheck {
+    transition: all 0.2s ease-in-out;
+}
+
+.QuickStartIcon__CircleNotCheck--path {
+    transition: all 0.2s ease-in-out;
+    stroke-dasharray: 4 4;
+    stroke-width: 2;
+    stroke: #8C9196;
+}
+
+.QuickStartIcon__CircleNotCheck--circle {
+    transition: all 0.2s ease-in-out;
+    stroke-dasharray: 4 4;
+    stroke-width: 2;
+    stroke: #999EA4;
+}
+
+/* Hover effects */
+.QuickStartTask {
+    cursor: pointer;
+}
+
+.QuickStartTask:hover {
+    background-color: var(--p-color-bg-surface-hover);
+}
+
+.QuickStartTask__Selected:hover {
+    background-color: var(--p-color-bg-surface-secondary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .QuickStartTask {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .QuickStartTask__Checkbox {
+        align-self: flex-start;
+    }
+}

@@ -23,7 +23,7 @@ import SurveyIframeProduction from '../panels/SurveyIframeProduction';
  * - Mobile: Reduced width side panels
  * - Fullscreen: Hidden side panels, expanded preview
  */
-const SurveyLayout = forwardRef(({ surveyId }, ref) => {
+const SurveyLayout = forwardRef(({ surveyId, onClose }, ref) => {
     const surveyPreviewRef = ref || useRef(null);
     const { selectedView } = useSurveyState();
 
@@ -54,9 +54,9 @@ const SurveyLayout = forwardRef(({ surveyId }, ref) => {
     const columnSpans = getColumnSpans();
 
     return (
-        <SurveyLoader >
+        <SurveyLoader surveyId={surveyId}>
             <div className="th-sf-survey-editor">
-                {/* <ModalHeader surveyPreviewRef={surveyPreviewRef} /> */}
+                <ModalHeader surveyPreviewRef={surveyPreviewRef} onClose={onClose} />
 
                 <div style={{ overflow: 'hidden' }}>
                     <Box padding="0" height="100%" overflow="hidden" className="th-sf-survey-layout">

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helper\Helper;
 use App\Http\Requests\StoreSurveyRequest;
-use App\Http\Requests\UpdateSurveyRequest;
 use App\Http\Resources\SurveyResource;
 use App\Models\Store;
 use App\Models\Survey;
 use App\Services\SurveyService;
+use App\Services\ShopifyExtensionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
@@ -38,6 +38,7 @@ class SurveyController extends Controller
 			if ($request->filled('is_active')) {
 				$query->where('is_active', filter_var($request->get('is_active'), FILTER_VALIDATE_BOOLEAN));
 			}
+
 			if ($request->filled('q')) {
 				$query->where('name', 'like', '%'.$request->get('q').'%');
 			}
@@ -46,36 +47,40 @@ class SurveyController extends Controller
 			$surveys = $query->paginate($perPage);
 
 			return SurveyResource::collection($surveys);
-		} catch (\Exception $e) {
-			Log::error('Surveys list error: '.$e->getMessage());
+		} catch (\Exception $exception) {
+            Helper::logError('Unable to get the survey', [__CLASS__, __FUNCTION__], $exception, $request->toArray());
 			return Response::json([
-				'success' => false,
 				'error' => 'An error occurred while fetching surveys',
 			], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	/**
-	 * Create a new survey
+	 * Create or update a survey
 	 */
-	public function saveSurvey(StoreSurveyRequest $request)
+	public function saveSurvey(StoreSurveyRequest $request, string $uuid = null)
 	{
 		try {
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
 
-			$survey = $this->surveyService->createSurvey($request->validated(), $store);
+			// Use route parameter first, fallback to request body
+			$survey_uuid = $uuid ?? $request->get('survey_uuid');
+
+			$survey = $this->surveyService->saveOrUpdate($request->validated(), $store, $survey_uuid);
 
 			$resource = new SurveyResource($survey);
+			$status = $survey->wasRecentlyCreated ? HttpResponse::HTTP_CREATED : HttpResponse::HTTP_OK;
+			$message = $survey->wasRecentlyCreated ? 'Survey created successfully' : 'Survey updated successfully';
+
 			return Response::json([
 				'item' => $resource,
-				'message' => 'Survey created successfully'
-			], HttpResponse::HTTP_CREATED);
-		} catch (\Exception $e) {
-			Log::error('Survey create error: '.$e->getMessage());
+				'message' => $message
+			], $status);
+		} catch (\Exception $exception) {
+            Helper::logError('Unable to get the survey', [__CLASS__, __FUNCTION__], $exception, $request->toArray());
 			return Response::json([
-				'success' => false,
-				'error' => 'An error occurred while creating the survey',
+				'error' => 'An error occurred while saving the survey',
 			], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -89,54 +94,15 @@ class SurveyController extends Controller
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
 
-			$survey = Survey::where('store_uuid', $store->uuid)->where('uuid', $uuid)->first();
-			if (! $survey) {
-				return Response::json([
-					'success' => false,
-					'error' => 'Survey not found',
-				], HttpResponse::HTTP_NOT_FOUND);
-			}
+			$survey = Survey::where('store_uuid', $store->uuid)
+                ->where('uuid', $uuid)->first();
 
 			return new SurveyResource($survey);
-		} catch (\Exception $e) {
-			Log::error('Survey fetch error: '.$e->getMessage());
-			return Response::json([
-				'success' => false,
-				'error' => 'An error occurred while fetching the survey',
-			], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	/**
-	 * Update a survey by UUID
-	 */
-	public function update(UpdateSurveyRequest $request, string $uuid)
-	{
-		try {
-			$session = $request->get('shopifySession');
-			$store = Store::where('store_url', $session->getShop())->firstOrFail();
-
-			$survey = Survey::where('store_uuid', $store->uuid)->where('uuid', $uuid)->first();
-			if (! $survey) {
-				return Response::json([
-					'success' => false,
-					'error' => 'Survey not found',
-				], HttpResponse::HTTP_NOT_FOUND);
-			}
-
-			$updated = $this->surveyService->updateSurvey($survey, $request->validated());
-
-			$resource = new SurveyResource($updated);
-			return Response::json([
-				'item' => $resource,
-				'message' => 'Survey updated successfully'
-			], HttpResponse::HTTP_OK);
-		} catch (\Exception $e) {
-			Log::error('Survey update error: '.$e->getMessage());
-			return Response::json([
-				'success' => false,
-				'error' => 'An error occurred while updating the survey',
-			], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+		} catch (\Exception $exception) {
+            Helper::logError('Unable to get the survey', [__CLASS__, __FUNCTION__], $exception, $request->toArray());
+            return Response::json([
+                'error' => 'An error occurred while getting the survey',
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -150,22 +116,61 @@ class SurveyController extends Controller
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
 
 			$survey = Survey::where('store_uuid', $store->uuid)->where('uuid', $uuid)->first();
-			if (! $survey) {
-				return Response::json([
-					'success' => false,
-					'error' => 'Survey not found',
-				], HttpResponse::HTTP_NOT_FOUND);
-			}
 
 			$this->surveyService->deleteSurvey($survey);
 
 			return Response::json(['message' => 'Survey deleted successfully'], HttpResponse::HTTP_OK);
-		} catch (\Exception $e) {
-			Log::error('Survey delete error: '.$e->getMessage());
+		} catch (\Exception $exception) {
+            Helper::logError('Unable to delete the survey', [__CLASS__, __FUNCTION__], $exception, $request->toArray());
+            return Response::json([
+                'error' => 'An error occurred while deleting the survey',
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	/**
+	 * Check extension status for the current store
+	 */
+	public function checkExtensionStatus(Request $request)
+	{
+		try {
+			$session = $request->get('shopifySession');
+			$store = Store::where('store_url', $session->getShop())->firstOrFail();
+			
+			$extensionService = app(ShopifyExtensionService::class);
+			$status = $extensionService->getExtensionStatus($store);
+			
 			return Response::json([
-				'success' => false,
-				'error' => 'An error occurred while deleting the survey',
-			], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+				'data' => $status
+			], HttpResponse::HTTP_OK);
+		} catch (\Exception $exception) {
+            Helper::logError('Unable to check extension status', [__CLASS__, __FUNCTION__], $exception, $request->toArray());
+            return Response::json([
+                'error' => 'An error occurred while checking extension status',
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	/**
+	 * Refresh extension status (bypass cache)
+	 */
+	public function refreshExtensionStatus(Request $request)
+	{
+		try {
+			$session = $request->get('shopifySession');
+			$store = Store::where('store_url', $session->getShop())->firstOrFail();
+			
+			$extensionService = app(ShopifyExtensionService::class);
+			$status = $extensionService->refreshExtensionStatus($store);
+			
+			return Response::json([
+				'data' => $status
+			], HttpResponse::HTTP_OK);
+		} catch (\Exception $exception) {
+            Helper::logError('Unable to refresh extension status', [__CLASS__, __FUNCTION__], $exception, $request->toArray());
+            return Response::json([
+                'error' => 'An error occurred while refreshing extension status',
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
 		}
 	}
 }

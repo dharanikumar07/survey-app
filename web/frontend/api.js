@@ -29,7 +29,7 @@ export const apiClient = async (request_type, url, data) => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: request_type !== "GET" ? JSON.stringify(data) : null,
+            body: (request_type !== "GET" && request_type !== "DELETE" && data) ? JSON.stringify(data) : null,
         });
 
         const parsedData = await response.json(); 

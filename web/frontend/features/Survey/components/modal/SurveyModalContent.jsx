@@ -19,7 +19,7 @@ import { loadTemplateData } from '../../utils/templateHelpers';
  * @param {string} props.templateKey Optional template key to load from surveyData.json
  * @param {string} props.uuid Optional survey ID for editing existing surveys
  */
-const SurveyModalContent = forwardRef(({ templateKey, uuid, ...props }, ref) => {
+const SurveyModalContent = forwardRef(({ templateKey, uuid, onClose, ...props }, ref) => {
     // Get store setters to load template data
     const resetSurveyToDefault = useStore((state) => state.resetSurveyToDefault);
     const setSurveyTitle = useStore((state) => state.setSurveyTitle);
@@ -40,18 +40,33 @@ const SurveyModalContent = forwardRef(({ templateKey, uuid, ...props }, ref) => 
             console.log(`Loading survey data for UUID: ${uuid}`);
 
             // TODO: Replace with API call to fetch survey data
-            // For now, just reset to default
-            resetSurveyToDefault();
+            // The API call will be handled by SurveyLoader component
+            // Don't reset to default here - let SurveyLoader handle it
 
             return;
         }
 
         // Case 2: Creating from template
         if (templateKey) {
-            // Load template data
-            const templateData = loadTemplateData(templateKey);
+            // Get AI data if available (for ai_creation template)
+            let aiOverrides = {};
+            if (templateKey === 'ai_creation') {
+                try {
+                    const storedAIData = localStorage.getItem('aiSurveyData');
+                    if (storedAIData) {
+                        aiOverrides = JSON.parse(storedAIData);
+                        // Clear the data after use
+                        localStorage.removeItem('aiSurveyData');
+                    }
+                } catch (error) {
+                    console.error('Error loading AI data:', error);
+                }
+            }
+
+            // Load template data with AI overrides
+            const templateData = loadTemplateData(templateKey, aiOverrides);
             if (templateData) {
-                // Update store with template data
+                // Update store with template data (including AI overrides)
                 setSurveyTitle(templateData.surveyTitle);
                 setQuestions(templateData.questions);
                 setChannelItems?.(templateData.channelItems);
@@ -71,7 +86,7 @@ const SurveyModalContent = forwardRef(({ templateKey, uuid, ...props }, ref) => 
         resetSurveyToDefault();
     }, [templateKey, uuid]);
 
-    return <SurveyLayout ref={ref} />;
+    return <SurveyLayout ref={ref} surveyId={uuid} onClose={onClose} />;
 });
 
 export default SurveyModalContent;

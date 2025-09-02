@@ -151,6 +151,11 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             color: #ddd;
         }
         
+        .th-sf-survey-rating-option.hovered {
+            color: #ffd700;
+            transform: scale(1.1);
+        }
+        
         .th-sf-survey-rating-option:hover {
             color: #ffd700;
             transform: scale(1.1);
@@ -159,6 +164,13 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         .th-sf-survey-rating-option.selected {
             color: #ffd700;
             filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+        }
+        
+        /* Number scale hover effect */
+        .th-sf-survey-number-option.hovered {
+            border-color: #2c6ecb !important;
+            // background-color: #e6f0ff !important;
+            transform: scale(1.1);
         }
         
         .th-sf-survey-multiple-choice-container {
@@ -546,15 +558,36 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Render rating question
         function renderRatingQuestion(question) {
+            // Get the current rating if it exists
+            const currentRating = parseInt(answers[currentQuestionIndex]?.rating || '0');
+            
+            // Update emoji and text based on rating
+            let emoji = '😐';
+            let ratingText = 'Not likely';
+            
+            if (currentRating >= 4) {
+                emoji = '🤩';
+                ratingText = 'Love it';
+            } else if (currentRating >= 3) {
+                emoji = '😊';
+                ratingText = 'Like it';
+            } else if (currentRating >= 2) {
+                emoji = '😐';
+                ratingText = 'Neutral';
+            } else if (currentRating >= 1) {
+                emoji = '😕';
+                ratingText = 'Dislike it';
+            }
+            
             let html = \`
-                <div class="th-sf-survey-rating-emoji" style="font-size: 48px; text-align: center;">😐</div>
-                <p class="th-sf-survey-rating-text" style="text-align: center; margin: 0; font-size: 16px; color: #6d7175;">Not likely</p>
+                <div class="th-sf-survey-rating-emoji" style="font-size: 48px; text-align: center;">\${emoji}</div>
+                <p class="th-sf-survey-rating-text" style="text-align: center; margin: 0; font-size: 16px; color: #6d7175;">\${ratingText}</p>
                 <div class="th-sf-survey-rating-scale">
                     <div style="display: flex; justify-content: center; gap: \${selectedView === 'mobile' ? '4px' : '8px'}; width: 100%;">
             \`;
             
             for (let i = 1; i <= 5; i++) {
-                const isSelected = answers[currentQuestionIndex]?.rating === i.toString();
+                const isSelected = i <= currentRating; // Fill all stars up to the selected rating
                 html += \`
                     <button class="th-sf-survey-rating-option \${isSelected ? 'selected' : ''}" 
                             data-rating="\${i}" 
@@ -617,13 +650,33 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Render number scale question
         function renderNumberScaleQuestion(question) {
+            // Get the current rating if it exists
+            const currentRating = parseInt(answers[currentQuestionIndex] || '0');
+            
+            // Create a label based on the selected rating
+            let ratingText = '';
+            if (currentRating === 5) {
+                ratingText = 'Excellent';
+            } else if (currentRating === 4) {
+                ratingText = 'Very Good';
+            } else if (currentRating === 3) {
+                ratingText = 'Good';
+            } else if (currentRating === 2) {
+                ratingText = 'Fair';
+            } else if (currentRating === 1) {
+                ratingText = 'Poor';
+            } else {
+                ratingText = 'Select your rating';
+            }
+            
             let html = \`
                 <div class="th-sf-survey-number-scale">
+                    <p class="th-sf-survey-rating-text" style="text-align: center; margin: 0 0 10px 0; font-size: 16px; color: #6d7175;">\${ratingText}</p>
                     <div style="display: flex; justify-content: center; gap: \${selectedView === 'mobile' ? '4px' : '8px'}; width: 100%;">
             \`;
             
             for (let i = 1; i <= 5; i++) {
-                const isSelected = answers[currentQuestionIndex] === i.toString();
+                const isSelected = i <= currentRating; // Fill all numbers up to the selected rating
                 html += \`
                     <button class="th-sf-survey-number-option \${isSelected ? 'selected' : ''}" 
                             data-rating="\${i}"
@@ -635,7 +688,7 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             
             html += \`
                     </div>
-                    <div style="display: flex; justify-content: space-between; width: 100%; max-width: 300px; font-size: 14px; color: #6d7175;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; max-width: 300px; font-size: 14px; color: #6d7175; margin-top: 10px;">
                         <span>Poor</span>
                         <span>Excellent</span>
                     </div>
@@ -679,12 +732,90 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Add event listeners to question elements
         function addQuestionEventListeners() {
-            // Rating options
+            // Star rating container
+            const ratingContainer = document.querySelector('.th-sf-survey-rating-scale');
+            if (ratingContainer) {
+                ratingContainer.addEventListener('mouseleave', () => {
+                    // Remove all hover effects when mouse leaves the rating area
+                    document.querySelectorAll('.th-sf-survey-rating-option').forEach(star => {
+                        star.classList.remove('hovered');
+                    });
+                });
+            }
+            
+            // Number scale container
+            const numberScaleContainer = document.querySelector('.th-sf-survey-number-scale');
+            if (numberScaleContainer) {
+                numberScaleContainer.addEventListener('mouseleave', () => {
+                    // Remove all hover effects when mouse leaves the number scale area
+                    document.querySelectorAll('.th-sf-survey-number-option').forEach(number => {
+                        number.classList.remove('hovered');
+                    });
+                });
+            }
+            
+            // Rating options (handles both star rating and number scale)
             const ratingOptions = document.querySelectorAll('[data-rating]');
             ratingOptions.forEach(option => {
+                // Handle click for rating
                 option.addEventListener('click', (e) => {
-                    const rating = e.target.dataset.rating;
-                    handleRatingSelect(rating);
+                    const ratingElement = e.target.closest('[data-rating]');
+                    const rating = ratingElement.dataset.rating;
+                    
+                    // Check if it's a star rating or number scale
+                    if (ratingElement.classList.contains('th-sf-survey-rating-option')) {
+                        handleRatingSelect(rating);
+                    } else if (ratingElement.classList.contains('th-sf-survey-number-option')) {
+                        handleNumberScaleSelect(rating);
+                    } else {
+                        // Handle any other type of rating
+                        handleRatingSelect(rating);
+                    }
+                });
+
+                // Handle hover effect for star rating and number scale
+                option.addEventListener('mouseenter', (e) => {
+                    const ratingElement = e.target.closest('[data-rating]');
+                    const hoveredRating = parseInt(ratingElement.dataset.rating);
+                    
+                    if (ratingElement.classList.contains('th-sf-survey-rating-option')) {
+                        // Highlight all stars up to the hovered one
+                        document.querySelectorAll('.th-sf-survey-rating-option').forEach((star, index) => {
+                            const starRating = index + 1;
+                            if (starRating <= hoveredRating) {
+                                star.classList.add('hovered');
+                            } else {
+                                star.classList.remove('hovered');
+                            }
+                        });
+                    } else if (ratingElement.classList.contains('th-sf-survey-number-option')) {
+                        // Highlight all numbers up to the hovered one
+                        document.querySelectorAll('.th-sf-survey-number-option').forEach((number, index) => {
+                            const numberRating = index + 1;
+                            if (numberRating <= hoveredRating) {
+                                number.classList.add('hovered');
+                            } else {
+                                number.classList.remove('hovered');
+                            }
+                        });
+                    }
+                });
+                
+                // Handle mouse leave for options
+                option.addEventListener('mouseleave', (e) => {
+                    const ratingElement = e.target.closest('[data-rating]');
+                    
+                    if (ratingElement.classList.contains('th-sf-survey-rating-option')) {
+                        // Remove hover effect from all stars
+                        document.querySelectorAll('.th-sf-survey-rating-option').forEach(star => {
+                            star.classList.remove('hovered');
+                        });
+                    } else if (ratingElement.classList.contains('th-sf-survey-number-option')) {
+                        // Remove hover effect from all numbers
+                        document.querySelectorAll('.th-sf-survey-number-option').forEach(number => {
+                            number.classList.remove('hovered');
+                        });
+                    }
                 });
             });
             
@@ -712,11 +843,80 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             updateQuestionDisplay();
             updateNavigationButtons();
             
+            // Update emoji and text based on rating
+            const ratingInt = parseInt(rating);
+            let emoji = '😐';
+            let ratingText = 'Not likely';
+            
+            if (ratingInt >= 4) {
+                emoji = '🤩';
+                ratingText = 'Love it';
+            } else if (ratingInt >= 3) {
+                emoji = '😊';
+                ratingText = 'Like it';
+            } else if (ratingInt >= 2) {
+                emoji = '😐';
+                ratingText = 'Neutral';
+            } else if (ratingInt >= 1) {
+                emoji = '😕';
+                ratingText = 'Dislike it';
+            }
+            
+            // Update the emoji and text immediately
+            const emojiElement = document.querySelector('.th-sf-survey-rating-emoji');
+            const textElement = document.querySelector('.th-sf-survey-rating-text');
+            
+            if (emojiElement) {
+                emojiElement.textContent = emoji;
+            }
+            
+            if (textElement) {
+                textElement.textContent = ratingText;
+            }
+            
             // Sync with parent
             sendMessageToParent('ANSWER_SELECTED', {
                 questionIndex: currentQuestionIndex,
                 answer: answers[currentQuestionIndex],
                 questionType: surveyData.questions[currentQuestionIndex].type
+            });
+        }
+        
+        // Handle number scale selection
+        function handleNumberScaleSelect(rating) {
+            answers[currentQuestionIndex] = rating;
+            
+            // Update the label based on the selected rating
+            const ratingInt = parseInt(rating);
+            let ratingText = '';
+            
+            if (ratingInt === 5) {
+                ratingText = 'Excellent';
+            } else if (ratingInt === 4) {
+                ratingText = 'Very Good';
+            } else if (ratingInt === 3) {
+                ratingText = 'Good';
+            } else if (ratingInt === 2) {
+                ratingText = 'Fair';
+            } else if (ratingInt === 1) {
+                ratingText = 'Poor';
+            }
+            
+            // Update the text immediately
+            const textElement = document.querySelector('.th-sf-survey-rating-text');
+            
+            if (textElement) {
+                textElement.textContent = ratingText;
+            }
+            
+            updateQuestionDisplay();
+            updateNavigationButtons();
+            
+            // Sync with parent
+            sendMessageToParent('ANSWER_SELECTED', {
+                questionIndex: currentQuestionIndex,
+                answer: rating,
+                questionType: 'number-scale'
             });
         }
         

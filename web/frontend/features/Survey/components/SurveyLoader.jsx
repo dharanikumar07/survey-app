@@ -38,7 +38,7 @@ const SurveyLoader = ({ surveyId, children }) => {
                 // If no surveyId, the store is already initialized with the default data
                 setLoading(false);
             } catch (err) {
-                console.error('Error loading survey:', err);
+                console.log('Error loading survey:', err);
                 setError('Failed to load survey data. Please try again.');
                 setLoading(false);
             }

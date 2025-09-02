@@ -19,11 +19,12 @@ class Survey extends Model
         'survey_meta_data',
         'total_responses',
         'total_impressions',
-        'is_active'
+        'is_active',
+        'store_uuid'
     ];
 
     protected $casts = [
-        'survey_meta_data' => 'json',
+        'survey_meta_data' => 'array',
         'is_active' => 'boolean',
         'total_responses' => 'integer',
         'total_impressions' => 'integer'

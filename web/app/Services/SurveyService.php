@@ -9,45 +9,62 @@ use Illuminate\Support\Facades\DB;
 
 class SurveyService
 {
-	public function createSurvey(array $data, Store $store): Survey
-	{
-		DB::beginTransaction();
-		try {
-			$survey = new Survey($data);
-			$survey->store_uuid = $store->uuid;
-			$survey->total_responses = 0;
-			$survey->total_impressions = 0;
-			if (! isset($data['status'])) {
-				$survey->status = 'draft';
-			}
-			$survey->save();
+    public function saveOrUpdate(array $data, Store $store, ?string $survey_uuid = null): Survey
+    {
+        DB::beginTransaction();
 
-			DB::commit();
-			return $survey;
-		} catch (\Throwable $e) {
-			DB::rollBack();
+        try {
+            $attributes = [];
+
+            if ($survey_uuid) {
+                // For updates, scope by both UUID and store_uuid for security
+                $attributes = ['uuid' => $survey_uuid, 'store_uuid' => $store->uuid];
+                $data['store_uuid'] = $store->uuid;
+            } else {
+                // For creates, set default values
+                $data['total_responses'] = 0;
+                $data['total_impressions'] = 0;
+                $data['status'] = $data['status'] ?? 'draft';
+                $data['store_uuid'] = $store->uuid;
+            }
+
+            $metaData = $data['survey_meta_data'] ?? [];
+
+            if (is_string($metaData)) {
+                $metaData = json_decode($metaData, true) ?? [];
+            }
+
+            $metaBlock = [
+                'meta' => [
+                    'schema_version' => '1.0.0',
+                    'name' => 'Post Purchase Survey'
+                ]
+            ];
+
+            $metaData = $metaBlock + $metaData;
+
+            $data['survey_meta_data'] = $metaData;
+
+            if ($attributes) {
+                $survey = Survey::updateOrCreate($attributes, $data);
+            } else {
+                $survey = Survey::create($data);
+            }
+
+            DB::commit();
+
+            return $survey;
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
             Helper::logError("Error Occurred", [__CLASS__, __FUNCTION__], $e);
-            throw new \Exception('Failed to delete survey.');
-		}
-	}
+            throw new \Exception('Failed to save survey.');
+        }
+    }
 
-	public function updateSurvey(Survey $survey, array $data): Survey
-	{
-		DB::beginTransaction();
-		try {
-			$locked = Survey::where('uuid', $survey->uuid)->lockForUpdate()->firstOrFail();
-			$locked->fill($data);
-			$locked->save();
-			DB::commit();
-			return $locked;
-		} catch (\Throwable $e) {
-			DB::rollBack();
-            Helper::logError("Error Occurred", [__CLASS__, __FUNCTION__], $e);
-            throw new \Exception('Failed to update survey.');
-		}
-	}
 
-	public function deleteSurvey(Survey $survey): void
+
+    public function deleteSurvey(Survey $survey): void
 	{
 		DB::beginTransaction();
 		try {
