@@ -1,9 +1,12 @@
 import { create } from "zustand";
 import { v4 as uuidv4 } from 'uuid';
 import { loadSurveyData, createNewQuestion, processSurveyDataFromApi } from '../features/Survey/utils/surveyStoreHelpers';
+import { apiClient } from "../api";
 
 // Load initial data from JSON or API
+console.log('=== Store initialization ===');
 const initialData = loadSurveyData();
+console.log('Initial data loaded:', initialData);
 
 const useStore = create((set, get) => ({
     // Load initial state from our helper function
@@ -241,6 +244,142 @@ const useStore = create((set, get) => ({
 
     // API related functions - to be implemented when API is ready
     
+    // Transform API data to match store structure
+    transformApiDataToStore: (apiData) => {
+        try {
+            // Extract survey metadata
+            const surveyMeta = apiData.survey_meta_data || {};
+            
+            // Transform questions
+            const questions = (surveyMeta.questions || []).map((q, index) => {
+                // Transform answer options properly
+                let answerOptions = [];
+                if (q.answers && Array.isArray(q.answers)) {
+                    answerOptions = q.answers.map((answer, optIndex) => ({
+                        id: answer.id || `opt${optIndex + 1}`,
+                        text: answer.content || answer.text || answer.label || `Option ${optIndex + 1}`
+                    }));
+                } else if (q.answerOptions && Array.isArray(q.answerOptions)) {
+                    answerOptions = q.answerOptions.map((answer, optIndex) => ({
+                        id: answer.id || `opt${optIndex + 1}`,
+                        text: answer.content || answer.text || answer.label || `Option ${optIndex + 1}`
+                    }));
+                }
+                
+                return {
+                    id: q.id || `q${index + 1}`,
+                    content: q.heading || q.content || 'Question',
+                    type: q.type || 'text',
+                    description: q.description || '',
+                    questionType: get().getQuestionType(q.type),
+                    isDraggable: true,
+                    answerOptions: answerOptions,
+                    position: q.position || index
+                };
+            });
+            
+            // Add thank you card if it exists
+            if (surveyMeta.thankYou) {
+                questions.push({
+                    id: 'thankyou',
+                    content: surveyMeta.thankYou.heading || 'Thank You Card',
+                    type: 'card',
+                    description: surveyMeta.thankYou.description || '',
+                    questionType: 'Card',
+                    isDraggable: false,
+                    answerOptions: []
+                });
+            }
+            
+            // Transform channels
+            const channelItems = get().transformChannels(surveyMeta.channels || {});
+            
+            // Transform discount settings
+            const discountSettings = get().transformDiscountSettings(surveyMeta.discount || {});
+            
+            const transformedData = {
+                // Survey basic info
+                surveyTitle: surveyMeta.name || apiData.name || 'Survey',
+                isActive: surveyMeta.isActive || apiData.is_active || true,
+                selectedTheme: 'default',
+                
+                // Questions
+                questions: questions,
+                
+                // Channels
+                channelItems: channelItems,
+                
+                // Discount
+                discountEnabled: surveyMeta.discount?.enabled || false,
+                discountSettings: discountSettings,
+                discountSections: [
+                    { id: 'banner', title: 'Discount banner', icon: 'page', isExpanded: false },
+                    { id: 'requestEmail', title: 'Request email card', icon: 'email', isExpanded: false },
+                    { id: 'discountEmail', title: 'Discount email', icon: 'email', isExpanded: true }
+                ],
+                
+                // UI state
+                selectedTab: 0,
+                editModalOpen: false,
+                selectedQuestionId: questions.length > 0 ? questions[0].id : '1',
+                selectedView: 'desktop',
+                themePopoverActive: false,
+                statusPopoverActive: false,
+                surveyPagePopoverActive: false,
+                selectedSurveyPage: 'page',
+                currentQuestionIndex: 0
+            };
+            
+            return transformedData;
+            
+        } catch (error) {
+            console.error('Error transforming API data:', error);
+            // Return fallback data if transformation fails
+            return loadSurveyData();
+        }
+    },
+    
+    // Helper function to get question type display name
+    getQuestionType: (type) => {
+        const typeMap = {
+            'text': 'Short answer',
+            'rating': 'Star rating',
+            'satisfaction': 'Satisfaction scale',
+            'number-scale': 'Number scale',
+            'single-choice': 'Single choice',
+            'multiple-choice': 'Multiple choice',
+            'card': 'Card'
+        };
+        return typeMap[type] || 'Question';
+    },
+    
+    // Helper function to transform channels
+    transformChannels: (channels) => {
+        const defaultChannels = [
+            { id: 'branded', title: 'Branded survey page', icon: 'document', isExpanded: false, isEnabled: false },
+            { id: 'onsite', title: 'On-site survey', icon: 'store', isExpanded: false, isEnabled: false },
+            { id: 'thankyou', title: 'Thank you page', icon: 'checkmark', isExpanded: true, isEnabled: true },
+            { id: 'email', title: 'Post-purchase email', icon: 'email', isExpanded: false, isEnabled: false },
+            { id: 'exit', title: 'Exit intent', icon: 'exit', isExpanded: false, isEnabled: false },
+            { id: 'embed', title: 'Embed survey', icon: 'code', isExpanded: false, isEnabled: false }
+        ];
+        
+        // Update enabled status based on API data
+        return defaultChannels.map(channel => ({
+            ...channel,
+            isEnabled: channels[channel.id]?.enabled || channel.isEnabled
+        }));
+    },
+    
+    // Helper function to transform discount settings
+    transformDiscountSettings: (discount) => {
+        return {
+            code: discount.code || '',
+            displayOn: discount.displayOn || 'email',
+            limitPerEmail: discount.limitOnePerEmail || false
+        };
+    },
+    
     // Reset the store to the initial state from the JSON file
     resetSurveyToDefault: () => {
         const defaultData = loadSurveyData();
@@ -250,17 +389,20 @@ const useStore = create((set, get) => ({
     // Load survey data from API
     loadSurveyFromApi: async (surveyId) => {
         try {
-            // This would be an API call when implemented
-            // const response = await fetch(`/api/surveys/${surveyId}`);
-            // const data = await response.json();
+            const response = await apiClient("GET", `/surveys/${surveyId}`);
+            const surveyData = response.data.data;
             
-            // For now, just use our JSON data
-            const surveyData = loadSurveyData();
-            set({ ...surveyData });
+            console.log('API response:', surveyData);
+            
+            // Transform API data to match store structure
+            const transformedData = get().transformApiDataToStore(surveyData);
+            
+            set({ ...transformedData });
+            console.log('Store updated with API data');
             
             return true;
         } catch (error) {
-            console.error('Error loading survey from API:', error);
+            console.error('API error:', error);
             return false;
         }
     },

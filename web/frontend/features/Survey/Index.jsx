@@ -8,16 +8,14 @@ import {
     Button,
     IndexTable,
     Badge,
-    Icon,
     Tabs,
     Box,
     Banner,
     InlineStack,
-    Tooltip,
-    ButtonGroup,
     Popover,
     ActionList,
-    Pagination
+    Pagination,
+    Modal
 } from "@shopify/polaris";
 import {
     MenuVerticalIcon,
@@ -28,54 +26,76 @@ import {
     ViewIcon,
     DisabledIcon
 } from "@shopify/polaris-icons";
+import { useSurveyApi } from "./action/use-survey-api";
+import { useQueryEvents } from "../../components/helper/use-query-event";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "../../components/helper/toast-helper";
 
 export default function Survey() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState(0);
+    const [surveys, setSurveys] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [popoverActive, setPopoverActive] = useState({});
+    const [deleteModalActive, setDeleteModalActive] = useState(false);
+    const [surveyToDelete, setSurveyToDelete] = useState(null);
+    const { getSurveys, deleteSurvey } = useSurveyApi();
+    const { showToast } = useToast();
+    const queryClient = useQueryClient();
 
+    // Delete mutation
+    const deleteSurveyMutation = useMutation({
+        mutationFn: deleteSurvey,
+        onSuccess: (response) => {
+            const message = response?.data?.message || "Survey deleted successfully";
+            showToast({ message, type: "success" });
+            setDeleteModalActive(false);
+            setSurveyToDelete(null);
+            // Invalidate and refetch surveys
+            queryClient.invalidateQueries({ queryKey: ["surveys"] });
+        },
+        onError: (error) => {
+            const errorMessage = error?.data?.error || "Failed to delete survey";
+            showToast({ message: errorMessage, type: "error" });
+            setDeleteModalActive(false);
+            setSurveyToDelete(null);
+        },
+        onSettled: () => {
+            // Reset mutation state after completion (success or error)
+            deleteSurveyMutation.reset();
+        }
+    });
+
+    const { data, isLoading, isError, isPending } = useQueryEvents(
+        useQuery({
+            queryKey: ["surveys", activeTab, currentPage],
+            queryFn: () => getSurveys({ status: activeTab, page: currentPage }),
+        }),
+        {
+            onSuccess: (data) => {
+                setSurveys(data.data.data);
+            },
+            onError: (error) => {
+                // Handle error silently or show toast if needed
+            },
+        }
+    )
     const resourceName = {
         singular: "survey",
         plural: "surveys",
     };
 
-    const mockSurveys = [
-        {
-            id: "1",
-            name: "SEA Customer Survey",
-            status: "Active",
-            created: "Aug 06, 2025 at 23:45 PM",
-            channels: ["Branded survey page", "On-site survey", "Post-purchase page"],
-            responses: 125
-        },
-        {
-            id: "2",
-            name: "Post-purchase Satisfaction",
-            status: "Active",
-            created: "Aug 01, 2025 at 14:23 PM",
-            channels: ["Post-purchase page"],
-            responses: 83
-        },
-        {
-            id: "3",
-            name: "Product Feedback",
-            status: "Inactive",
-            created: "Jul 15, 2025 at 09:12 AM",
-            channels: ["Branded survey page"],
-            responses: 47
-        },
-    ];
+
 
     // Pagination settings
     const itemsPerPage = 10;
-    const totalPages = Math.ceil(mockSurveys.length / itemsPerPage);
+    const totalPages = Math.ceil(surveys.length / itemsPerPage);
 
     // Filter surveys based on active tab
-    const filteredSurveys = mockSurveys.filter(survey => {
+    const filteredSurveys = surveys.filter(survey => {
         if (activeTab === 0) return true; // All
-        if (activeTab === 1) return survey.status === "Active"; // Active
-        if (activeTab === 2) return survey.status === "Inactive"; // Inactive
+        if (activeTab === 1) return survey.status === "active"; // Active
+        if (activeTab === 2) return survey.status === "inactive"; // Inactive
         return true;
     });
 
@@ -150,24 +170,38 @@ export default function Survey() {
                 handleEditSurvey(id);
                 break;
             case 'view':
-                // Handle view action
-                console.log(`View survey ${id}`);
+                // Handle view action - TODO: Implement view functionality
                 break;
             case 'duplicate':
-                // Handle duplicate action
-                console.log(`Duplicate survey ${id}`);
+                // Handle duplicate action - TODO: Implement duplicate functionality
                 break;
             case 'activate':
-                // Handle activate/deactivate action
-                console.log(`Activate/deactivate survey ${id}`);
+                // Handle activate/deactivate action - TODO: Implement activate/deactivate functionality
                 break;
             case 'delete':
-                // Handle delete action
-                console.log(`Delete survey ${id}`);
+                // Handle delete action - show confirmation modal
+                const survey = surveys.find(s => s.uuid === id);
+                setSurveyToDelete(survey);
+                setDeleteModalActive(true);
+                // Reset mutation state to ensure clean state
+                deleteSurveyMutation.reset();
                 break;
             default:
                 break;
         }
+    };
+
+    const handleDeleteConfirm = () => {
+        if (surveyToDelete) {
+            deleteSurveyMutation.mutate(surveyToDelete.uuid);
+        }
+    };
+
+    const handleDeleteCancel = () => {
+        setDeleteModalActive(false);
+        setSurveyToDelete(null);
+        // Reset mutation state when cancelling
+        deleteSurveyMutation.reset();
     };
 
     return (
@@ -183,7 +217,7 @@ export default function Survey() {
                     accessibilityLabel: 'Access help center',
                     icon: InfoIcon,
                     onAction: () => {
-                        // Open help center
+                        // TODO: Implement help center functionality
                     },
                 },
             ]}
@@ -202,6 +236,7 @@ export default function Survey() {
                     <Tabs tabs={tabs} selected={activeTab} onSelect={handleTabChange} />
                     <IndexTable
                         resourceName={resourceName}
+                        loading={isLoading || isPending || deleteSurveyMutation.isPending}
                         itemCount={paginatedSurveys.length}
                         headings={[
                             { title: "Survey name" },
@@ -215,8 +250,8 @@ export default function Survey() {
                     >
                         {paginatedSurveys.map((survey, index) => (
                             <IndexTable.Row
-                                id={survey.id}
-                                key={survey.id}
+                                id={survey.uuid}
+                                key={survey.uuid}
                                 position={index}
                             >
                                 <IndexTable.Cell>
@@ -224,7 +259,7 @@ export default function Survey() {
                                         variant="bodyMd"
                                         fontWeight="bold"
                                         as="a"
-                                        onClick={() => handleEditSurvey(survey.id)}
+                                        onClick={() => handleEditSurvey(survey.uuid)}
                                         className="th-sf-survey-edit-link"
                                     >
                                         {survey.name}
@@ -232,34 +267,46 @@ export default function Survey() {
                                 </IndexTable.Cell>
                                 <IndexTable.Cell>
                                     <InlineStack gap="200">
-                                        <Badge tone={survey.status === "Active" ? "success" : "attention"}>{survey.status}</Badge>
+                                        <Badge tone={survey.status === "active" ? "success" : "attention"}>
+                                            {survey.status === "active" ? "Active" : "Inactive"}
+                                        </Badge>
                                     </InlineStack>
                                 </IndexTable.Cell>
                                 <IndexTable.Cell>
-                                    {survey.created}
+                                    {new Date(survey.created_at).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: '2-digit',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
                                 </IndexTable.Cell>
                                 <IndexTable.Cell>
                                     <InlineStack gap="200">
-                                        {survey.channels.map((channel, idx) => (
-                                            <Badge key={idx} tone="info">{channel}</Badge>
-                                        ))}
+                                        {survey.survey_meta_data?.channelTypes?.map((channel, idx) => (
+                                            <Badge key={idx} tone="info">
+                                                {channel === "dedicatedPageSurvey" ? "Branded survey page" :
+                                                    channel === "thankyou" ? "Post-purchase page" :
+                                                        channel === "onSite" ? "On-site survey" : channel}
+                                            </Badge>
+                                        )) || <Badge tone="info">No channels</Badge>}
                                     </InlineStack>
                                 </IndexTable.Cell>
                                 <IndexTable.Cell>
                                     <Text variant="bodyMd" fontWeight="bold">
-                                        {survey.responses}
+                                        {survey.total_responses || 0}
                                     </Text>
                                 </IndexTable.Cell>
                                 <IndexTable.Cell>
                                     <Popover
-                                        active={popoverActive[survey.id]}
+                                        active={popoverActive[survey.uuid]}
                                         activator={
                                             <Button variant="plain" icon={MenuVerticalIcon} onClick={(e) => {
                                                 e.stopPropagation();
-                                                togglePopover(survey.id);
+                                                togglePopover(survey.uuid);
                                             }} />
                                         }
-                                        onClose={() => togglePopover(survey.id)}
+                                        onClose={() => togglePopover(survey.uuid)}
                                         preferredAlignment="right"
                                     >
                                         <ActionList
@@ -268,28 +315,28 @@ export default function Survey() {
                                                 {
                                                     content: 'Edit',
                                                     icon: EditIcon,
-                                                    onAction: () => handleSurveyAction('edit', survey.id)
+                                                    onAction: () => handleSurveyAction('edit', survey.uuid)
                                                 },
                                                 {
                                                     content: 'View live survey',
                                                     icon: ViewIcon,
-                                                    onAction: () => handleSurveyAction('view', survey.id)
+                                                    onAction: () => handleSurveyAction('view', survey.uuid)
                                                 },
                                                 {
                                                     content: 'Duplicate',
                                                     icon: DuplicateIcon,
-                                                    onAction: () => handleSurveyAction('duplicate', survey.id)
+                                                    onAction: () => handleSurveyAction('duplicate', survey.uuid)
                                                 },
                                                 {
-                                                    content: survey.status === 'Active' ? 'Deactivate' : 'Activate',
-                                                    icon: survey.status === 'Active' ? DisabledIcon : InfoIcon,
-                                                    onAction: () => handleSurveyAction('activate', survey.id)
+                                                    content: survey.status === 'active' ? 'Deactivate' : 'Activate',
+                                                    icon: survey.status === 'active' ? DisabledIcon : InfoIcon,
+                                                    onAction: () => handleSurveyAction('activate', survey.uuid)
                                                 },
                                                 {
                                                     content: 'Delete',
                                                     icon: DeleteIcon,
                                                     destructive: true,
-                                                    onAction: () => handleSurveyAction('delete', survey.id)
+                                                    onAction: () => handleSurveyAction('delete', survey.uuid)
                                                 },
                                             ]}
                                         />
@@ -318,6 +365,31 @@ export default function Survey() {
                     </Box>
                 </Card>
             </BlockStack>
+
+            {/* Delete Confirmation Modal */}
+            <Modal
+                open={deleteModalActive}
+                onClose={handleDeleteCancel}
+                title="Delete Survey"
+                primaryAction={{
+                    content: 'Delete',
+                    destructive: true,
+                    onAction: handleDeleteConfirm,
+                    loading: deleteSurveyMutation.isPending,
+                }}
+                secondaryActions={[
+                    {
+                        content: 'Cancel',
+                        onAction: handleDeleteCancel,
+                    },
+                ]}
+            >
+                <Modal.Section>
+                    <Text variant="bodyMd">
+                        Are you sure you want to delete "{surveyToDelete?.name}"? This action cannot be undone.
+                    </Text>
+                </Modal.Section>
+            </Modal>
         </Page>
     );
 }

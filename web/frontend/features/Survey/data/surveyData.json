@@ -4,12 +4,8 @@
       "title": "Blank survey",
       "description": "Tell us your needs - we'll take care of everything.",
       "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -53,12 +49,8 @@
       "title": "Marketing attribution",
       "description": "Find out which marketing channels are most effective.",
       "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -107,13 +99,9 @@
     "customer_experience": {
       "title": "Customer experience survey",
       "description": "Gauge customer experience and satisfaction across key touchpoints.",
-      "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
+     "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -177,13 +165,9 @@
     "not_purchasing": {
       "title": "Reason for not purchasing",
       "description": "Understand what's stopping users from purchasing on your site.",
-      "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
+     "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": true, "isEnabled": true },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -233,12 +217,8 @@
       "title": "Exit intent",
       "description": "Understand what's stopping users from purchasing on your site.",
       "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": true, "isEnabled": true },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -282,12 +262,8 @@
       "title": "AI-assisted survey",
       "description": "AI-generated survey with custom title and questions.",
       "channelItems": [
-        { "id": "branded", "title": "Branded survey page", "icon": "document", "isExpanded": false, "isEnabled": false },
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true },
-        { "id": "email", "title": "Post-purchase email", "icon": "email", "isExpanded": false, "isEnabled": false },
-        { "id": "exit", "title": "Exit intent", "icon": "exit", "isExpanded": false, "isEnabled": false },
-        { "id": "embed", "title": "Embed survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
         "code": "",
@@ -414,48 +390,6 @@
       "questionType": "Date",
       "isDraggable": true,
       "answerOptions": []
-    },
-    "matrix": {
-      "content": "Rate our services across different aspects",
-      "type": "matrix",
-      "description": "Rate each aspect on a scale from 1 (Poor) to 5 (Excellent).",
-      "questionType": "Matrix",
-      "isDraggable": true,
-      "answerOptions": [
-        { "id": "template_opt27", "text": "Product Quality" },
-        { "id": "template_opt28", "text": "Customer Service" },
-        { "id": "template_opt29", "text": "Value for Money" },
-        { "id": "template_opt30", "text": "Ease of Use" },
-        { "id": "template_opt31", "text": "Overall Experience" }
-      ]
-    },
-    "ranking": {
-      "content": "Rank these features by importance",
-      "type": "ranking",
-      "description": "Drag and drop to rank these items in order of importance to you.",
-      "questionType": "Ranking",
-      "isDraggable": true,
-      "answerOptions": [
-        { "id": "template_opt32", "text": "Price" },
-        { "id": "template_opt33", "text": "Quality" },
-        { "id": "template_opt34", "text": "Customer Service" },
-        { "id": "template_opt35", "text": "Brand Reputation" },
-        { "id": "template_opt36", "text": "Innovation" }
-      ]
-    },
-    "demographic": {
-      "content": "What is your age group?",
-      "type": "demographic",
-      "description": "This information helps us better understand our customer base.",
-      "questionType": "Demographic",
-      "isDraggable": true,
-      "answerOptions": [
-        { "id": "template_opt37", "text": "18-24 years" },
-        { "id": "template_opt38", "text": "25-34 years" },
-        { "id": "template_opt39", "text": "35-44 years" },
-        { "id": "template_opt40", "text": "45-54 years" },
-        { "id": "template_opt41", "text": "55+ years" }
-      ]
     }
   }
 }

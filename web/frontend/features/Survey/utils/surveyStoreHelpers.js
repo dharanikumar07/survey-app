@@ -7,36 +7,49 @@ import surveyData from '../data/surveyData.json';
  */
 export const loadSurveyData = () => {
   try {
+    console.log('=== loadSurveyData called ===');
+    console.log('surveyData import:', surveyData);
+    
+    // Check if surveyData is properly imported
+    if (!surveyData) {
+      console.error('surveyData import failed - using fallback');
+      return getDefaultSurveyData();
+    }
+    
     // This would be the place to add API fetching logic in the future
     // For now, we just return the JSON data directly
-    return {
+    const result = {
       // Channel data
-      channelItems: surveyData.channelItems,
+      channelItems: surveyData.channelItems || [],
       
       // Discount data
-      discountEnabled: surveyData.defaultValues.discountEnabled,
-      discountSettings: surveyData.discountSettings,
-      discountSections: surveyData.discountSections,
+      discountEnabled: surveyData.defaultValues?.discountEnabled || false,
+      discountSettings: surveyData.discountSettings || {},
+      discountSections: surveyData.discountSections || [],
       
       // UI state
-      selectedTab: surveyData.defaultValues.selectedTab,
-      editModalOpen: surveyData.defaultValues.editModalOpen,
-      surveyTitle: surveyData.defaultValues.surveyTitle,
-      selectedQuestionId: surveyData.defaultValues.selectedQuestionId,
-      selectedView: surveyData.defaultValues.selectedView,
-      isActive: surveyData.defaultValues.isActive,
-      selectedTheme: surveyData.defaultValues.selectedTheme,
-      themePopoverActive: surveyData.defaultValues.themePopoverActive,
-      statusPopoverActive: surveyData.defaultValues.statusPopoverActive,
-      surveyPagePopoverActive: surveyData.defaultValues.surveyPagePopoverActive,
-      selectedSurveyPage: surveyData.defaultValues.selectedSurveyPage,
-      currentQuestionIndex: surveyData.defaultValues.currentQuestionIndex,
+      selectedTab: surveyData.defaultValues?.selectedTab || 0,
+      editModalOpen: surveyData.defaultValues?.editModalOpen || false,
+      surveyTitle: surveyData.defaultValues?.surveyTitle || 'New Survey',
+      selectedQuestionId: surveyData.defaultValues?.selectedQuestionId || '1',
+      selectedView: surveyData.defaultValues?.selectedView || 'desktop',
+      isActive: surveyData.defaultValues?.isActive || true,
+      selectedTheme: surveyData.defaultValues?.selectedTheme || 'default',
+      themePopoverActive: surveyData.defaultValues?.themePopoverActive || false,
+      statusPopoverActive: surveyData.defaultValues?.statusPopoverActive || false,
+      surveyPagePopoverActive: surveyData.defaultValues?.surveyPagePopoverActive || false,
+      selectedSurveyPage: surveyData.defaultValues?.selectedSurveyPage || 'page',
+      currentQuestionIndex: surveyData.defaultValues?.currentQuestionIndex || 0,
       
       // Question data
-      questions: surveyData.questions,
+      questions: surveyData.questions || [],
     };
+    
+    console.log('Data processed successfully:', result);
+    return result;
   } catch (error) {
     console.error('Error loading survey data:', error);
+    console.error('Error stack:', error.stack);
     return getDefaultSurveyData();
   }
 };

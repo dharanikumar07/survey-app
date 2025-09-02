@@ -34,12 +34,12 @@ function QuestionSettings() {
     // SINGLE useEffect hook that handles all state updates
     // This replaces the three separate useEffect hooks
     useEffect(() => {
-        console.log('QuestionSettings: selectedQuestionId changed to:', selectedQuestionId);
+        // console.log('QuestionSettings: selectedQuestionId changed to:', selectedQuestionId);
 
         if (selectedQuestionId && questions.length > 0) {
             const question = questions.find(q => q.id === selectedQuestionId);
             if (question) {
-                console.log('QuestionSettings: selectedQuestion changed, updating local state');
+                // console.log('QuestionSettings: selectedQuestion changed, updating local state');
                 setHeadingValue(question.content);
                 setDescriptionValue(question.description || '');
 
@@ -81,9 +81,9 @@ function QuestionSettings() {
         );
     }
 
-    console.log('QuestionSettings: selectedQuestionId:', selectedQuestionId);
-    console.log('QuestionSettings: selectedQuestion:', selectedQuestion);
-    console.log('QuestionSettings: all questions:', questions);
+    // console.log('QuestionSettings: selectedQuestionId:', selectedQuestionId);
+    // console.log('QuestionSettings: selectedQuestion:', selectedQuestion);
+    // console.log('QuestionSettings: all questions:', questions);
 
     // Update the heading when input changes
     const handleHeadingChange = (value) => {
@@ -94,7 +94,7 @@ function QuestionSettings() {
             setHeadingValue(value);
             updateQuestion(selectedQuestionId, { content: value });
         } else {
-            console.error('Validation errors:', errors);
+            console.log('Validation errors:', errors);
             // TODO: Show validation errors to user
             // For now, still update but log errors
             setHeadingValue(value);
@@ -111,7 +111,7 @@ function QuestionSettings() {
             setDescriptionValue(value);
             updateQuestion(selectedQuestionId, { description: value });
         } else {
-            console.error('Validation errors:', errors);
+            console.log('Validation errors:', errors);
             // TODO: Show validation errors to user
             // For now, still update but log errors
             setDescriptionValue(value);
@@ -378,29 +378,35 @@ function QuestionSettings() {
                         </BlockStack>
                     )}
 
+                    {selectedQuestionId !== 'thankyou' &&
+                        // Only show answer options for question types that need them
+                        !['rating', 'satisfaction', 'text', 'date', 'number-scale'].includes(selectedQuestion.type) && (
+                            <BlockStack gap="300">
+                                <Text variant="bodySm" as="h3">Answer(s)</Text>
+
+                                {/* Answer options list with up/down controls instead of drag-and-drop */}
+                                {selectedQuestion.answerOptions && selectedQuestion.answerOptions.length > 0 ? (
+                                    <BlockStack gap="200">
+                                        {selectedQuestion.answerOptions.map((option, index) =>
+                                            renderAnswerOption(option, index)
+                                        )}
+                                    </BlockStack>
+                                ) : (
+                                    <Box padding="300" background="bg-surface-secondary" borderRadius="100">
+                                        <Text variant="bodyMd" alignment="center" color="subdued">No answer options yet</Text>
+                                    </Box>
+                                )}
+
+                                <Box paddingBlockStart="300">
+                                    <Button onClick={handleAddAnswerOption}>
+                                        Add option
+                                    </Button>
+                                </Box>
+                            </BlockStack>
+                        )}
+
                     {selectedQuestionId !== 'thankyou' && (
                         <BlockStack gap="300">
-                            <Text variant="bodySm" as="h3">Answer(s)</Text>
-
-                            {/* Answer options list with up/down controls instead of drag-and-drop */}
-                            {selectedQuestion.answerOptions && selectedQuestion.answerOptions.length > 0 ? (
-                                <BlockStack gap="200">
-                                    {selectedQuestion.answerOptions.map((option, index) =>
-                                        renderAnswerOption(option, index)
-                                    )}
-                                </BlockStack>
-                            ) : (
-                                <Box padding="300" background="bg-surface-secondary" borderRadius="100">
-                                    <Text variant="bodyMd" alignment="center" color="subdued">No answer options yet</Text>
-                                </Box>
-                            )}
-
-                            <Box paddingBlockStart="300">
-                                <Button onClick={handleAddAnswerOption}>
-                                    Add option
-                                </Button>
-                            </Box>
-
                             <Box paddingBlockStart="300">
                                 <Checkbox
                                     label="Allow customers to skip this question"

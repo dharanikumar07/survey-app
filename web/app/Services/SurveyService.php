@@ -17,8 +17,11 @@ class SurveyService
             $attributes = [];
 
             if ($survey_uuid) {
-                $attributes['uuid'] = $survey_uuid;
+                // For updates, scope by both UUID and store_uuid for security
+                $attributes = ['uuid' => $survey_uuid, 'store_uuid' => $store->uuid];
+                $data['store_uuid'] = $store->uuid;
             } else {
+                // For creates, set default values
                 $data['total_responses'] = 0;
                 $data['total_impressions'] = 0;
                 $data['status'] = $data['status'] ?? 'draft';
