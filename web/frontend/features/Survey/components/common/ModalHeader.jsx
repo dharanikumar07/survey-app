@@ -29,6 +29,7 @@ import { prepareSurveyForBackend, formatSurveyForAPI, validateSurveyForAPI } fro
 import { useSurveyApi } from '../../action/use-survey-api';
 import { useToast } from '../../../../components/helper/toast-helper';
 import { useMutation } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 
 function ModalHeader({ title = "Survey #1", surveyPreviewRef, onClose }) {
     const {
@@ -55,6 +56,8 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef, onClose }) {
 
     const { saveSurvey } = useSurveyApi();
     const { showToast } = useToast();
+    const { uuid } = useParams();
+
     const { mutate: saveSurveyMutation, isPending } = useMutation({
         mutationFn: saveSurvey,
         onSuccess: () => {
@@ -162,7 +165,11 @@ function ModalHeader({ title = "Survey #1", surveyPreviewRef, onClose }) {
 
         // Here you would typically send the data to your backend
         // Example: await saveSurveyToBackend(completeSurveyData);
-        saveSurveyMutation(completeSurveyData);
+        if (uuid) {
+            saveSurveyMutation(completeSurveyData, uuid);
+        } else {
+            saveSurveyMutation(completeSurveyData);
+        }
     };
 
     const themes = [
