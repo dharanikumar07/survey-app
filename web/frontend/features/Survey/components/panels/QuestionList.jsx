@@ -4,7 +4,7 @@ import { EditIcon } from '@shopify/polaris-icons';
 import TabsContent from '../common/TabsContent';
 import { useSurveyState } from '../../hooks/useSurveyState';
 
-function QuestionList() {
+function QuestionList({ surveyPreviewRef }) {
     const {
         editModalOpen,
         setEditModalOpen,
@@ -41,7 +41,7 @@ function QuestionList() {
                     </InlineStack>
                     <Divider />
                     {/* Tabs Section */}
-                    <TabsContent />
+                    <TabsContent surveyPreviewRef={surveyPreviewRef} />
                 </BlockStack>
             </Scrollable>
 

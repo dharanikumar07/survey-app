@@ -64,7 +64,7 @@ const SurveyLayout = forwardRef(({ surveyId, onClose }, ref) => {
                             {/* Left Panel - Question List */}
                             {selectedView !== 'maximize' && (
                                 <Grid.Cell columnSpan={columnSpans.left}>
-                                    <QuestionList />
+                                    <QuestionList surveyPreviewRef={surveyPreviewRef} />
                                 </Grid.Cell>
                             )}
 
