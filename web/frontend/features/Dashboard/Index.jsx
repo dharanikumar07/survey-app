@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Page,
     Layout,
@@ -10,15 +10,22 @@ import {
     Box,
     InlineGrid,
     BlockStack,
+    SkeletonPage,
+    SkeletonDisplayText,
+    SkeletonBodyText,
 } from "@shopify/polaris";
 import { Icon } from "@shopify/polaris";
 import { ChartVerticalIcon } from "@shopify/polaris-icons";
 import Quickstart from "./components/QuickStart.jsx";
 import { useNavigate } from "react-router-dom";
+import { useShopInfo } from "./action/use-shop-info.jsx";
+import { useQueryEvents } from "../../components/helper/use-query-event.jsx";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
     const progress = 100; // 3 of 3 tasks completed
     const navigate = useNavigate();
+    const [shopName, setShopName] = useState("");
 
     const resourceName = {
         singular: "survey",
@@ -35,8 +42,63 @@ export default function Dashboard() {
         },
     ];
 
+    const { getShopInfo } = useShopInfo();
+    const { data: shopInfo, isLoading: shopInfoLoading } = useQueryEvents(
+        useQuery({
+            queryKey: ["shopInfo"],
+            queryFn: getShopInfo,
+        }),
+        {
+            onSuccess: (data) => {
+                console.log("shopInfo", data);
+                setShopName(data?.data?.data?.shop?.name);
+            },
+        },
+        {
+            onError: (error) => {
+                console.log(error);
+            },
+        }
+    )
+
+    // Show shimmer effect while loading shop info
+    if (shopInfoLoading) {
+        return (
+            <SkeletonPage>
+                <Layout>
+                    <Layout.Section>
+                        <SkeletonDisplayText size="large" />
+                        <SkeletonBodyText lines={3} />
+                    </Layout.Section>
+
+                    <Layout.Section>
+                        <InlineGrid columns={{ xs: 1, sm: 3 }} gap="400">
+                            {[1, 2, 3].map((index) => (
+                                <Card key={index}>
+                                    <BlockStack gap="200">
+                                        <SkeletonDisplayText size="small" />
+                                        <SkeletonDisplayText size="large" />
+                                    </BlockStack>
+                                </Card>
+                            ))}
+                        </InlineGrid>
+                    </Layout.Section>
+
+                    <Layout.Section>
+                        <Card>
+                            <BlockStack gap="300">
+                                <SkeletonDisplayText size="small" />
+                                <SkeletonBodyText lines={4} />
+                            </BlockStack>
+                        </Card>
+                    </Layout.Section>
+                </Layout>
+            </SkeletonPage>
+        );
+    }
+
     return (
-        <Page title="Hi swaminathan b! 👋" subtitle="Welcome to SEA Customer Survey">
+        <Page title={`Hi ${shopName}! 👋`} subtitle="Welcome to SEA Customer Survey">
             <Layout>
                 <Layout.Section>
                     <Quickstart />
