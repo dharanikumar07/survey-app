@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Store;
+use App\Models\Survey;
 
 class DataPreparerForMetaObjects
 {
@@ -18,7 +19,28 @@ class DataPreparerForMetaObjects
                     'store_uuid' => $store->uuid,
                     'url' => env('HOST'),
                     'access_token' => $store->getAccessToken(),
-                ]
+                ],
+                'survey_data' => $this->getActiveSurvey()
         ];
+    }
+
+    public function getActiveSurvey()
+    {
+        $survey = Survey::where('is_active', true)->first();
+
+        if (!$survey) {
+            return [];
+        }
+
+        return [
+            'uuid' => $survey->uuid,
+            'channel' => $survey->survey_type,
+            'allowedPages' => $this->getAllowedPagesForSurvey($survey)
+        ];
+    }
+
+    protected function getAllowedPagesForSurvey(Survey $survey)
+    {
+        return [];
     }
 }

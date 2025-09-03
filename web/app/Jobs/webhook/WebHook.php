@@ -15,12 +15,6 @@ class WebHook implements ShouldQueue
 
     protected $topics = [
         Topics::APP_SUBSCRIPTIONS_UPDATE,
-        Topics::ORDERS_CREATE,
-        Topics::ORDERS_CANCELLED,
-        Topics::ORDERS_FULFILLED,
-        Topics::ORDERS_PAID,
-        Topics::ORDERS_UPDATED,
-        Topics::ORDERS_DELETE,
         Topics::CUSTOMERS_CREATE,
         Topics::CUSTOMERS_UPDATE,
         Topics::CUSTOMERS_DELETE,

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helper\Helper;
 use App\Models\Store;
 use App\Models\Survey;
 use App\Services\SurveyWidget;
@@ -11,22 +12,28 @@ class SurveyViewController
 {
     public function getSurveyWidget(Request $request, string $storeUuid, string $surveyUuid = null)
     {
+        try {
+            $survey = new SurveyWidget($storeUuid, $surveyUuid);
 
-        $survey = new SurveyWidget($storeUuid, $surveyUuid);
+            $surveyData = $survey->getSurveyMetaData() ?? [];
 
-        $surveyData = $survey->getSurveyMetaData() ?? [];
+            $surveyData = [
+                'uuid' => $survey->getSurveyUuid(),
+                'store_uuid' => $storeUuid,
+                'backend_url' => env('HOST'),
+                'questions' => $surveyData['questions']
+            ];
 
-        $surveyData = [
-            'uuid' => $survey->getSurveyUuid(),
-            'backend_url' => env('HOST'),
-            'questions' => $surveyData['questions']
-        ];
 
-        return view('survey.widget', [
-            'survey' => $survey,
-            'surveyData' => $surveyData,
-            'selectedView' => 'desktop',
-            'initialQuestionIndex' => 0,
-        ]);
+            return view('survey.widget', [
+                'survey' => $survey,
+                'surveyData' => $surveyData,
+                'selectedView' => 'desktop',
+                'initialQuestionIndex' => 0,
+            ]);
+        } catch (\Exception $exception) {
+            Helper::logError("Unable to render the widget",__CLASS__, $exception);
+            throw new \Exception("Unable to render the widget");
+        }
     }
 }

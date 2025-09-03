@@ -228,4 +228,16 @@ GraphQL;
             'tax_amount' => $lineItem['taxLines'][0]['priceSet']['shopMoney']['amount'] ?? null,
         ];
     }
+
+    public function fetchShopifyOrder($orderId)
+    {
+        $params = [
+            'endpoint' => "orders/{$orderId}.json",
+            'payload'  => []
+        ];
+
+        $orderData = $this->sendRequest($params, false);
+
+        return $orderData['order'] ?? null;
+    }
 }

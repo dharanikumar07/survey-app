@@ -45,6 +45,9 @@ export default function Survey() {
     const { getSurveys, deleteSurvey } = useSurveyApi();
     const { showToast } = useToast();
     const queryClient = useQueryClient();
+    // Pagination settings
+    const itemsPerPage = 10;
+    const [totalPage , setTotalPage] = useState(1);
 
     // Delete mutation
     const deleteSurveyMutation = useMutation({
@@ -71,15 +74,17 @@ export default function Survey() {
 
     const { data, isLoading, isError, isPending } = useQueryEvents(
         useQuery({
-            queryKey: ["surveys", activeTab, currentPage],
-            queryFn: () => getSurveys({ status: activeTab, page: currentPage }),
+            queryKey: ["surveys", activeTab, currentPage, itemsPerPage, totalPage],
+            queryFn: () => getSurveys({ status: activeTab, page: currentPage, per_page: itemsPerPage }),
         }),
         {
             onSuccess: (data) => {
+                console.log(data);
                 setSurveys(data.data.data);
+                setTotalPage(data.data.meta.total);
+
             },
             onError: (error) => {
-                // Handle error silently or show toast if needed
             },
         }
     )
@@ -90,8 +95,7 @@ export default function Survey() {
 
 
 
-    // Pagination settings
-    const itemsPerPage = 10;
+
     const totalPages = Math.ceil(surveys.length / itemsPerPage);
 
     // Filter surveys based on active tab
