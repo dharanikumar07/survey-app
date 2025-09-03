@@ -13,6 +13,8 @@
     iframe.style.zIndex = "9999";
     iframe.style.borderRadius = "8px";
     iframe.allow = "fullscreen";
+    iframe.style.opacity = "0";
+    iframe.style.transition = "opacity 0.3s ease";
 
     document.body.appendChild(iframe);
 
@@ -20,6 +22,7 @@
         if (event.data.type === "survey-widget-height") {
             iframe.style.height = event.data.height + "px";
             iframe.style.width = event.data.width + "px";
+            iframe.style.opacity = "1";
         }
     });
 })();
