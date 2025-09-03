@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Box, Text, BlockStack, Divider, Button, TextField, Icon, InlineStack, Checkbox, Scrollable, Popover, Card, DatePicker } from '@shopify/polaris';
-import { DeleteIcon, DragHandleIcon, ArrowUpIcon, ArrowDownIcon, CalendarIcon } from '@shopify/polaris-icons';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Box, Text, BlockStack, Divider, Button, TextField, Icon, InlineStack, Checkbox, Scrollable, Popover, Card, DatePicker, ActionList } from '@shopify/polaris';
+import { DeleteIcon, DragHandleIcon, ArrowUpIcon, ArrowDownIcon, CalendarIcon, CaretDownIcon, QuestionCircleIcon } from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
 import { validateQuestion, getQuestionTypeDisplayName } from '../../utils/surveyHelpers';
 
-function QuestionSettings() {
+function QuestionSettings({ surveyPreviewRef }) {
     const {
         selectedQuestionId,
         setSelectedQuestionId,
@@ -21,6 +21,22 @@ function QuestionSettings() {
     const [headingValue, setHeadingValue] = useState('');
     const [descriptionValue, setDescriptionValue] = useState('');
     const [allowSkip, setAllowSkip] = useState(false);
+
+    // Question type popover state
+    const [questionTypePopoverActive, setQuestionTypePopoverActive] = useState(false);
+    const toggleQuestionTypePopover = useCallback(() =>
+        setQuestionTypePopoverActive((active) => !active), []);
+
+    // Available question types
+    const questionTypes = [
+        { value: 'single-choice', label: 'Single Choice' },
+        { value: 'multiple-choice', label: 'Multiple Choice' },
+        { value: 'text', label: 'Text' },
+        { value: 'rating', label: 'Star Rating' },
+        { value: 'satisfaction', label: 'Satisfaction' },
+        { value: 'number-scale', label: 'Number Scale' },
+        { value: 'date', label: 'Date' }
+    ];
 
     // Date picker state for date-type questions
     const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -122,6 +138,35 @@ function QuestionSettings() {
     // Handle checkbox change for allowing skipping questions
     const handleAllowSkipChange = (checked) => {
         setAllowSkip(checked);
+    };
+
+    // Question type change handler
+    const handleQuestionTypeChange = (newType) => {
+        if (selectedQuestionId === 'thankyou') return; // Don't change type for thank you card
+
+        // Create default answer options for choice questions if needed
+        let updatedQuestion = { ...selectedQuestion, type: newType };
+
+        // Reset answer options when changing question type
+        if (newType === 'single-choice' || newType === 'multiple-choice') {
+            if (!updatedQuestion.answerOptions || updatedQuestion.answerOptions.length === 0) {
+                updatedQuestion.answerOptions = [
+                    { id: `option-${Date.now()}-1`, text: 'Option 1' },
+                    { id: `option-${Date.now()}-2`, text: 'Option 2' }
+                ];
+            }
+        } else {
+            // For non-choice questions, we don't need answer options
+            updatedQuestion.answerOptions = [];
+        }
+
+        // Update the question with the new type and reset options
+        updateQuestion(selectedQuestionId, updatedQuestion);
+
+        // Refresh the iframe to reflect the question type change
+        if (surveyPreviewRef && surveyPreviewRef.current && surveyPreviewRef.current.refreshIframe) {
+            surveyPreviewRef.current.refreshIframe();
+        }
     };
 
     // Date picker handlers
@@ -255,14 +300,38 @@ function QuestionSettings() {
             >
                 <BlockStack gap="400">
                     <Text variant="headingMd" as="h2">Question</Text>
-                    <BlockStack gap="300">
+                    <InlineStack gap="300" align='start' blockAlign='center'>
                         <Text variant="bodySm" as="h3">Question type</Text>
-                        <div className="th-sf-question-type-display">
-                            <Text variant="bodySm" fontWeight="medium">
-                                {getQuestionTypeDisplayName(selectedQuestion.type)}
-                            </Text>
-                        </div>
-                    </BlockStack>
+                        <Popover
+                            active={questionTypePopoverActive}
+                            activator={
+                                <Button
+                                    onClick={toggleQuestionTypePopover}
+                                    disclosure
+                                    fullWidth
+                                    variant='secondary'
+                                >
+                                    {getQuestionTypeDisplayName(selectedQuestion.type)}
+                                </Button>
+                            }
+                            onClose={toggleQuestionTypePopover}
+                            preferredAlignment="left"
+                        >
+                            <ActionList
+                                actionRole="menuitem"
+                                items={questionTypes.map(type => ({
+                                    content: type.label,
+                                    onAction: () => {
+                                        if (selectedQuestion.type !== type.value) {
+                                            handleQuestionTypeChange(type.value);
+                                        }
+                                        setQuestionTypePopoverActive(false);
+                                    },
+                                    active: selectedQuestion.type === type.value
+                                }))}
+                            />
+                        </Popover>
+                    </InlineStack>
 
                     <BlockStack gap="300">
                         <Text variant="bodySm" as="h3">Heading</Text>
