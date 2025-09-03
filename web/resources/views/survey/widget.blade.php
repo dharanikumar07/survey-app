@@ -13,14 +13,11 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f6f6f7;
             overflow: hidden;
         }
 
         .th-sf-survey-container {
-            padding: 16px;
-            background: #f6f6f7;
-            height: 100vh;
+            padding: 32px;
             overflow: hidden;
         }
 
@@ -40,7 +37,6 @@
             border-radius: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             width: 100%;
-            max-width: 375px;
             border: none;
             position: relative;
             margin: 0 auto;
@@ -90,6 +86,15 @@
             padding-top: 16px;
             padding-bottom: 16px;
             width: 100%;
+        }
+        .th-sf-survey-number-option.hovered {
+            border-color: #2c6ecb !important;
+        // background-color: #e6f0ff !important;
+            transform: scale(1.1);
+        }
+        .th-sf-survey-rating-option.hovered {
+            color: #ffd700;
+            transform: scale(1.1);
         }
 
         .th-sf-survey-answer-content {
@@ -293,7 +298,6 @@
             }
         }
 
-        /* Mobile device frame indicator */
         .th-sf-survey-card.mobile-view::before {
             content: '';
             position: absolute;
@@ -307,7 +311,6 @@
             z-index: 1;
         }
 
-        /* Scrollbar styles */
         .th-sf-survey-content::-webkit-scrollbar {
             width: 8px;
         }
@@ -328,98 +331,50 @@
     </style>
 </head>
 <body>
-<div class="th-sf-survey-container" style="padding: 32px; background: #f6f6f7; min-height: 100vh;">
-    {!! $survey->getSurveyHtmlContent() !!}
+<div class="th-sf-survey-container">
+    @php
+        $surveyHtmlContent = $survey->getSurveyHtmlContent();
+        if (!empty($surveyHtmlContent)) {
+            $surveyHtmlContent = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $surveyHtmlContent);
+        }
+    @endphp
+    {!! $surveyHtmlContent !!}
 </div>
 <script>
-    let surveyData = null;
+
+    let surveyData = @json($surveyData);
     let selectedView = 'desktop';
     let currentQuestionIndex = 0;
-    let answers = {};
+    let answersStoreFront = {};
 
-    // DOM elements
     let questionContent = null;
     let prevButton = null;
     let nextButton = null;
     let progressIndicators = null;
 
-    // Communication with parent component
-    function sendMessageToParent(type, data) {
-        if (window.parent && window.parent !== window) {
-            window.parent.postMessage({type, data}, '*');
-        }
-    }
+    initSurvey();
 
-    // Listen for messages from parent
-    window.addEventListener('message', (event) => {
-        const {type, data} = event.data;
-
-        switch (type) {
-            case 'INIT_SURVEY':
-                surveyData = data.surveyData;
-                selectedView = data.selectedView;
-                currentQuestionIndex = data.initialQuestionIndex || 0;
-                answers = {};
-                initSurvey();
-                sendMessageToParent('SURVEY_READY', {currentQuestionIndex});
-                break;
-
-            case 'SET_QUESTION_INDEX':
-                currentQuestionIndex = data.questionIndex;
-                renderQuestion();
-                renderProgressIndicators();
-                updateNavigationButtons();
-                sendMessageToParent('QUESTION_CHANGED', {
-                    currentQuestionIndex,
-                    question: surveyData.questions[currentQuestionIndex]
-                });
-                break;
-
-            case 'SET_ANSWERS':
-                answers = {...answers, ...data.answers};
-                updateQuestionDisplay();
-                updateNavigationButtons();
-                break;
-
-            case 'RESET_SURVEY':
-                currentQuestionIndex = 0;
-                answers = {};
-                renderQuestion();
-                renderProgressIndicators();
-                updateNavigationButtons();
-                sendMessageToParent('NAVIGATION_CHANGED', {currentQuestionIndex});
-                break;
-        }
-    });
-
-    // Initialize the survey
     function initSurvey() {
-        // Get DOM elements after they're available
         questionContent = document.getElementById('question-content');
         prevButton = document.getElementById('prev-button');
         nextButton = document.getElementById('next-button');
         progressIndicators = document.getElementById('progress-indicators');
-
-        console.log
 
         if (questionContent && prevButton && nextButton && progressIndicators) {
             renderProgressIndicators();
             renderQuestion();
             updateNavigationButtons();
 
-            // Add navigation event listeners
             nextButton.addEventListener('click', goToNext);
             prevButton.addEventListener('click', goToPrevious);
         } else {
-            // Wait for DOM to be ready
             setTimeout(initSurvey, 100);
         }
     }
 
-    // Render progress indicators
     function renderProgressIndicators() {
         if (!progressIndicators || !surveyData) return;
-
+        console.log(surveyData.questions)
         progressIndicators.innerHTML = '';
         surveyData.questions.forEach((_, index) => {
             const dot = document.createElement('div');
@@ -428,7 +383,6 @@
         });
     }
 
-    // Render current question
     function renderQuestion() {
         if (!questionContent || !surveyData) return;
 
@@ -438,8 +392,9 @@
         }
 
         const question = surveyData.questions[currentQuestionIndex];
+        console.log("question in recent log" , question.type);
         let questionHTML = `
-                <h3 class="th-sf-survey-question-heading">${question.content}</h3>
+                <h3 class="th-sf-survey-question-heading">${question.heading}</h3>
             `;
 
         if (question.description) {
@@ -452,15 +407,15 @@
                 <div class="th-sf-survey-answer-area">
                     <div class="th-sf-survey-answer-content">
             `;
+        console.log("questionHTML rendered");
 
-        // Render different question types
         if (question.type === 'rating') {
             questionHTML += renderRatingQuestion(question);
         } else if (question.type === 'satisfaction') {
             questionHTML += renderSatisfactionQuestion(question);
         } else if (question.type === 'number-scale') {
             questionHTML += renderNumberScaleQuestion(question);
-        } else if (question.answerOptions && question.answerOptions.length > 0) {
+        } else if (question.type === 'multiple-choice') {
             questionHTML += renderMultipleChoiceQuestion(question);
         } else if (question.type === 'text') {
             questionHTML += renderTextQuestion(question);
@@ -473,41 +428,121 @@
 
         questionContent.innerHTML = questionHTML;
 
-        // Add event listeners to the new elements
         addQuestionEventListeners();
     }
 
-    // Render rating question
     function renderRatingQuestion(question) {
+        const storedValue = answersStoreFront[currentQuestionIndex];
+        const currentRating = parseInt(
+            typeof storedValue === 'object' ? storedValue?.rating : storedValue || '0',
+            10
+        );
+
+        let emoji = '😐';
+        let ratingText = 'Not likely';
+
+        if (currentRating >= 4) {
+            emoji = '🤩';
+            ratingText = 'Love it';
+        } else if (currentRating >= 3) {
+            emoji = '😊';
+            ratingText = 'Like it';
+        } else if (currentRating >= 2) {
+            emoji = '😐';
+            ratingText = 'Neutral';
+        } else if (currentRating >= 1) {
+            emoji = '😕';
+            ratingText = 'Dislike it';
+        }
+
         let html = `
-                <div class="th-sf-survey-rating-emoji" style="font-size: 48px; text-align: center;">😐</div>
-                <p class="th-sf-survey-rating-text" style="text-align: center; margin: 0; font-size: 16px; color: #6d7175;">Not likely</p>
-                <div class="th-sf-survey-rating-scale">
-                    <div style="display: flex; justify-content: center; gap: ${selectedView === 'mobile' ? '4px' : '8px'}; width: 100%;">
-            `;
+        <div class="th-sf-survey-rating-emoji" style="font-size: 48px; text-align: center;">${emoji}</div>
+        <p class="th-sf-survey-rating-text" style="text-align: center; margin: 0; font-size: 16px; color: #6d7175;">${ratingText}</p>
+        <div class="th-sf-survey-rating-scale">
+            <div style="display: flex; justify-content: center; gap: ${selectedView === 'mobile' ? '4px' : '8px'}; width: 100%;">
+    `;
 
         for (let i = 1; i <= 5; i++) {
-            const isSelected = answers[currentQuestionIndex]?.rating === i.toString();
+            const isSelected = i <= currentRating; // Fill all stars up to the selected rating
             html += `
-                    <button class="th-sf-survey-rating-option ${isSelected ? 'selected' : ''}"
-                            data-rating="${i}"
-                            style="width: ${selectedView === 'mobile' ? '32px' : '40px'}; height: ${selectedView === 'mobile' ? '32px' : '40px'};">
-                        ⭐
-                    </button>
-                `;
+            <button class="th-sf-survey-rating-option ${isSelected ? 'selected' : ''}"
+                    data-rating="${i}"
+                    style="width: ${selectedView === 'mobile' ? '32px' : '40px'};
+                           height: ${selectedView === 'mobile' ? '32px' : '40px'};">
+                ⭐
+            </button>
+        `;
         }
 
         html += `
-                    </div>
-                    <div style="display: flex; justify-content: space-between; width: 100%; max-width: 300px; font-size: 14px; color: #6d7175;">
-                        <span>${question.leftLabel || 'Hate it'}</span>
-                        <span>${question.rightLabel || 'Love it'}</span>
-                    </div>
-                </div>
-            `;
+            </div>
+            <div style="display: flex; justify-content: space-between; width: 100%; max-width: 300px; font-size: 14px; color: #6d7175;">
+                <span>${question.leftLabel || 'Hate it'}</span>
+                <span>${question.rightLabel || 'Love it'}</span>
+            </div>
+        </div>
+    `;
 
         return html;
     }
+
+
+    function renderNumberScaleQuestion(question) {
+        const storedValue = answersStoreFront[currentQuestionIndex];
+        const currentRating = parseInt(
+            typeof storedValue === 'object' ? storedValue?.rating : storedValue || '0',
+            10
+        );
+
+        let ratingText = '';
+        switch (currentRating) {
+            case 5: ratingText = 'Excellent'; break;
+            case 4: ratingText = 'Very Good'; break;
+            case 3: ratingText = 'Good'; break;
+            case 2: ratingText = 'Fair'; break;
+            case 1: ratingText = 'Poor'; break;
+            default: ratingText = 'Select your rating';
+        }
+
+        let html = `
+        <div class="th-sf-survey-number-scale">
+            <p class="th-sf-survey-rating-text" style="text-align: center; margin: 0 0 10px 0; font-size: 16px; color: #6d7175;">${ratingText}</p>
+            <div style="display: flex; justify-content: center; gap: ${selectedView === 'mobile' ? '4px' : '8px'}; width: 100%;">
+    `;
+
+        for (let i = 1; i <= 5; i++) {
+            const isSelected = i <= currentRating;
+            html += `
+            <button class="th-sf-survey-number-option ${isSelected ? 'selected' : ''}"
+                    data-rating="${i}"
+                    style="width: ${selectedView === 'mobile' ? '32px' : '40px'};
+                           height: ${selectedView === 'mobile' ? '32px' : '40px'};
+                           border: 2px solid;
+                           border-color: ${isSelected ? '#2c6ecb' : '#ccc'};
+                           border-radius: 50%;
+                           background: ${isSelected ? '#2c6ecb' : 'white'};
+                           color: ${isSelected ? 'white' : '#000'};
+                           font-size: ${selectedView === 'mobile' ? '14px' : '16px'};
+                           cursor: pointer;
+                           transition: all 0.2s ease;
+                           font-weight: ${isSelected ? '600' : '400'};">
+                ${i}
+            </button>
+        `;
+        }
+
+        html += `
+            </div>
+            <div style="display: flex; justify-content: space-between; width: 100%; max-width: 300px; font-size: 14px; color: #6d7175; margin-top: 10px;">
+                <span>Poor</span>
+                <span>Excellent</span>
+            </div>
+        </div>
+    `;
+
+        return html;
+    }
+
 
     // Render satisfaction question
     function renderSatisfactionQuestion(question) {
@@ -525,7 +560,7 @@
             `;
 
         satisfactionOptions.forEach((option, index) => {
-            const isSelected = answers[currentQuestionIndex]?.rating === option.value;
+            const isSelected = answersStoreFront[currentQuestionIndex]?.rating === option.value;
             html += `
                     <button class="th-sf-survey-satisfaction-option ${isSelected ? 'selected' : ''}"
                             data-rating="${option.value}"
@@ -548,49 +583,18 @@
         return html;
     }
 
-    // Render number scale question
-    function renderNumberScaleQuestion(question) {
-        let html = `
-                <div class="th-sf-survey-number-scale">
-                    <div style="display: flex; justify-content: center; gap: ${selectedView === 'mobile' ? '4px' : '8px'}; width: 100%;">
-            `;
-
-        for (let i = 1; i <= 5; i++) {
-            const isSelected = answers[currentQuestionIndex] === i.toString();
-            html += `
-                    <button class="th-sf-survey-number-option ${isSelected ? 'selected' : ''}"
-                            data-rating="${i}"
-                            style="width: ${selectedView === 'mobile' ? '32px' : '40px'}; height: ${selectedView === 'mobile' ? '32px' : '40px'}; border: 2px solid; border-color: ${isSelected ? '#2c6ecb' : '#ccc'}; border-radius: 50%; background: ${isSelected ? '#2c6ecb' : 'white'}; color: ${isSelected ? 'white' : '#000'}; font-size: ${selectedView === 'mobile' ? '14px' : '16px'}; cursor: pointer; transition: all 0.2s ease; font-weight: ${isSelected ? '600' : '400'};">
-                        ${i}
-                    </button>
-                `;
-        }
-
-        html += `
-                    </div>
-                    <div style="display: flex; justify-content: space-between; width: 100%; max-width: 300px; font-size: 14px; color: #6d7175;">
-                        <span>Poor</span>
-                        <span>Excellent</span>
-                    </div>
-                </div>
-            `;
-
-        return html;
-    }
-
-    // Render multiple choice question
     function renderMultipleChoiceQuestion(question) {
         let html = `
                 <div class="th-sf-survey-multiple-choice-container">
             `;
 
-        question.answerOptions.forEach((option) => {
-            const isSelected = answers[currentQuestionIndex]?.multipleChoice === option.text;
+        question.answers.forEach((option) => {
+            const isSelected = answersStoreFront[currentQuestionIndex]?.multipleChoice === option.content;
             html += `
                     <div class="th-sf-survey-multiple-choice-option ${isSelected ? 'selected' : ''}"
-                         data-option="${option.text}">
+                         data-option="${option.content}">
                         <div class="th-sf-survey-multiple-choice-radio"></div>
-                        <span class="th-sf-survey-multiple-choice-text">${option.text}</span>
+                        <span class="th-sf-survey-multiple-choice-text">${option.content}</span>
                     </div>
                 `;
         });
@@ -599,20 +603,17 @@
         return html;
     }
 
-    // Render text question
     function renderTextQuestion(question) {
         return `
                 <div class="th-sf-survey-text-input-container" style="width: 100%; max-width: 500px; padding: 10px;">
                     <textarea class="th-sf-survey-text-input-field"
                               placeholder="Type your answer here..."
-                              style="border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-height: 80px; background: #fff; cursor: text; width: 100%; resize: vertical; font-family: inherit;">${answers[currentQuestionIndex] || ''}</textarea>
+                              style="border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-height: 80px; background: #fff; cursor: text; width: 100%; resize: vertical; font-family: inherit;">${answersStoreFront[currentQuestionIndex] || ''}</textarea>
                 </div>
             `;
     }
 
-    // Add event listeners to question elements
     function addQuestionEventListeners() {
-        // Rating options
         const ratingOptions = document.querySelectorAll('[data-rating]');
         ratingOptions.forEach(option => {
             option.addEventListener('click', (e) => {
@@ -621,16 +622,17 @@
             });
         });
 
-        // Multiple choice options
         const multipleChoiceOptions = document.querySelectorAll('[data-option]');
+
         multipleChoiceOptions.forEach(option => {
             option.addEventListener('click', (e) => {
+                console.log("clicked the element")
                 const optionText = e.target.closest('[data-option]').dataset.option;
+                console.log(optionText)
                 handleMultipleChoiceSelect(optionText);
             });
         });
 
-        // Text input
         const textInput = document.querySelector('.th-sf-survey-text-input-field');
         if (textInput) {
             textInput.addEventListener('input', (e) => {
@@ -639,41 +641,22 @@
         }
     }
 
-    // Handle rating selection
     function handleRatingSelect(rating) {
-        answers[currentQuestionIndex] = {...answers[currentQuestionIndex], rating};
+        answersStoreFront[currentQuestionIndex] = {...answersStoreFront[currentQuestionIndex], rating};
         updateQuestionDisplay();
         updateNavigationButtons();
 
-        // Sync with parent
-        sendMessageToParent('ANSWER_SELECTED', {
-            questionIndex: currentQuestionIndex,
-            answer: answers[currentQuestionIndex],
-            questionType: surveyData.questions[currentQuestionIndex].type
-        });
     }
 
     function handleMultipleChoiceSelect(optionText) {
-        answers[currentQuestionIndex] = {...answers[currentQuestionIndex], multipleChoice: optionText};
+        answersStoreFront[currentQuestionIndex] = {...answersStoreFront[currentQuestionIndex], multipleChoice: optionText};
         updateQuestionDisplay();
         updateNavigationButtons();
-
-        sendMessageToParent('ANSWER_SELECTED', {
-            questionIndex: currentQuestionIndex,
-            answer: answers[currentQuestionIndex],
-            questionType: surveyData.questions[currentQuestionIndex].type
-        });
     }
 
     function handleTextInput(value) {
-        answers[currentQuestionIndex] = value;
+        answersStoreFront[currentQuestionIndex] = value;
         updateNavigationButtons();
-
-        sendMessageToParent('ANSWER_SELECTED', {
-            questionIndex: currentQuestionIndex,
-            answer: value,
-            questionType: surveyData.questions[currentQuestionIndex].type
-        });
     }
 
     function updateQuestionDisplay() {
@@ -699,7 +682,7 @@
     function isQuestionComplete() {
         if (currentQuestionIndex >= surveyData.questions.length) return true;
 
-        const answer = answers[currentQuestionIndex];
+        const answer = answersStoreFront[currentQuestionIndex];
         if (!answer) return false;
 
         const question = surveyData.questions[currentQuestionIndex];
@@ -730,7 +713,7 @@
             prevButton.style.display = 'none';
         }
 
-        sendMessageToParent('SURVEY_COMPLETE', {answers});
+        sendMessageToParent('SURVEY_COMPLETE', {answersStoreFront});
     }
 
     function goToNext() {
@@ -739,28 +722,17 @@
             renderQuestion();
             renderProgressIndicators();
             updateNavigationButtons();
-
-            sendMessageToParent('NAVIGATION_CHANGED', {
-                currentQuestionIndex,
-                direction: 'next',
-                question: surveyData.questions[currentQuestionIndex]
-            });
         } else if (currentQuestionIndex === surveyData.questions.length) {
             alert('Survey submitted! Thank you for your feedback.');
 
-            sendMessageToParent('SURVEY_COMPLETE', {answers});
+            sendMessageToParent('SURVEY_COMPLETE', {answersStoreFront});
 
             // Reset to first question
             currentQuestionIndex = 0;
-            answers = {};
+            answersStoreFront = {};
             renderQuestion();
             renderProgressIndicators();
             updateNavigationButtons();
-
-            sendMessageToParent('NAVIGATION_CHANGED', {
-                currentQuestionIndex,
-                direction: 'reset'
-            });
         }
     }
 
@@ -770,14 +742,35 @@
             renderQuestion();
             renderProgressIndicators();
             updateNavigationButtons();
-
-            // Sync with parent
-            sendMessageToParent('NAVIGATION_CHANGED', {
-                currentQuestionIndex,
-                direction: 'previous',
-                question: surveyData.questions[currentQuestionIndex]
-            });
         }
+    }
+
+    function listenResizeObserver() {
+        const target = document.body;
+        if (!target) return;
+
+        if ('ResizeObserver' in window) {
+            const resizeObserver = new ResizeObserver(() => {
+                updateHeight();
+            });
+
+            resizeObserver.observe(target);
+
+            updateHeight();
+        } else {
+            console.warn("ResizeObserver is not supported in this browser.");
+        }
+    }
+
+    function updateHeight() {
+        const height = document.body.scrollHeight + 15;
+        const width = document.body.scrollWidth;
+
+        window.parent.postMessage({
+            type: 'survey-widget-height',
+            height: height,
+            width: width
+        }, '*');
     }
 
     function initializeSurvey() {
@@ -789,6 +782,10 @@
     }
 
     initializeSurvey();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        listenResizeObserver();
+    });
 </script>
 <script src="{{ asset('assets/js/survey-widget.js') }}"></script>
 </body>

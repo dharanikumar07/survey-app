@@ -26,6 +26,6 @@ class SurveyWidget
 
     public function getSurveyHtmlContent()
     {
-        return $this->settings['survey_meta_data']['completeHTML'];
+        return $this->settings['survey_meta_data']['htmlContent'];
     }
 }
