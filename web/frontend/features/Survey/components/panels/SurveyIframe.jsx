@@ -1088,8 +1088,24 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             const question = surveyData.questions[currentQuestionIndex];
             if (!question) return false;
             
+            // Handle number scale questions
+            if (question.type === 'number-scale') {
+                return answer && answer !== '' && answer !== null && answer !== undefined;
+            }
+            
+            // Handle rating questions
             if (question.type === 'rating') {
                 return answer.rating || answer.option || answer.multipleChoice;
+            }
+            
+            // Handle satisfaction questions
+            if (question.type === 'satisfaction') {
+                return answer.rating || answer.option || answer.multipleChoice;
+            }
+            
+            // Handle text questions
+            if (question.type === 'text') {
+                return answer && answer.trim().length > 0;
             }
             
             // For choice questions (single or multiple), check if at least one option is selected
