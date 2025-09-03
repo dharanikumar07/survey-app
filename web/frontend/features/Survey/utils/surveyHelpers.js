@@ -47,8 +47,15 @@ export const formatSurveyForAPI = (surveyData) => {
 // Helper function to get question type display name
 export const getQuestionTypeDisplayName = (type) => {
     const typeMap = {
-        'rating': 'Rating',
+        'single-choice': 'Single Choice',
+        'multiple-choice': 'Multiple Choice',
         'text': 'Text Input',
+        'rating': 'Star Rating',
+        'satisfaction': 'Satisfaction',
+        'number-scale': 'Number Scale',
+        'date': 'Date',
+        'thankyou': 'Thank You',
+        // Legacy mappings for backward compatibility
         'multiple_choice': 'Multiple Choice',
         'checkbox': 'Checkbox',
         'card': 'Card'
