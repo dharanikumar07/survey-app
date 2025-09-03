@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Helper\Helper;
 use App\Http\Requests\StoreSurveyRequest;
 use App\Http\Resources\SurveyResource;
+use App\Jobs\UpdateAppMetaObjects;
 use App\Models\Store;
 use App\Models\Survey;
 use App\Services\SurveyService;
@@ -72,7 +73,7 @@ class SurveyController extends Controller
 			$resource = new SurveyResource($survey);
 			$status = $survey->wasRecentlyCreated ? HttpResponse::HTTP_CREATED : HttpResponse::HTTP_OK;
 			$message = $survey->wasRecentlyCreated ? 'Survey created successfully' : 'Survey updated successfully';
-
+            UpdateAppMetaObjects::dispatch($store, $survey);
 			return Response::json([
 				'item' => $resource,
 				'message' => $message
@@ -136,10 +137,10 @@ class SurveyController extends Controller
 		try {
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
-			
+
 			$extensionService = app(ShopifyExtensionService::class);
 			$status = $extensionService->getExtensionStatus($store);
-			
+
 			return Response::json([
 				'data' => $status
 			], HttpResponse::HTTP_OK);
@@ -159,10 +160,10 @@ class SurveyController extends Controller
 		try {
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
-			
+
 			$extensionService = app(ShopifyExtensionService::class);
 			$status = $extensionService->refreshExtensionStatus($store);
-			
+
 			return Response::json([
 				'data' => $status
 			], HttpResponse::HTTP_OK);

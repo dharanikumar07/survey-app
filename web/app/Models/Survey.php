@@ -12,6 +12,11 @@ class Survey extends Model
 {
     use UuidTrait, SoftDeletes;
 
+    public const ONSITE_SURVEY = 'onsite';
+    public const POST_PURCHASE_SURVEY = 'post_purchase';
+
+    public const THANK_YOU_PAGE_SURVEY = 'thank_you_page';
+
     protected $fillable = [
         'name',
         'status',

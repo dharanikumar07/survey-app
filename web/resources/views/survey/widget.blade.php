@@ -17,7 +17,7 @@
         }
 
         .th-sf-survey-container {
-            padding: 32px;
+            padding: 22px;
             overflow: hidden;
         }
 
@@ -356,7 +356,7 @@
                 opacity: 1;
             }
         }
-        
+
         .th-sf-survey-checkmark {
             animation: checkmarkAnimation 0.5s ease-in-out forwards;
         }
@@ -406,7 +406,7 @@
 
     function renderProgressIndicators() {
         if (!progressIndicators || !surveyData) return;
-        console.log(surveyData.questions)
+
         progressIndicators.innerHTML = '';
         surveyData.questions.forEach((_, index) => {
             const dot = document.createElement('div');
@@ -417,11 +417,6 @@
 
     function renderQuestion() {
         if (!questionContent || !surveyData) return;
-
-        if (currentQuestionIndex >= surveyData.questions.length) {
-            renderThankYou();
-            return;
-        }
 
         const question = surveyData.questions[currentQuestionIndex];
         console.log("question in recent log" , question.type);
@@ -641,7 +636,7 @@
                 <div class="th-sf-survey-text-input-container" style="width: 100%; max-width: 500px; padding: 10px;">
                     <textarea class="th-sf-survey-text-input-field"
                               placeholder="Type your answer here..."
-                              style="border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-height: 80px; background: #fff; cursor: text; width: 100%; resize: vertical; font-family: inherit;">${answersStoreFront[currentQuestionIndex] || ''}</textarea>
+                              style="border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-height: 80px; background: #fff; cursor: text; width: 100%; resize: vertical; font-family: inherit;">${answersStoreFront[currentQuestionIndex]?.text || ''}</textarea>
                 </div>
             `;
     }
@@ -702,18 +697,18 @@
 
     function updateNavigationButtons() {
             if (!nextButton || !prevButton || !surveyData) return;
-            
+
             const canGoNext = isQuestionComplete();
-            const canGoPrev = currentQuestionIndex > 0;
+            const canGoPrev = currentQuestionIndex > 0 && currentQuestionIndex < surveyData.questions.length - 1;
             const isLastQuestion = currentQuestionIndex === surveyData.questions.length - 1;
-            
+
             // Update button text based on position in survey
             nextButton.textContent = isLastQuestion ? 'Submit' : 'Next';
-            
+
             // Update button styles and visibility
             nextButton.disabled = !canGoNext;
             prevButton.style.display = canGoPrev ? 'block' : 'none';
-            
+
             if (canGoNext) {
                 nextButton.style.background = isLastQuestion ? '#2c6ecb' : '#1a1a1a'; // Blue for submit
                 nextButton.style.opacity = '1';
@@ -738,7 +733,6 @@
         return true;
     }
 
-    <script>
     function renderThankYou() {
         if (!questionContent) return;
 
@@ -769,7 +763,7 @@
                 </div>
             </div>
         `;
-
+        console.log('previous button', prevButton)
         // Hide all navigation buttons on Thank You page
         if (nextButton) {
             nextButton.style.display = 'none';
@@ -791,12 +785,12 @@
             renderQuestion();
             renderProgressIndicators();
             updateNavigationButtons();
-        } else if (currentQuestionIndex === surveyData.questions.length) {
+        } else if (currentQuestionIndex === surveyData.questions.length - 1) {
             const backendUrl = surveyData.backend_url;
             const store_uuid = surveyData.store_uuid
             const survey_uuid = surveyData.uuid;
             const customerData = listenForCustomerData();
-            // Convert numeric-keyed object to a single merged object
+
             const mergedAnswers = Object.values(answersStoreFront).reduce((acc, curr) => {
                 return { ...acc, ...curr };
             }, {});
@@ -843,19 +837,23 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    console.log('Survey response saved:', data);
+                    renderThankYou()
+                    console.log("survey_uuid",surveyData.uuid)
+                    sendPostMessage(surveyData.uuid);
                 })
                 .catch(err => {
                     console.error('Error saving survey:', err);
                 });
-
-            currentQuestionIndex = 0;
-            answersStoreFront = {};
-            renderQuestion();
-            renderProgressIndicators();
-            updateNavigationButtons();
         }
     }
+
+    function sendPostMessage(surveyUuid) {
+        window.parent.postMessage({
+                type: 'survey-completed',
+                survey_uuid: surveyUuid
+            }, '*');
+    }
+
 
     function goToPrevious() {
         if (currentQuestionIndex > 0) {
@@ -870,7 +868,6 @@
 
     window.addEventListener("message", function (event) {
         if (event.data.type === "survey-customer-data") {
-            console.log("Customer data received in iframe:", event.data);
             customerData = {
                 customer_id: event.data.customerId,
                 order_id: event.data.orderId,
