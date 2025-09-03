@@ -78,7 +78,7 @@ class CreateMetaObjectDefinition implements ShouldQueue
             ]
         ];
         $isCreated = $metaobject->getMetaObjectByHandle($this->getType(),'post_purchase_survey');
-        info("isCreated: ".print_r($isCreated, true));
+
         if(isset($isCreated['data']['metaobjectByHandle']['id']))
         {
             info("enetereddd in uupdated");
@@ -87,6 +87,6 @@ class CreateMetaObjectDefinition implements ShouldQueue
             info("eneteredd in created");
             $metaobject->createMetaObject($meta_object);
         }
-        
+
     }
 }
