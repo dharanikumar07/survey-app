@@ -660,7 +660,7 @@
     }
 
     function handleTextInput(value) {
-        answersStoreFront[currentQuestionIndex] = value;
+        answersStoreFront[currentQuestionIndex] =  {...answersStoreFront[currentQuestionIndex], text: value};
         updateNavigationButtons();
     }
 
@@ -727,14 +727,52 @@
             updateNavigationButtons();
         } else if (currentQuestionIndex === surveyData.questions.length) {
             const backendUrl = surveyData.backend_url;
-            const uuid = surveyData.uuid;
-            fetch(`${backendUrl}/api/surveyResponse/${uuid}`, {
+            const store_uuid = surveyData.store_uuid
+            const survey_uuid = surveyData.uuid;
+            const customerData = listenForCustomerData();
+            // Convert numeric-keyed object to a single merged object
+            const mergedAnswers = Object.values(answersStoreFront).reduce((acc, curr) => {
+                return { ...acc, ...curr };
+            }, {});
+
+            const questionsPayload = surveyData.questions.map((q) => {
+                const answerKeyMap = {
+                    text: 'text',
+                    rating: 'rating',
+                    satisfaction: 'satisfaction',
+                    'multiple-choice': 'multipleChoice',
+                    'number-scale': 'number-scale'
+                };
+
+                const answerKey = answerKeyMap[q.type];
+
+                if (!answerKey) return null;
+
+                if (q.type === 'multiple-choice') {
+                    return {
+                        type: 'multiple',
+                        question: q.heading,
+                        answers: mergedAnswers[answerKey] ? [mergedAnswers[answerKey]] : []
+                    };
+                }
+
+                return {
+                    type: q.type,
+                    question: q.heading,
+                    answer: mergedAnswers[answerKey] || null
+                };
+            }).filter(Boolean);
+
+            fetch(`${backendUrl}/api/surveyResponse/${store_uuid}/${survey_uuid}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    answers: answersStoreFront
+                    customer_id: customerData?.customer_id || null,
+                    order_id: customerData?.order_id || null,
+                    page_type: customerData?.page_type || null,
+                    answers: questionsPayload
                 })
             })
                 .then(res => res.json())
@@ -760,6 +798,23 @@
             renderProgressIndicators();
             updateNavigationButtons();
         }
+    }
+
+    let customerData = null;
+
+    window.addEventListener("message", function (event) {
+        if (event.data.type === "survey-customer-data") {
+            console.log("Customer data received in iframe:", event.data);
+            customerData = {
+                customer_id: event.data.customerId,
+                order_id: event.data.orderId,
+                page_type: event.data.pageType
+            };
+        }
+    });
+
+    function listenForCustomerData() {
+        return customerData;
     }
 
     function listenResizeObserver() {

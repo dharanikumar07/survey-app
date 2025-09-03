@@ -182,7 +182,7 @@ GRAPHQL;
     {
         if (empty($platformCustomerId)) throw new \Exception('Platform Customer id empty');
 
-        $customer = Customer::where('platform_customer_id', $platformCustomerId)->first();
+        $customer = Customer::where('platform_customer_id', (string) $platformCustomerId)->first();
 
         if ($customer) {
             return $customer;

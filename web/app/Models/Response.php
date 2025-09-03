@@ -11,26 +11,11 @@ class Response extends Model
 {
     use UuidTrait;
 
-    protected $fillable = [
-        'survey_name',
-        'shopify_customer_id',
-        'customer_email',
-        'questions',
-        'channel_type',
-        'page_type',
-        'page_url',
-        'order_id',
-        'order_name',
-        'is_completed',
-        'extra'
-    ];
+    protected $table = 'responses';
+    protected $guarded = [];
 
     protected $casts = [
-        'questions' => 'array',
-        'extra' => 'array',
-        'is_completed' => 'boolean',
-        'shopify_customer_id' => 'integer',
-        'order_id' => 'integer'
+        'answers' => 'array',
     ];
 
     // Relationships

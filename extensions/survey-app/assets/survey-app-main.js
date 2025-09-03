@@ -1,6 +1,6 @@
 (function(){
-    const store_uuid = window.PostPurchaseSurveyData.data.store_uuid;
-    const url = window.PostPurchaseSurveyData.data.url;
+    const store_uuid = window.PostPurchaseSurveyData.value.data.store_uuid;
+    const url = window.PostPurchaseSurveyData.value.data.url;
     const iframeUrl = `${url}/api/get-survey/${store_uuid}`;
 
     const iframe = document.createElement("iframe");
@@ -17,6 +17,17 @@
     iframe.style.transition = "opacity 0.3s ease";
 
     document.body.appendChild(iframe);
+
+    iframe.addEventListener("load", function () {
+        const postData = {
+            type: "survey-customer-data",
+            customerId: window.PostPurchaseSurveyData?.customerId,
+            orderId: window.PostPurchaseSurveyData?.orderId,
+            pageType: window.PostPurchaseSurveyData?.pageType
+        };
+
+        iframe.contentWindow.postMessage(postData, "*");
+    });
 
     window.addEventListener("message", function(event) {
         if (event.data.type === "survey-widget-height") {
