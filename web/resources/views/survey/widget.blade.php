@@ -732,7 +732,6 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${shopifyAccessToken}`
                 },
                 body: JSON.stringify({
                     answers: answersStoreFront
