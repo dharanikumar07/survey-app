@@ -174,7 +174,6 @@ export function ContentTab({ surveyPreviewRef }) {
                                         { content: 'Star rating', onAction: () => insertQuestionByType('rating') },
                                         { content: 'Satisfaction', onAction: () => insertQuestionByType('satisfaction') },
                                         { content: 'Short answer', onAction: () => insertQuestionByType('text') },
-                                        { content: 'Date', onAction: () => insertQuestionByType('date') },
                                     ]}
                                 />
                             </Popover>
