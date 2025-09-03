@@ -28,4 +28,14 @@ class SurveyWidget
     {
         return $this->settings['survey_meta_data']['htmlContent'];
     }
+
+    public function getSurveyUuid()
+    {
+        return $this->settings['uuid'];
+    }
+
+    public function getSurveyMetaData()
+    {
+        return $this->settings['survey_meta_data'];
+    }
 }

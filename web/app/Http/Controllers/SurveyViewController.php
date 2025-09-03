@@ -11,11 +11,14 @@ class SurveyViewController
 {
     public function getSurveyWidget(Request $request, string $storeUuid, string $surveyUuid = null)
     {
+
         $survey = new SurveyWidget($storeUuid, $surveyUuid);
 
-        $surveyData = $survey->settings->survey_meta_data ?? [];
+        $surveyData = $survey->getSurveyMetaData() ?? [];
 
         $surveyData = [
+            'uuid' => $survey->getSurveyUuid(),
+            'backend_url' => env('HOST'),
             'questions' => $surveyData['questions']
         ];
 
@@ -23,7 +26,7 @@ class SurveyViewController
             'survey' => $survey,
             'surveyData' => $surveyData,
             'selectedView' => 'desktop',
-            'initialQuestionIndex' => 0
+            'initialQuestionIndex' => 0,
         ]);
     }
 }

@@ -489,8 +489,9 @@
 
     function renderNumberScaleQuestion(question) {
         const storedValue = answersStoreFront[currentQuestionIndex];
+        const type = question.type;
         const currentRating = parseInt(
-            typeof storedValue === 'object' ? storedValue?.rating : storedValue || '0',
+            typeof storedValue === 'object' ? storedValue?.[type] : storedValue || '0',
             10
         );
 
@@ -558,9 +559,9 @@
                 <div class="th-sf-survey-satisfaction-scale">
                     <div style="display: flex; justify-content: center; gap: ${selectedView === 'mobile' ? '8px' : '16px'}; width: 100%;">
             `;
-
+        const type = question.type;
         satisfactionOptions.forEach((option, index) => {
-            const isSelected = answersStoreFront[currentQuestionIndex]?.rating === option.value;
+            const isSelected = answersStoreFront[currentQuestionIndex]?.[type] === option.value;
             html += `
                     <button class="th-sf-survey-satisfaction-option ${isSelected ? 'selected' : ''}"
                             data-rating="${option.value}"
@@ -617,7 +618,7 @@
         const ratingOptions = document.querySelectorAll('[data-rating]');
         ratingOptions.forEach(option => {
             option.addEventListener('click', (e) => {
-                const rating = e.target.dataset.rating;
+                const rating = e.target.closest('[data-rating]')?.dataset.rating;
                 handleRatingSelect(rating);
             });
         });
@@ -626,9 +627,7 @@
 
         multipleChoiceOptions.forEach(option => {
             option.addEventListener('click', (e) => {
-                console.log("clicked the element")
                 const optionText = e.target.closest('[data-option]').dataset.option;
-                console.log(optionText)
                 handleMultipleChoiceSelect(optionText);
             });
         });
@@ -642,7 +641,13 @@
     }
 
     function handleRatingSelect(rating) {
-        answersStoreFront[currentQuestionIndex] = {...answersStoreFront[currentQuestionIndex], rating};
+        const question = surveyData.questions[currentQuestionIndex];
+        const questionType = question.type;
+
+        answersStoreFront[currentQuestionIndex] = {
+            ...answersStoreFront[currentQuestionIndex],
+            [questionType]: rating
+        };
         updateQuestionDisplay();
         updateNavigationButtons();
 
@@ -712,8 +717,6 @@
         if (prevButton) {
             prevButton.style.display = 'none';
         }
-
-        sendMessageToParent('SURVEY_COMPLETE', {answersStoreFront});
     }
 
     function goToNext() {
@@ -723,11 +726,26 @@
             renderProgressIndicators();
             updateNavigationButtons();
         } else if (currentQuestionIndex === surveyData.questions.length) {
-            alert('Survey submitted! Thank you for your feedback.');
+            const backendUrl = surveyData.backend_url;
+            const uuid = surveyData.uuid;
+            fetch(`${backendUrl}/api/surveyResponse/${uuid}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${shopifyAccessToken}`
+                },
+                body: JSON.stringify({
+                    answers: answersStoreFront
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log('Survey response saved:', data);
+                })
+                .catch(err => {
+                    console.error('Error saving survey:', err);
+                });
 
-            sendMessageToParent('SURVEY_COMPLETE', {answersStoreFront});
-
-            // Reset to first question
             currentQuestionIndex = 0;
             answersStoreFront = {};
             renderQuestion();
