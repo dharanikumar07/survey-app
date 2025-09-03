@@ -29,6 +29,9 @@ Route::middleware('shopify.auth')->group(function () {
     Route::post('/surveys/{uuid?}', [SurveyController::class, 'saveSurvey']);
     Route::get('/surveys/{uuid}', [SurveyController::class, 'show']);
     Route::delete('/surveys/{uuid}', [SurveyController::class, 'destroy']);
+    Route::post('/surveyResponse/{uuid}', function (){
+        info("enteredd in survey response");
+    });
 
     // Extension Status
     Route::get('/extension/status', [SurveyController::class, 'checkExtensionStatus']);
