@@ -176,6 +176,17 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
             limitOnePerEmail: false
         },
         channelTypes: surveyData.channelTypes || ['thankyou'],
+        onsiteConfig: surveyData.onsiteConfig || {
+            pageTargeting: 'all',
+            specificPages: '',
+            excludePages: false,
+            timing: {
+                delay: 10,
+                unit: 'seconds'
+            },
+            userTargeting: 'all',
+            widgetRecurrence: 'every_time'
+        },
         htmlContent: htmlContent, // Use original HTML content directly
         cleanHTML: generateCleanSurveyHTML(surveyData, htmlContent), // Clean HTML with minimal sanitization
         completeHTML: generateCompleteSurveyHTML(surveyData, htmlContent), // Complete HTML with minimal sanitization

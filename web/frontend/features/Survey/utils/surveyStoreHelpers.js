@@ -32,7 +32,7 @@ export const loadSurveyData = () => {
       editModalOpen: surveyData.defaultValues?.editModalOpen || false,
       surveyTitle: surveyData.defaultValues?.surveyTitle || 'New Survey',
       selectedQuestionId: surveyData.defaultValues?.selectedQuestionId || '1',
-      selectedView: surveyData.defaultValues?.selectedView || 'desktop',
+      selectedView: surveyData.defaultValues?.selectedView || 'mobile',
       isActive: surveyData.defaultValues?.isActive || true,
       selectedTheme: surveyData.defaultValues?.selectedTheme || 'default',
       themePopoverActive: surveyData.defaultValues?.themePopoverActive || false,
@@ -40,6 +40,39 @@ export const loadSurveyData = () => {
       surveyPagePopoverActive: surveyData.defaultValues?.surveyPagePopoverActive || false,
       selectedSurveyPage: surveyData.defaultValues?.selectedSurveyPage || 'page',
       currentQuestionIndex: surveyData.defaultValues?.currentQuestionIndex || 0,
+      
+      // Onsite survey configuration
+      onsiteConfig: surveyData.defaultValues?.onsiteConfig || {
+        pageTargeting: 'all',
+        specificPages: '',
+        excludePages: false,
+        excludedPageTypes: [],
+        timing: {
+          delay: 10,
+          unit: 'seconds'
+        },
+        userTargeting: 'all',
+        userTag: false,
+        customerType: {
+          newCustomer: false,
+          returnCustomer: false
+        },
+        productPurchased: false,
+        widgetRecurrence: 'every_time'
+      },
+      
+      // Thank you page configuration
+      thankyouConfig: surveyData.defaultValues?.thankyouConfig || {
+        message: 'Thank you for your feedback!',
+        action: 'message',
+        socialSharing: false,
+        emailCollection: false,
+        userTargeting: 'all',
+        userTag: false,
+        productPurchased: false,
+        newCustomer: false,
+        returnCustomer: false
+      },
       
       // Question data
       questions: surveyData.questions || [],
@@ -72,7 +105,7 @@ export const getDefaultSurveyData = () => {
     editModalOpen: false,
     surveyTitle: 'New Survey',
     selectedQuestionId: '1',
-    selectedView: 'desktop',
+    selectedView: 'mobile',
     isActive: true,
     selectedTheme: 'default',
     themePopoverActive: false,
@@ -80,6 +113,35 @@ export const getDefaultSurveyData = () => {
     surveyPagePopoverActive: false,
     selectedSurveyPage: 'page',
     currentQuestionIndex: 0,
+    onsiteConfig: {
+      pageTargeting: 'all',
+      specificPages: '',
+      excludePages: false,
+      excludedPageTypes: [],
+      timing: {
+        delay: 10,
+        unit: 'seconds'
+      },
+      userTargeting: 'all',
+      userTag: false,
+      customerType: {
+        newCustomer: false,
+        returnCustomer: false
+      },
+      productPurchased: false,
+      widgetRecurrence: 'every_time'
+    },
+    thankyouConfig: {
+      message: 'Thank you for your feedback!',
+      action: 'message',
+      socialSharing: false,
+      emailCollection: false,
+      userTargeting: 'all',
+      userTag: false,
+      productPurchased: false,
+      newCustomer: false,
+      returnCustomer: false
+    },
     questions: [
       { 
         id: '1', 

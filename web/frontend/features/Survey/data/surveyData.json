@@ -4,7 +4,7 @@
       "title": "Blank survey",
       "description": "Tell us your needs - we'll take care of everything.",
       "channelItems": [
-        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": true, "isEnabled": true },
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
@@ -22,7 +22,7 @@
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
@@ -30,7 +30,25 @@
         "surveyPagePopoverActive": false,
         "selectedSurveyPage": "page",
         "discountEnabled": false,
-        "editModalOpen": false
+        "editModalOpen": false,
+        "onsiteConfig": {
+          "pageTargeting": "all",
+          "specificPages": "",
+          "excludePages": false,
+          "excludedPageTypes": [],
+          "timing": {
+            "delay": 10,
+            "unit": "seconds"
+          },
+          "userTargeting": "all",
+          "userTag": false,
+          "customerType": {
+            "newCustomer": false,
+            "returnCustomer": false
+          },
+          "productPurchased": false,
+          "widgetRecurrence": "every_time"
+        }
       },
       "questions": [
         { 
@@ -49,7 +67,7 @@
       "title": "Marketing attribution",
       "description": "Find out which marketing channels are most effective.",
       "channelItems": [
-        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": true, "isEnabled": true },
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
@@ -67,7 +85,7 @@
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
@@ -118,7 +136,7 @@
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
@@ -184,7 +202,7 @@
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
@@ -217,7 +235,7 @@
       "title": "Exit intent",
       "description": "Understand what's stopping users from purchasing on your site.",
       "channelItems": [
-        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": true, "isEnabled": true },
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
@@ -235,7 +253,7 @@
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
@@ -262,7 +280,7 @@
       "title": "AI-assisted survey",
       "description": "AI-generated survey with custom title and questions.",
       "channelItems": [
-        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": true, "isEnabled": true },
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
       ],
       "discountSettings": {
@@ -280,7 +298,7 @@
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
