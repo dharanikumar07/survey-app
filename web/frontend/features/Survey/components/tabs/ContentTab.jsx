@@ -33,7 +33,7 @@ function getTypeIcon(type) {
     }
 }
 
-export function ContentTab() {
+export function ContentTab({ surveyPreviewRef }) {
     const {
         questions,
         addQuestion,
@@ -105,6 +105,13 @@ export function ContentTab() {
         // This will use our template system from JSON
         addQuestion(type);
         setAddPopoverActive(false);
+
+        // Trigger refresh after successfully adding question
+        setTimeout(() => {
+            if (surveyPreviewRef?.current?.refreshIframe) {
+                surveyPreviewRef.current.refreshIframe();
+            }
+        }, 100); // Small delay to ensure state is updated
     };
 
     // This function is no longer needed since we use templates from JSON
@@ -167,7 +174,6 @@ export function ContentTab() {
                                         { content: 'Star rating', onAction: () => insertQuestionByType('rating') },
                                         { content: 'Satisfaction', onAction: () => insertQuestionByType('satisfaction') },
                                         { content: 'Short answer', onAction: () => insertQuestionByType('text') },
-                                        { content: 'Date', onAction: () => insertQuestionByType('date') },
                                     ]}
                                 />
                             </Popover>

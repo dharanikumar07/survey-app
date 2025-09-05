@@ -356,12 +356,8 @@ const useStore = create((set, get) => ({
     // Helper function to transform channels
     transformChannels: (channels) => {
         const defaultChannels = [
-            { id: 'branded', title: 'Branded survey page', icon: 'document', isExpanded: false, isEnabled: false },
             { id: 'onsite', title: 'On-site survey', icon: 'store', isExpanded: false, isEnabled: false },
             { id: 'thankyou', title: 'Thank you page', icon: 'checkmark', isExpanded: true, isEnabled: true },
-            { id: 'email', title: 'Post-purchase email', icon: 'email', isExpanded: false, isEnabled: false },
-            { id: 'exit', title: 'Exit intent', icon: 'exit', isExpanded: false, isEnabled: false },
-            { id: 'embed', title: 'Embed survey', icon: 'code', isExpanded: false, isEnabled: false }
         ];
         
         // Update enabled status based on API data

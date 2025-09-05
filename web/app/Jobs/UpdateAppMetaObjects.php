@@ -2,14 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Cache\SettingsCacheService;
-use App\Models\Organization;
-use App\Models\OrgSettings;
+use App\Cache\SurveyCacheService;
 use App\Models\Store;
+use App\Models\Survey;
 use App\Services\DataPreparerForMetaObjects;
 use App\Services\MetaObjects;
-use App\Services\Shopify\DataPreparerForSettings;
-use App\Services\Shopify\ShopifyMetaObject;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -19,12 +16,15 @@ class UpdateAppMetaObjects implements ShouldQueue
 
     public $store;
 
+    public $survey;
+
     /**
      * Create a new job instance.
      */
-    public function __construct(Store $store)
+    public function __construct(Store $store, Survey $survey)
     {
         $this->store = $store;
+        $this->survey = $survey;
     }
 
     public function getType()
@@ -59,12 +59,17 @@ class UpdateAppMetaObjects implements ShouldQueue
             ]
         ];
 
+        $isUpdated = null;
+
         if(isset($isCreated['data']['metaobjectByHandle']['id']))
         {
-            $metaobject->updateMetaObject($isCreated['data']['metaobjectByHandle']['id'], $meta_object['fields']);
-        } else {
-            info("eneteredd in created");
-            $metaobject->createMetaObject($meta_object);
+            $isUpdated = $metaobject->updateMetaObject($isCreated['data']['metaobjectByHandle']['id'], $meta_object['fields']);
+        }
+
+        if(!empty($isUpdated))
+        {
+            $cacheService = app(SurveyCacheService::class);
+            $cacheService->saveSurveyData($this->store, $this->survey);
         }
     }
 }

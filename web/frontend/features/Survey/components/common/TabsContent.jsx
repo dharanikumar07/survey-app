@@ -5,7 +5,7 @@ import { ChannelTab } from '../tabs/ChannelTab';
 import { DiscountTab } from '../tabs/DiscountTab';
 import { useSurveyState } from '../../hooks/useSurveyState';
 
-function TabsContent() {
+function TabsContent({ surveyPreviewRef }) {
     const { selectedTab, setSelectedTab } = useSurveyState();
 
     const handleTabChange = (selectedTabIndex) => {
@@ -15,13 +15,13 @@ function TabsContent() {
     const renderTabContent = () => {
         switch (selectedTab) {
             case 0:
-                return <ContentTab />;
+                return <ContentTab surveyPreviewRef={surveyPreviewRef} />;
             case 1:
                 return <ChannelTab />;
             case 2:
                 return <DiscountTab />;
             default:
-                return <ContentTab />;
+                return <ContentTab surveyPreviewRef={surveyPreviewRef} />;
         }
     };
 

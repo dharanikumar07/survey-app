@@ -47,7 +47,7 @@ export default function Survey() {
     const queryClient = useQueryClient();
     // Pagination settings
     const itemsPerPage = 10;
-    const [totalPage , setTotalPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(1);
 
     // Delete mutation
     const deleteSurveyMutation = useMutation({
@@ -211,33 +211,6 @@ export default function Survey() {
         deleteSurveyMutation.reset();
     };
 
-    // Show shimmer effect while loading surveys
-    if (isLoading || isPending) {
-        return (
-            <SkeletonPage>
-                <BlockStack gap="400">
-                    <SkeletonDisplayText size="large" />
-                    <SkeletonBodyText lines={2} />
-
-                    <Card padding="200">
-                        <SkeletonDisplayText size="small" />
-                        <SkeletonBodyText lines={1} />
-
-                        {/* Skeleton for table rows */}
-                        {[1, 2, 3, 4, 5].map((index) => (
-                            <Box key={index} paddingBlockStart="200" paddingBlockEnd="200">
-                                <SkeletonBodyText lines={1} />
-                            </Box>
-                        ))}
-
-                        <Box paddingBlockStart="400" paddingBlockEnd="400">
-                            <SkeletonDisplayText size="small" />
-                        </Box>
-                    </Card>
-                </BlockStack>
-            </SkeletonPage>
-        );
-    }
 
     return (
         <Page

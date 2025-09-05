@@ -2,10 +2,14 @@
 
 namespace App\Services;
 
+use App\Cache\CacheKeys;
+use App\Cache\SurveyCacheService;
 use App\Models\Survey;
+use Illuminate\Support\Facades\Redis;
 
 class SurveyWidget
 {
+    use CacheKeys;
     public $storeUuid;
     public $surveyUuid;
     public $settings;
@@ -18,10 +22,22 @@ class SurveyWidget
 
     public function getSettings()
     {
-        return Survey::where('store_uuid', $this->storeUuid)
-            ->where('status', 'active')
-            ->latest('created_at')
-            ->firstOrFail();
+        $key = $this->getSurveyDataCacheKey($this->storeUuid, $this->surveyUuid);
+        $cacheService = app(SurveyCacheService::class);
+
+        if(Redis::exist($key)) {
+            info("enter in the getting redis data");
+            $surveyData = $cacheService->getSurveyDataFromCache($key);
+        } else {
+            $surveyData =  Survey::where('store_uuid', $this->storeUuid)
+                ->where('uuid', $this->surveyUuid)
+                ->where('status', 'active')
+                ->firstOrFail();
+
+            $cacheService->saveSurveyData($surveyData->store, $surveyData);
+        }
+
+        return $surveyData;
     }
 
     public function getSurveyHtmlContent()

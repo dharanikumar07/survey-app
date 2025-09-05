@@ -64,19 +64,19 @@ const SurveyLayout = forwardRef(({ surveyId, onClose }, ref) => {
                             {/* Left Panel - Question List */}
                             {selectedView !== 'maximize' && (
                                 <Grid.Cell columnSpan={columnSpans.left}>
-                                    <QuestionList />
+                                    <QuestionList surveyPreviewRef={surveyPreviewRef} />
                                 </Grid.Cell>
                             )}
 
                             {/* Center Panel - Survey Preview */}
                             <Grid.Cell columnSpan={columnSpans.center}>
-                                <SurveyIframeProduction ref={ref} />
+                                <SurveyIframeProduction ref={surveyPreviewRef} />
                             </Grid.Cell>
 
                             {/* Right Panel - Question Settings */}
                             {selectedView !== 'maximize' && (
                                 <Grid.Cell columnSpan={columnSpans.right}>
-                                    <QuestionSettings />
+                                    <QuestionSettings surveyPreviewRef={surveyPreviewRef} />
                                 </Grid.Cell>
                             )}
                         </Grid>

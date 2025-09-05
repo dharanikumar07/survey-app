@@ -15,6 +15,11 @@
             orderId: {% if order %}{{ order.id }}{% else %}null{% endif %},
             pageType: "{{ template.name }}"
         };
+
+        if (window.PostPurchaseSurveyData?.value?.onsite_survey?.length > 0) {
+            const surveyUuids = window.PostPurchaseSurveyData.value.onsite_survey.map(survey => survey.uuid);
+            localStorage.setItem('onsite_survey_uuids', JSON.stringify(surveyUuids));
+        }
 </script>
 
 <script  src="{{ "survey-app-main.js" | asset_url }}" defer></script>

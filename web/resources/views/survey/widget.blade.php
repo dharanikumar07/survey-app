@@ -17,7 +17,7 @@
         }
 
         .th-sf-survey-container {
-            padding: 32px;
+            padding: 22px;
             overflow: hidden;
         }
 
@@ -275,16 +275,31 @@
         }
 
         .th-sf-survey-thank-you-heading {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 600;
             margin: 0;
             color: #202223;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out 0.3s forwards;
         }
 
         .th-sf-survey-thank-you-description {
-            font-size: 16px;
+            font-size: 18px;
             margin: 0;
             color: #6d7175;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes slideIn {
@@ -327,6 +342,23 @@
 
         .th-sf-survey-content::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
+        }
+        @keyframes checkmarkAnimation {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .th-sf-survey-checkmark {
+            animation: checkmarkAnimation 0.5s ease-in-out forwards;
         }
     </style>
 </head>
@@ -374,7 +406,7 @@
 
     function renderProgressIndicators() {
         if (!progressIndicators || !surveyData) return;
-        console.log(surveyData.questions)
+
         progressIndicators.innerHTML = '';
         surveyData.questions.forEach((_, index) => {
             const dot = document.createElement('div');
@@ -385,11 +417,6 @@
 
     function renderQuestion() {
         if (!questionContent || !surveyData) return;
-
-        if (currentQuestionIndex >= surveyData.questions.length) {
-            renderThankYou();
-            return;
-        }
 
         const question = surveyData.questions[currentQuestionIndex];
         console.log("question in recent log" , question.type);
@@ -609,7 +636,7 @@
                 <div class="th-sf-survey-text-input-container" style="width: 100%; max-width: 500px; padding: 10px;">
                     <textarea class="th-sf-survey-text-input-field"
                               placeholder="Type your answer here..."
-                              style="border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-height: 80px; background: #fff; cursor: text; width: 100%; resize: vertical; font-family: inherit;">${answersStoreFront[currentQuestionIndex] || ''}</textarea>
+                              style="border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-height: 80px; background: #fff; cursor: text; width: 100%; resize: vertical; font-family: inherit;">${answersStoreFront[currentQuestionIndex]?.text || ''}</textarea>
                 </div>
             `;
     }
@@ -669,20 +696,27 @@
     }
 
     function updateNavigationButtons() {
-        const canGoNext = isQuestionComplete();
-        const canGoPrev = currentQuestionIndex > 0;
+            if (!nextButton || !prevButton || !surveyData) return;
 
-        nextButton.disabled = !canGoNext;
-        prevButton.style.display = canGoPrev ? 'block' : 'none';
+            const canGoNext = isQuestionComplete();
+            const canGoPrev = currentQuestionIndex > 0 && currentQuestionIndex < surveyData.questions.length - 1;
+            const isLastQuestion = currentQuestionIndex === surveyData.questions.length - 1;
 
-        if (canGoNext) {
-            nextButton.style.background = '#1a1a1a';
-            nextButton.style.opacity = '1';
-        } else {
-            nextButton.style.background = '#ccc';
-            nextButton.style.opacity = '0.6';
+            // Update button text based on position in survey
+            nextButton.textContent = isLastQuestion ? 'Submit' : 'Next';
+
+            // Update button styles and visibility
+            nextButton.disabled = !canGoNext;
+            prevButton.style.display = canGoPrev ? 'block' : 'none';
+
+            if (canGoNext) {
+                nextButton.style.background = isLastQuestion ? '#2c6ecb' : '#1a1a1a'; // Blue for submit
+                nextButton.style.opacity = '1';
+            } else {
+                nextButton.style.background = '#ccc';
+                nextButton.style.opacity = '0.6';
+            }
         }
-    }
 
     function isQuestionComplete() {
         if (currentQuestionIndex >= surveyData.questions.length) return true;
@@ -703,34 +737,60 @@
         if (!questionContent) return;
 
         questionContent.innerHTML = `
-                <div class="th-sf-survey-thank-you-card">
-                    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
-                        <h3 class="th-sf-survey-thank-you-heading">Thank you for your feedback!</h3>
-                        <p class="th-sf-survey-thank-you-description">We appreciate your time and input.</p>
+            <div class="th-sf-survey-thank-you-card">
+                <div style="display: flex; flex-direction: column; gap: 16px; align-items: center;">
+                    <div class="th-sf-survey-checkmark"
+                        style="
+                            width: 80px;
+                            height: 80px;
+                            border-radius: 50%;
+                            background-color: #008060;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            margin-bottom: 8px;
+                        ">
+                        <svg width="40" height="40" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16.7 5.3c-.4-.4-1-.4-1.4 0l-6.8 6.8-3.8-3.8c-.4-.4-1-.4-1.4 0-.4.4-.4 1 0 1.4l4.5 4.5c.2.2.4.3.7.3.3 0 .5-.1.7-.3l7.5-7.5c.4-.4.4-1 0-1.4z" fill="white"/>
+                        </svg>
                     </div>
+                    <h3 class="th-sf-survey-thank-you-heading">
+                        Thank you for your feedback!
+                    </h3>
+                    <p class="th-sf-survey-thank-you-description">
+                        We appreciate your time and input.
+                    </p>
                 </div>
-            `;
-
+            </div>
+        `;
+        console.log('previous button', prevButton)
+        // Hide all navigation buttons on Thank You page
         if (nextButton) {
-            nextButton.textContent = 'Submit';
+            nextButton.style.display = 'none';
         }
         if (prevButton) {
             prevButton.style.display = 'none';
         }
+
+        // Hide progress indicators on Thank You page
+        if (progressIndicators) {
+            progressIndicators.style.display = 'none';
+        }
+
     }
 
     function goToNext() {
-        if (currentQuestionIndex < surveyData.questions.length) {
+        if (currentQuestionIndex < surveyData.questions.length - 1 ) {
             currentQuestionIndex++;
             renderQuestion();
             renderProgressIndicators();
             updateNavigationButtons();
-        } else if (currentQuestionIndex === surveyData.questions.length) {
+        } else if (currentQuestionIndex === surveyData.questions.length - 1) {
             const backendUrl = surveyData.backend_url;
             const store_uuid = surveyData.store_uuid
             const survey_uuid = surveyData.uuid;
             const customerData = listenForCustomerData();
-            // Convert numeric-keyed object to a single merged object
+
             const mergedAnswers = Object.values(answersStoreFront).reduce((acc, curr) => {
                 return { ...acc, ...curr };
             }, {});
@@ -777,19 +837,23 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    console.log('Survey response saved:', data);
+                    renderThankYou()
+                    console.log("survey_uuid",surveyData.uuid)
+                    sendPostMessage(surveyData.uuid);
                 })
                 .catch(err => {
                     console.error('Error saving survey:', err);
                 });
-
-            currentQuestionIndex = 0;
-            answersStoreFront = {};
-            renderQuestion();
-            renderProgressIndicators();
-            updateNavigationButtons();
         }
     }
+
+    function sendPostMessage(surveyUuid) {
+        window.parent.postMessage({
+                type: 'survey-completed',
+                survey_uuid: surveyUuid
+            }, '*');
+    }
+
 
     function goToPrevious() {
         if (currentQuestionIndex > 0) {
@@ -804,7 +868,6 @@
 
     window.addEventListener("message", function (event) {
         if (event.data.type === "survey-customer-data") {
-            console.log("Customer data received in iframe:", event.data);
             customerData = {
                 customer_id: event.data.customerId,
                 order_id: event.data.orderId,

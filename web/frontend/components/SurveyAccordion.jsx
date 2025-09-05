@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, InlineStack, Text, Collapsible, Icon, Divider } from '@shopify/polaris';
-import CustomToggle from '../features/Survey/components/common/CustomToggle';
+import Knob from '../features/Survey/components/common/Knob';
 import {
     PageAddIcon,
     StoreFilledIcon,
@@ -43,7 +43,7 @@ export default function SurveyAccordion({ item, onToggleExpand, onToggleEnabled 
             borderBlockEndWidth="0165"
             borderColor="border-disabled"
         >
-            <InlineStack blockAlign="center" gap="200" wrap={false}>
+            <InlineStack blockAlign="center" gap="800" wrap={false}>
                 <Box onClick={() => onToggleExpand(item.id)} className="th-sf-accordion-header">
                     <InlineStack blockAlign="center" gap="300">
                         <Box>
@@ -61,9 +61,10 @@ export default function SurveyAccordion({ item, onToggleExpand, onToggleEnabled 
                     </InlineStack>
                 </Box>
                 <Box>
-                    <CustomToggle
-                        checked={item.isEnabled}
-                        onChange={() => onToggleEnabled(item.id)}
+                    <Knob
+                        selected={item.isEnabled}
+                        onClick={() => onToggleEnabled(item.id)}
+                        ariaLabel={`Toggle ${item.title}`}
                     />
                 </Box>
                 {/* <Divider /> */}

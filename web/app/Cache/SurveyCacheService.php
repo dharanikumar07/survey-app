@@ -39,4 +39,31 @@ class SurveyCacheService
 
         return $decoded;
     }
+
+    public function cacheSurveyData($key, $data)
+    {
+        if(is_string($data)) {
+            $jsonData = $data;
+        } else {
+            $jsonData = json_encode($data);
+        }
+
+        Redis::set($key, $jsonData);
+    }
+
+    public function saveSurveyData(Store $store, Survey $survey)
+    {
+        $key = $this->getSurveyDataCacheKey($store->uuid, $survey->uuid);
+
+        $this->cacheSurveyData($key, $survey);
+    }
+
+    public function getSurveyDataFromCache($key): array
+    {
+        $data = Redis::get($key);
+
+        $decoded = !empty($data) ? json_decode($data, true) : [];
+
+        return $decoded;
+    }
 }

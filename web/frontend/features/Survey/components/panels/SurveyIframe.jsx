@@ -47,6 +47,24 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             overflow: hidden;
         }
         
+        @keyframes checkmarkAnimation {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .th-sf-survey-checkmark {
+            animation: checkmarkAnimation 0.5s ease-in-out forwards;
+        }
+        
         .th-sf-survey-container {
             padding: 16px;
             background: #f6f6f7;
@@ -203,22 +221,33 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             transform: scale(1.02);
         }
         
-        .th-sf-survey-multiple-choice-radio {
+        .th-sf-survey-multiple-choice-checkbox {
             width: 20px;
             height: 20px;
-            border-radius: 50%;
             border: 2px solid #ccc;
             margin-right: 16px;
             background: transparent;
             position: relative;
+            flex-shrink: 0;
         }
         
-        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-radio {
+        /* Radio button style for single choice questions */
+        .th-sf-survey-multiple-choice-checkbox.radio-style {
+            border-radius: 50%;
+        }
+        
+        /* Checkbox style for multiple choice questions */
+        .th-sf-survey-multiple-choice-checkbox.checkbox-style {
+            border-radius: 4px;
+        }
+        
+        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-checkbox {
             border-color: #2c6ecb;
             background: #2c6ecb;
         }
         
-        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-radio::after {
+        /* Radio button indicator (circular dot) */
+        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-checkbox.radio-style::after {
             content: '';
             position: absolute;
             top: 50%;
@@ -228,6 +257,18 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             height: 8px;
             background: white;
             border-radius: 50%;
+        }
+        
+        /* Checkbox indicator (checkmark) */
+        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-checkbox.checkbox-style::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
         }
         
         .th-sf-survey-navigation {
@@ -314,16 +355,31 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         }
         
         .th-sf-survey-thank-you-heading {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 600;
             margin: 0;
             color: #202223;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out 0.3s forwards;
         }
         
         .th-sf-survey-thank-you-description {
-            font-size: 16px;
+            font-size: 18px;
             margin: 0;
             color: #6d7175;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out 0.5s forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         @keyframes slideIn {
@@ -509,6 +565,7 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         function renderQuestion() {
             if (!questionContent || !surveyData || !surveyData.questions) return;
             
+            // If we're past the last question, show the thank you page
             if (currentQuestionIndex >= surveyData.questions.length) {
                 renderThankYou();
                 return;
@@ -700,16 +757,31 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Render multiple choice question
         function renderMultipleChoiceQuestion(question) {
+            // Determine if this is a single-choice or multiple-choice question
+            const isMultipleChoice = question.type === 'multiple-choice' || question.allowMultiple === true;
+            
             let html = \`
                 <div class="th-sf-survey-multiple-choice-container">
             \`;
             
             question.answerOptions.forEach((option) => {
-                const isSelected = answers[currentQuestionIndex]?.multipleChoice === option.text;
+                let isSelected = false;
+                
+                if (isMultipleChoice) {
+                    // For multiple choice: check if option is in the array
+                    const selectedOptions = answers[currentQuestionIndex]?.multipleChoice || [];
+                    isSelected = Array.isArray(selectedOptions) && selectedOptions.includes(option.text);
+                } else {
+                    // For single choice: check if this is the selected option
+                    const selectedOption = answers[currentQuestionIndex]?.singleChoice;
+                    isSelected = selectedOption === option.text;
+                }
+                
                 html += \`
                     <div class="th-sf-survey-multiple-choice-option \${isSelected ? 'selected' : ''}" 
-                         data-option="\${option.text}">
-                        <div class="th-sf-survey-multiple-choice-radio"></div>
+                         data-option="\${option.text}"
+                         data-question-type="\${isMultipleChoice ? 'multiple' : 'single'}">
+                        <div class="th-sf-survey-multiple-choice-checkbox \${isMultipleChoice ? 'checkbox-style' : 'radio-style'}"></div>
                         <span class="th-sf-survey-multiple-choice-text">\${option.text}</span>
                     </div>
                 \`;
@@ -922,7 +994,36 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Handle multiple choice selection
         function handleMultipleChoiceSelect(optionText) {
-            answers[currentQuestionIndex] = { ...answers[currentQuestionIndex], multipleChoice: optionText };
+            const question = surveyData.questions[currentQuestionIndex];
+            const isMultipleChoice = question.type === 'multiple-choice' || question.allowMultiple === true;
+            const currentAnswer = answers[currentQuestionIndex] || {};
+            
+            if (isMultipleChoice) {
+                // Multiple choice behavior: toggle option in array
+                const selectedOptions = currentAnswer.multipleChoice || [];
+                let newSelectedOptions;
+                
+                if (Array.isArray(selectedOptions) && selectedOptions.includes(optionText)) {
+                    // Remove the option if it's already selected
+                    newSelectedOptions = selectedOptions.filter(option => option !== optionText);
+                } else {
+                    // Add the option if it's not selected
+                    newSelectedOptions = [...selectedOptions, optionText];
+                }
+                
+                // Update the answer
+                answers[currentQuestionIndex] = { 
+                    ...currentAnswer, 
+                    multipleChoice: newSelectedOptions 
+                };
+            } else {
+                // Single choice behavior: replace current selection
+                answers[currentQuestionIndex] = { 
+                    ...currentAnswer, 
+                    singleChoice: optionText 
+                };
+            }
+            
             updateQuestionDisplay();
             updateNavigationButtons();
             
@@ -958,12 +1059,17 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             
             const canGoNext = isQuestionComplete();
             const canGoPrev = currentQuestionIndex > 0;
+            const isLastQuestion = currentQuestionIndex === surveyData.questions.length - 1;
             
+            // Update button text based on position in survey
+            nextButton.textContent = isLastQuestion ? 'Submit' : 'Next';
+            
+            // Update button styles and visibility
             nextButton.disabled = !canGoNext;
             prevButton.style.display = canGoPrev ? 'block' : 'none';
             
             if (canGoNext) {
-                nextButton.style.background = '#1a1a1a';
+                nextButton.style.background = isLastQuestion ? '#2c6ecb' : '#1a1a1a'; // Blue for submit
                 nextButton.style.opacity = '1';
             } else {
                 nextButton.style.background = '#ccc';
@@ -982,8 +1088,38 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             const question = surveyData.questions[currentQuestionIndex];
             if (!question) return false;
             
+            // Handle number scale questions
+            if (question.type === 'number-scale') {
+                return answer && answer !== '' && answer !== null && answer !== undefined;
+            }
+            
+            // Handle rating questions
             if (question.type === 'rating') {
                 return answer.rating || answer.option || answer.multipleChoice;
+            }
+            
+            // Handle satisfaction questions
+            if (question.type === 'satisfaction') {
+                return answer.rating || answer.option || answer.multipleChoice;
+            }
+            
+            // Handle text questions
+            if (question.type === 'text') {
+                return answer && answer.trim().length > 0;
+            }
+            
+            // For choice questions (single or multiple), check if at least one option is selected
+            if (question.answerOptions && question.answerOptions.length > 0) {
+                const isMultipleChoice = question.type === 'multiple-choice' || question.allowMultiple === true;
+                
+                if (isMultipleChoice) {
+                    // Multiple choice: check if at least one option is selected
+                    const selectedOptions = answer.multipleChoice || [];
+                    return Array.isArray(selectedOptions) && selectedOptions.length > 0;
+                } else {
+                    // Single choice: check if one option is selected
+                    return answer.singleChoice && answer.singleChoice.length > 0;
+                }
             }
             
             return true;
@@ -995,18 +1131,29 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             
             questionContent.innerHTML = \`
                 <div class="th-sf-survey-thank-you-card">
-                    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center;">
+                        <div class="th-sf-survey-checkmark" style="width: 80px; height: 80px; border-radius: 50%; background-color: #008060; display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
+                            <svg width="40" height="40" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16.7 5.3c-.4-.4-1-.4-1.4 0l-6.8 6.8-3.8-3.8c-.4-.4-1-.4-1.4 0-.4.4-.4 1 0 1.4l4.5 4.5c.2.2.4.3.7.3.3 0 .5-.1.7-.3l7.5-7.5c.4-.4.4-1 0-1.4z" fill="white"/>
+                            </svg>
+                        </div>
                         <h3 class="th-sf-survey-thank-you-heading">Thank you for your feedback!</h3>
                         <p class="th-sf-survey-thank-you-description">We appreciate your time and input.</p>
                     </div>
                 </div>
             \`;
             
+            // Hide all navigation buttons on Thank You page
             if (nextButton) {
-                nextButton.textContent = 'Submit';
+                nextButton.style.display = 'none';
             }
             if (prevButton) {
                 prevButton.style.display = 'none';
+            }
+            
+            // Hide progress indicators on Thank You page
+            if (progressIndicators) {
+                progressIndicators.style.display = 'none';
             }
             
             // Send message to parent about survey completion
@@ -1015,7 +1162,8 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
         
         // Navigation functions
         function goToNext() {
-            if (currentQuestionIndex < surveyData.questions.length) {
+            if (currentQuestionIndex < surveyData.questions.length - 1) {
+                // Move to the next question
                 currentQuestionIndex++;
                 renderQuestion();
                 renderProgressIndicators();
@@ -1027,24 +1175,13 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
                     direction: 'next',
                     question: surveyData.questions[currentQuestionIndex]
                 });
-            } else if (currentQuestionIndex === surveyData.questions.length) {
-                // Submit survey
-                alert('Survey submitted! Thank you for your feedback.');
+            } else if (currentQuestionIndex === surveyData.questions.length - 1) {
+                // On the last question, clicking Submit should show Thank You page
+                currentQuestionIndex = surveyData.questions.length; // Set to one past the last question
+                renderThankYou();
                 
                 // Send completion message to parent
                 sendMessageToParent('SURVEY_COMPLETE', { answers });
-                
-                // Reset to first question
-                currentQuestionIndex = 0;
-                answers = {};
-                renderQuestion();
-                renderProgressIndicators();
-                updateNavigationButtons();
-                
-                sendMessageToParent('NAVIGATION_CHANGED', {
-                    currentQuestionIndex,
-                    direction: 'reset'
-                });
             }
         }
         

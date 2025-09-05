@@ -19,8 +19,8 @@ export const loadSurveyData = () => {
     // This would be the place to add API fetching logic in the future
     // For now, we just return the JSON data directly
     const result = {
-      // Channel data
-      channelItems: surveyData.channelItems || [],
+      // Channel data - use the channels from the blank template
+      channelItems: surveyData.templates?.blank?.channelItems || [],
       
       // Discount data
       discountEnabled: surveyData.defaultValues?.discountEnabled || false,

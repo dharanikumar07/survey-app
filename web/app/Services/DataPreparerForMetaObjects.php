@@ -20,23 +20,28 @@ class DataPreparerForMetaObjects
                     'url' => env('HOST'),
                     'access_token' => $store->getAccessToken(),
                 ],
-                'survey_data' => $this->getActiveSurvey()
+                'onsite_survey' => $this->getAllActiveSurveyBasedOnSurveyType($store, Survey::POST_PURCHASE_SURVEY),
+                'thank_you_page' => $this->getAllActiveSurveyBasedOnSurveyType($store, Survey::THANK_YOU_PAGE_SURVEY),
         ];
     }
 
-    public function getActiveSurvey()
+    public function getAllActiveSurveyBasedOnSurveyType($store, $type)
     {
-        $survey = Survey::where('is_active', true)->first();
+        $surveys = Survey::where('is_active', 'true')
+            ->where('store_uuid', $store->uuid)
+            ->where('survey_type', $type)
+            ->get();
 
-        if (!$survey) {
+        if ($surveys->isEmpty()) {
             return [];
         }
 
-        return [
-            'uuid' => $survey->uuid,
-            'channel' => $survey->survey_type,
-            'allowedPages' => $this->getAllowedPagesForSurvey($survey)
-        ];
+        return $surveys->map(function ($survey) {
+            return [
+                'uuid' => $survey->uuid,
+                'allowedPages' => $this->getAllowedPagesForSurvey($survey),
+            ];
+        })->toArray();
     }
 
     protected function getAllowedPagesForSurvey(Survey $survey)
