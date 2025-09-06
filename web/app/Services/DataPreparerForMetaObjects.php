@@ -27,7 +27,7 @@ class DataPreparerForMetaObjects
 
     public function getAllActiveSurveyBasedOnSurveyType($store, $type)
     {
-        $surveys = Survey::where('is_active', 'true')
+        $surveys = Survey::where('status', 'active')
             ->where('store_uuid', $store->uuid)
             ->where('survey_type', $type)
             ->get();

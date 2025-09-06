@@ -25,7 +25,7 @@ class SurveyWidget
         $key = $this->getSurveyDataCacheKey($this->storeUuid, $this->surveyUuid);
         $cacheService = app(SurveyCacheService::class);
 
-        if(Redis::exist($key)) {
+        if(Redis::exists($key)) {
             info("enter in the getting redis data");
             $surveyData = $cacheService->getSurveyDataFromCache($key);
         } else {

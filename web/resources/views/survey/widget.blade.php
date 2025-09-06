@@ -57,6 +57,109 @@
             overflow: hidden;
         }
 
+        .th-sf-survey-multiple-choice-option {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .th-sf-survey-multiple-choice-option:hover {
+            background: #f8f9fa;
+            border-color: #999;
+            transform: scale(1.02);
+        }
+
+        .th-sf-survey-multiple-choice-option.selected {
+            border-color: #2c6ecb;
+            background: #f1f8ff;
+            transform: scale(1.02);
+        }
+        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-checkbox {
+            border-color: #2c6ecb;
+            background: #2c6ecb;
+        }
+
+        /* Radio button indicator (circular dot) */
+        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-checkbox.radio-style::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .th-sf-survey-multiple-choice-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ccc;
+            margin-right: 16px;
+            background: transparent;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* Radio button style for single choice questions */
+        .th-sf-survey-multiple-choice-checkbox.radio-style {
+            border-radius: 50%;
+        }
+
+        /* Checkbox style for multiple choice questions */
+        .th-sf-survey-multiple-choice-checkbox.checkbox-style {
+            border-radius: 4px;
+        }
+
+        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-checkbox {
+            border-color: #2c6ecb;
+            background: #2c6ecb;
+        }
+
+        /* Radio button indicator (circular dot) */
+        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-checkbox.radio-style::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* Checkbox indicator (checkmark) */
+        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-checkbox.checkbox-style::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* Checkbox indicator (checkmark) */
+        .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-checkbox.checkbox-style::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
         .th-sf-survey-question-content {
             display: flex;
             flex-direction: column;
@@ -419,7 +522,7 @@
         if (!questionContent || !surveyData) return;
 
         const question = surveyData.questions[currentQuestionIndex];
-        console.log("question in recent log" , question.type);
+
         let questionHTML = `
                 <h3 class="th-sf-survey-question-heading">${question.heading}</h3>
             `;
@@ -446,6 +549,8 @@
             questionHTML += renderMultipleChoiceQuestion(question);
         } else if (question.type === 'text') {
             questionHTML += renderTextQuestion(question);
+        } else if (question.type === 'single-choice') {
+            questionHTML += renderMultipleChoiceQuestion(question);
         }
 
         questionHTML += `
@@ -612,16 +717,30 @@
     }
 
     function renderMultipleChoiceQuestion(question) {
+        const isMultipleChoice = question.type === 'multiple-choice';
+
         let html = `
                 <div class="th-sf-survey-multiple-choice-container">
             `;
 
         question.answers.forEach((option) => {
-            const isSelected = answersStoreFront[currentQuestionIndex]?.multipleChoice === option.content;
+            let isSelected = false;
+
+            if (isMultipleChoice) {
+                const selectedOptions = answersStoreFront[currentQuestionIndex]?.multipleChoice || [];
+                isSelected = Array.isArray(selectedOptions) && selectedOptions.includes(option.content);
+            } else {
+                const selectedOption = answersStoreFront[currentQuestionIndex]?.singleChoice;
+                isSelected = selectedOption === option.content;
+            }
+
             html += `
                     <div class="th-sf-survey-multiple-choice-option ${isSelected ? 'selected' : ''}"
-                         data-option="${option.content}">
-                        <div class="th-sf-survey-multiple-choice-radio"></div>
+                         ${question.type === 'multiple-choice'
+                ? `data-option="${option.content}"`
+                : `data-single-option="${option.content}"`}
+                         data-question-type="${isMultipleChoice ? 'multiple' : 'single'}">
+                        <div class="th-sf-survey-multiple-choice-checkbox ${isMultipleChoice ? 'checkbox-style' : 'radio-style'}"></div>
                         <span class="th-sf-survey-multiple-choice-text">${option.content}</span>
                     </div>
                 `;
@@ -654,8 +773,17 @@
 
         multipleChoiceOptions.forEach(option => {
             option.addEventListener('click', (e) => {
-                const optionText = e.target.closest('[data-option]').dataset.option;
-                handleMultipleChoiceSelect(optionText);
+                const multipleOptionText = e.target.closest('[data-option]').dataset.option;
+                handleMultipleChoiceSelect(multipleOptionText);
+            });
+        });
+
+        const singleOptionChoices = document.querySelectorAll('[data-single-option]');
+
+        singleOptionChoices.forEach(option => {
+            option.addEventListener('click', (e) => {
+                const singleOptionText = e.target.closest('[data-single-option]').dataset.singleOption;
+                handleSingleChoiceSelect(singleOptionText);
             });
         });
 
@@ -681,10 +809,34 @@
     }
 
     function handleMultipleChoiceSelect(optionText) {
-        answersStoreFront[currentQuestionIndex] = {...answersStoreFront[currentQuestionIndex], multipleChoice: optionText};
+        let selectedOptions = answersStoreFront[currentQuestionIndex]?.multipleChoice || [];
+
+        if (!Array.isArray(selectedOptions)) {
+            selectedOptions = [selectedOptions];
+        }
+
+        if (selectedOptions.includes(optionText)) {
+            selectedOptions = selectedOptions.filter(opt => opt !== optionText);
+        } else {
+            selectedOptions.push(optionText);
+        }
+
+        answersStoreFront[currentQuestionIndex] = {
+            ...answersStoreFront[currentQuestionIndex],
+            multipleChoice: selectedOptions
+        };
+
         updateQuestionDisplay();
         updateNavigationButtons();
     }
+
+    function handleSingleChoiceSelect(optionText) {
+        answersStoreFront[currentQuestionIndex] = {...answersStoreFront[currentQuestionIndex], singleChoice: optionText};
+        updateQuestionDisplay();
+        updateNavigationButtons();
+    }
+
+
 
     function handleTextInput(value) {
         answersStoreFront[currentQuestionIndex] =  {...answersStoreFront[currentQuestionIndex], text: value};
@@ -763,7 +915,6 @@
                 </div>
             </div>
         `;
-        console.log('previous button', prevButton)
         // Hide all navigation buttons on Thank You page
         if (nextButton) {
             nextButton.style.display = 'none';
@@ -838,8 +989,9 @@
                 .then(res => res.json())
                 .then(data => {
                     renderThankYou()
-                    console.log("survey_uuid",surveyData.uuid)
-                    sendPostMessage(surveyData.uuid);
+                    setTimeout(()=>{
+                        sendPostMessage(surveyData.uuid);
+                    },3000);
                 })
                 .catch(err => {
                     console.error('Error saving survey:', err);

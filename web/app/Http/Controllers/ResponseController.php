@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Cache\CacheKeys;
 use App\Cache\SurveyCacheService;
 use App\Http\Helper\Helper;
+use App\Http\Resources\SurveyResource;
 use App\Jobs\ProcessResponseEntry;
 use App\Models\Store;
 use App\Models\Survey;
+use App\Services\ResponseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -40,5 +42,27 @@ class ResponseController extends Controller
                 'error' => 'An error occurred while save the response',
             ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function getResponse(Request $request)
+    {
+        try {
+            $session = $request->get('shopifySession');
+            $store = Store::where('store_url', $session->getShop())->firstOrFail();
+
+            $survey_uuid = $request->get('surveyUuid') ?? null;
+            $date['from_date'] = $request->get('fromDate') ?? null;
+            $date['to_date'] = $request->get('ToDate') ?? null;
+
+            $responseService = new  ResponseService($store);
+            $responseData = $responseService->resolveResponseByRequest($survey_uuid, $date);
+            return SurveyResource::collection($responseData);
+        } catch(\Exception $e) {
+            Helper::logError("Unable to get response data",__CLASS__, $e);
+            return Response::json([
+                'error' => 'An error occurred while get the survey data',
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

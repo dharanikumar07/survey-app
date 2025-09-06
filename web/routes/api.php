@@ -35,6 +35,9 @@ Route::middleware('shopify.auth')->group(function () {
     Route::get('/extension/status', [SurveyController::class, 'checkExtensionStatus']);
     Route::post('/extension/refresh', [SurveyController::class, 'refreshExtensionStatus']);
 
+    //response
+    Route::get('/response', [ResponseController::class, 'getResponse']);
+
     //AI Assistance
     Route::post('/assistant/generate-title', [SurveyAssistantController::class, 'generateTitle']);
 });
