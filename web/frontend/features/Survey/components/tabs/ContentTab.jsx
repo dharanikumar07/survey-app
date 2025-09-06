@@ -57,6 +57,19 @@ export function ContentTab({ surveyPreviewRef }) {
         }
     }, [questions, selectedQuestionId, setSelectedQuestionId]);
 
+    // Sync selected question with iframe
+    useEffect(() => {
+        if (selectedQuestionId && surveyPreviewRef?.current) {
+            // Find the index of the selected question
+            const questionIndex = questions.findIndex(q => q.id === selectedQuestionId);
+
+            if (questionIndex !== -1) {
+                // Navigate the iframe to show the selected question
+                surveyPreviewRef.current.setQuestionIndex(questionIndex);
+            }
+        }
+    }, [selectedQuestionId, questions, surveyPreviewRef]);
+
     // Create display list with "Add question" item inserted before the thank you card
     const displayList = useMemo(() => {
         const newList = [...questions];
@@ -108,8 +121,12 @@ export function ContentTab({ surveyPreviewRef }) {
 
         // Trigger refresh after successfully adding question
         setTimeout(() => {
-            if (surveyPreviewRef?.current?.refreshIframe) {
+            if (surveyPreviewRef?.current) {
+                // Refresh the iframe
                 surveyPreviewRef.current.refreshIframe();
+
+                // The selectedQuestionId effect will handle navigation to the new question
+                // after the iframe is refreshed, since addQuestion sets selectedQuestionId
             }
         }, 100); // Small delay to ensure state is updated
     };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Box, Text } from '@shopify/polaris';
+import useStore from '../../../../State/store';
 
 /**
  * SurveyIframe Component
@@ -19,7 +20,8 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
     const [iframeState, setIframeState] = useState({
         currentQuestionIndex: 0,
         answers: {},
-        isReady: false
+        isReady: false,
+        pendingNavigationIndex: undefined
     });
 
     // Generate the complete HTML content for the iframe
@@ -1291,14 +1293,43 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
 
         // Send initial survey data to iframe
         if (iframeRef.current && iframeRef.current.contentWindow) {
+            // Check if we have a pending navigation index
+            const initialQuestionIndex = iframeState.pendingNavigationIndex !== undefined
+                ? iframeState.pendingNavigationIndex
+                : 0;
+
             iframeRef.current.contentWindow.postMessage({
                 type: 'INIT_SURVEY',
                 data: {
                     surveyData,
                     selectedView,
-                    initialQuestionIndex: 0
+                    initialQuestionIndex
                 }
             }, '*');
+
+            // Clear the pending navigation index
+            if (iframeState.pendingNavigationIndex !== undefined) {
+                setIframeState(prev => ({
+                    ...prev,
+                    pendingNavigationIndex: undefined
+                }));
+            }
+
+            // After a short delay, check if we need to navigate to a specific question
+            // This helps with synchronization after iframe refresh
+            setTimeout(() => {
+                const { selectedQuestionId, questions } = useStore.getState();
+                if (selectedQuestionId) {
+                    const questionIndex = questions.findIndex(q => q.id === selectedQuestionId);
+                    if (questionIndex !== -1 && questionIndex !== initialQuestionIndex) {
+                        // Navigate to the selected question
+                        iframeRef.current.contentWindow.postMessage({
+                            type: 'SET_QUESTION_INDEX',
+                            data: { questionIndex }
+                        }, '*');
+                    }
+                }
+            }, 300); // Give iframe enough time to initialize
         }
     };
 
@@ -1332,11 +1363,20 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             }
         },
 
-        refreshIframe: () => {
+        refreshIframe: (targetQuestionIndex = null) => {
             // Force iframe to reload by changing srcDoc
             const newContent = generateIframeContent();
             setIframeContent(newContent);
             setIsLoading(true);
+
+            // Store the target question index to navigate to after refresh
+            if (targetQuestionIndex !== null) {
+                // We'll use this in handleIframeLoad
+                setIframeState(prev => ({
+                    ...prev,
+                    pendingNavigationIndex: targetQuestionIndex
+                }));
+            }
         },
 
         // Get current state from iframe

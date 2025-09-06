@@ -168,6 +168,12 @@ const useStore = create((set, get) => ({
         // Create a new question using our helper
         const newQuestion = createNewQuestion(questionType);
         
+        // If question creation failed, return current state
+        if (!newQuestion) {
+            console.log(`Failed to create question of type: ${questionType}`);
+            return state;
+        }
+        
         // Find the index of the thank you card to insert before it
         const thankYouIndex = state.questions.findIndex(q => q.id === 'thankyou');
         const insertIndex = thankYouIndex !== -1 ? thankYouIndex : state.questions.length;
