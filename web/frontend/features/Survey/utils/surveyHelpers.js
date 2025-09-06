@@ -163,29 +163,12 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
         name: surveyData.name || 'Survey #1',
         isActive: surveyData.isActive !== undefined ? surveyData.isActive : true,
         questions: surveyData.questions || [],
-        thankYou: surveyData.thankYou || {
-            type: 'thank_you',
-            heading: 'Thank You Card',
-            description: ''
-        },
         channels: surveyData.channels || {},
         discount: surveyData.discount || {
             enabled: false,
             code: '',
             displayOn: 'email',
             limitOnePerEmail: false
-        },
-        channelTypes: surveyData.channelTypes || ['thankyou'],
-        onsiteConfig: surveyData.onsiteConfig || {
-            pageTargeting: 'all',
-            specificPages: '',
-            excludePages: false,
-            timing: {
-                delay: 10,
-                unit: 'seconds'
-            },
-            userTargeting: 'all',
-            widgetRecurrence: 'every_time'
         },
         htmlContent: htmlContent, // Use original HTML content directly
         cleanHTML: generateCleanSurveyHTML(surveyData, htmlContent), // Clean HTML with minimal sanitization

@@ -1,16 +1,53 @@
 import { create } from "zustand";
 import { v4 as uuidv4 } from 'uuid';
-import { loadSurveyData, createNewQuestion, processSurveyDataFromApi } from '../features/Survey/utils/surveyStoreHelpers';
+import { createNewQuestion, processSurveyDataFromApi } from '../features/Survey/utils/surveyStoreHelpers';
 import { apiClient } from "../api";
 
-// Load initial data from JSON or API
-console.log('=== Store initialization ===');
-const initialData = loadSurveyData();
-console.log('Initial data loaded:', initialData);
-
+// Initialize store with empty state - API will be the only source of truth
 const useStore = create((set, get) => ({
-    // Load initial state from our helper function
-    ...initialData,
+    // Initialize with empty state - all data will come from API
+    surveyTitle: '',
+    isActive: false,
+    questions: [],
+    channelItems: [],
+    onsiteConfig: {
+        pageTargeting: 'all', // 'all' or 'specific'
+        specificPages: '',
+        excludePages: false,
+        excludedPageTypes: [], // Array of page types to exclude
+        userTargeting: 'all', // 'all' or 'segment'
+        userTag: false, // User tag checkbox
+        customerType: {
+            newCustomer: false,
+            returnCustomer: false
+        },
+        productPurchased: false,
+        widgetRecurrence: 'every_time'
+    },
+    thankyouConfig: {
+        message: 'Thank you for your feedback!',
+        action: 'message', // 'message', 'redirect', 'discount'
+        socialSharing: false,
+        emailCollection: false,
+        userTargeting: 'all', // 'all' or 'segment'
+        userTag: false,
+        productPurchased: false,
+        newCustomer: false,
+        returnCustomer: false
+    },
+    discountEnabled: false,
+    discountSettings: {},
+    discountSections: [],
+    selectedTab: 0,
+    editModalOpen: false,
+    selectedQuestionId: '',
+    selectedView: 'mobile',
+    selectedTheme: 'default',
+    themePopoverActive: false,
+    statusPopoverActive: false,
+    surveyPagePopoverActive: false,
+    selectedSurveyPage: 'page',
+    currentQuestionIndex: 0,
     
     // TabsContent state
     setSelectedTab: (index) => set({ selectedTab: index }),
@@ -31,10 +68,11 @@ const useStore = create((set, get) => ({
         specificPages: '',
         excludePages: false,
         excludedPageTypes: [], // Array of page types to exclude
-        timing: {
-            delay: 10,
-            unit: 'seconds'
-        },
+        // TODO: Timing feature - commented out for now, can be re-enabled in future
+        // timing: {
+        //     delay: 10,
+        //     unit: 'seconds'
+        // },
         userTargeting: 'all', // 'all' or 'segment'
         userTag: false, // User tag checkbox
         customerType: {
@@ -344,6 +382,9 @@ const useStore = create((set, get) => ({
             // Transform discount settings
             const discountSettings = get().transformDiscountSettings(surveyMeta.discount || {});
             
+            // Transform onsite config from channels.onsite.config
+            const onsiteConfig = get().transformOnsiteConfig(surveyMeta.channels?.onsite?.config || {});
+            
             const transformedData = {
                 // Survey basic info
                 surveyTitle: surveyMeta.name || apiData.name || 'Survey',
@@ -355,6 +396,9 @@ const useStore = create((set, get) => ({
                 
                 // Channels
                 channelItems: channelItems,
+                
+                // Onsite config
+                onsiteConfig: onsiteConfig,
                 
                 // Discount
                 discountEnabled: surveyMeta.discount?.enabled || false,
@@ -381,8 +425,28 @@ const useStore = create((set, get) => ({
             
         } catch (error) {
             console.error('Error transforming API data:', error);
-            // Return fallback data if transformation fails
-            return loadSurveyData();
+            // Return empty state if transformation fails - API is the source of truth
+            return {
+                surveyTitle: '',
+                isActive: false,
+                questions: [],
+                channelItems: [],
+                onsiteConfig: {},
+                thankyouConfig: {},
+                discountEnabled: false,
+                discountSettings: {},
+                discountSections: [],
+                selectedTab: 0,
+                editModalOpen: false,
+                selectedQuestionId: '',
+                selectedView: 'mobile',
+                selectedTheme: 'default',
+                themePopoverActive: false,
+                statusPopoverActive: false,
+                surveyPagePopoverActive: false,
+                selectedSurveyPage: 'page',
+                currentQuestionIndex: 0,
+            };
         }
     },
     
@@ -404,29 +468,94 @@ const useStore = create((set, get) => ({
     transformChannels: (channels) => {
         const defaultChannels = [
             { id: 'onsite', title: 'On-site survey', icon: 'store', isExpanded: false, isEnabled: false },
-            { id: 'thankyou', title: 'Thank you page', icon: 'checkmark', isExpanded: true, isEnabled: true },
+            { id: 'thankyou', title: 'Thank you page', icon: 'checkmark', isExpanded: false, isEnabled: false },
         ];
         
         // Update enabled status based on API data
         return defaultChannels.map(channel => ({
             ...channel,
-            isEnabled: channels[channel.id]?.enabled || channel.isEnabled
+            isEnabled: channels[channel.id]?.enabled
         }));
     },
     
     // Helper function to transform discount settings
     transformDiscountSettings: (discount) => {
         return {
-            code: discount.code || '',
-            displayOn: discount.displayOn || 'email',
-            limitPerEmail: discount.limitOnePerEmail || false
+            code: discount.code,
+            displayOn: discount.displayOn,
+            limitPerEmail: discount.limitOnePerEmail
         };
     },
     
-    // Reset the store to the initial state from the JSON file
+    // Helper function to transform onsite config from API
+    transformOnsiteConfig: (config) => {
+        return {
+            pageTargeting: config.pageTargeting,
+            specificPages: config.specificPages,
+            excludePages: config.excludePages,
+            excludedPageTypes: config.excludedPageTypes,
+            // TODO: Timing feature - commented out for now, can be re-enabled in future
+            // timing: {
+            //     delay: config.timing?.delay,
+            //     unit: config.timing?.unit
+            // },
+            userTargeting: config.userTargeting,
+            userTag: config.userTag,
+            customerType: {
+                newCustomer: config.customerType?.newCustomer,
+                returnCustomer: config.customerType?.returnCustomer
+            },
+            productPurchased: config.productPurchased,
+            widgetRecurrence: config.widgetRecurrence
+        };
+    },
+    
+    // Reset the store to empty state - API will be the source of truth
     resetSurveyToDefault: () => {
-        const defaultData = loadSurveyData();
-        set({ ...defaultData });
+        set({
+            surveyTitle: '',
+            isActive: false,
+            questions: [],
+            channelItems: [],
+            onsiteConfig: {
+                pageTargeting: 'all', // 'all' or 'specific'
+                specificPages: '',
+                excludePages: false,
+                excludedPageTypes: [], // Array of page types to exclude
+                userTargeting: 'all', // 'all' or 'segment'
+                userTag: false, // User tag checkbox
+                customerType: {
+                    newCustomer: false,
+                    returnCustomer: false
+                },
+                productPurchased: false,
+                widgetRecurrence: 'every_time'
+            },
+            thankyouConfig: {
+                message: 'Thank you for your feedback!',
+                action: 'message', // 'message', 'redirect', 'discount'
+                socialSharing: false,
+                emailCollection: false,
+                userTargeting: 'all', // 'all' or 'segment'
+                userTag: false,
+                productPurchased: false,
+                newCustomer: false,
+                returnCustomer: false
+            },
+            discountEnabled: false,
+            discountSettings: {},
+            discountSections: [],
+            selectedTab: 0,
+            editModalOpen: false,
+            selectedQuestionId: '',
+            selectedView: 'mobile',
+            selectedTheme: 'default',
+            themePopoverActive: false,
+            statusPopoverActive: false,
+            surveyPagePopoverActive: false,
+            selectedSurveyPage: 'page',
+            currentQuestionIndex: 0,
+        });
     },
     
     // Load survey data from API

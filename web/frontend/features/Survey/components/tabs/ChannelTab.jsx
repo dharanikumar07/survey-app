@@ -34,11 +34,14 @@ export function ChannelTab() {
         }
     };
 
-    // Sync local state with store state on mount
+    // Sync local state with store state on mount or when channelItems change
     useEffect(() => {
         const expandedItem = channelItems.find(item => item.isExpanded);
         if (expandedItem) {
             setOpenAccordionId(expandedItem.id);
+        } else {
+            // Reset the openAccordionId if no items are expanded
+            setOpenAccordionId(null);
         }
     }, [channelItems]);
 

@@ -18,6 +18,7 @@ export const loadTemplateData = (templateKey, aiOverrides = {}) => {
       return null;
     }
     
+    
     // Base template data
     const baseData = {
       // Channel data
@@ -42,7 +43,7 @@ export const loadTemplateData = (templateKey, aiOverrides = {}) => {
       selectedSurveyPage: templateData.defaultValues.selectedSurveyPage || 'page',
       currentQuestionIndex: templateData.defaultValues.currentQuestionIndex || 0,
       
-      // Question data
+      // Question data - ensure we're getting the questions from the template
       questions: templateData.questions || [],
     };
 

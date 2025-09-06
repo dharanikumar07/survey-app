@@ -46,19 +46,20 @@ export function OnsiteSurveyConfig() {
         updateOnsiteConfig('excludedPageTypes', newExcludedPages);
     };
 
-    const handleTimingDelayChange = (value) => {
-        updateOnsiteConfig('timing', {
-            ...onsiteConfig.timing,
-            delay: parseInt(value) || 10
-        });
-    };
+    // TODO: Timing feature - commented out for now, can be re-enabled in future
+    // const handleTimingDelayChange = (value) => {
+    //     updateOnsiteConfig('timing', {
+    //         ...onsiteConfig.timing,
+    //         delay: parseInt(value) || 10
+    //     });
+    // };
 
-    const handleTimingUnitChange = (value) => {
-        updateOnsiteConfig('timing', {
-            ...onsiteConfig.timing,
-            unit: value
-        });
-    };
+    // const handleTimingUnitChange = (value) => {
+    //     updateOnsiteConfig('timing', {
+    //         ...onsiteConfig.timing,
+    //         unit: value
+    //     });
+    // };
 
     const handleUserTargetingChange = (value) => {
         updateOnsiteConfig('userTargeting', value);
@@ -83,11 +84,12 @@ export function OnsiteSurveyConfig() {
         updateOnsiteConfig('productPurchased', checked);
     };
 
-    const timingUnitOptions = [
-        { label: 'seconds', value: 'seconds' },
-        { label: 'minutes', value: 'minutes' },
-        { label: 'hours', value: 'hours' }
-    ];
+    // TODO: Timing feature - commented out for now, can be re-enabled in future
+    // const timingUnitOptions = [
+    //     { label: 'seconds', value: 'seconds' },
+    //     { label: 'minutes', value: 'minutes' },
+    //     { label: 'hours', value: 'hours' }
+    // ];
 
     const widgetRecurrenceOptions = [
         { label: 'Every time if the survey is not completed', value: 'every_time' },
@@ -186,46 +188,6 @@ export function OnsiteSurveyConfig() {
 
                 <Divider />
 
-                {/* Timing section */}
-                <Box>
-                    <Text variant="headingMd" as="h4">
-                        Timing(s)
-                    </Text>
-                    <Box paddingBlockStart="200">
-                        <Box display="flex" gap="200" alignItems="end">
-                            <Box minWidth="120px">
-                                <TextField
-                                    label=""
-                                    type="number"
-                                    value={onsiteConfig.timing.delay.toString()}
-                                    onChange={handleTimingDelayChange}
-                                    min="1"
-                                    max="3600"
-                                    suffix="seconds"
-                                />
-                            </Box>
-                            {/* <Box minWidth="120px">
-                                <Select
-                                    label=""
-                                    options={timingUnitOptions}
-                                    value={onsiteConfig.timing.unit}
-                                    onChange={handleTimingUnitChange}
-                                />
-                            </Box> */}
-                            <Text variant="bodyMd" color="subdued">
-                                after page load
-                            </Text>
-                        </Box>
-                        <Box paddingBlockStart="200">
-                            <Text variant="bodySm" color="subdued">
-                                Set the delay time before the survey appears to visitors
-                            </Text>
-                        </Box>
-                    </Box>
-                </Box>
-
-                <Divider />
-
                 {/* User targeting section */}
                 <Box>
                     <Text variant="headingMd" as="h4">
@@ -313,10 +275,10 @@ export function OnsiteSurveyConfig() {
                     </Box>
                 </Box>
 
-                <Divider />
+                {/* <Divider /> */}
 
                 {/* Widget recurrence section */}
-                <Box>
+                {/* <Box>
                     <Text variant="headingMd" as="h4">
                         Widget recurrence
                     </Text>
@@ -328,7 +290,7 @@ export function OnsiteSurveyConfig() {
                             onChange={handleWidgetRecurrenceChange}
                         />
                     </Box>
-                </Box>
+                </Box> */}
             </BlockStack>
         </div>
     );
