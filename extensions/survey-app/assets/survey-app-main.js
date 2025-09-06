@@ -3,7 +3,7 @@
         const surveyUuids = JSON.parse(localStorage.getItem('onsite_survey_uuids') || '[]');
 
         if (surveyUuids.length === 0) {
-            console.log("✅ No surveys left to run.");
+            localStorage.setItem('onsite_survey_uuids', JSON.stringify({ is_finished: true }));
             return;
         }
 

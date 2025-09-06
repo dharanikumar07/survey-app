@@ -37,7 +37,7 @@ class SurveyController extends Controller
 				$query->where('status', $request->get('status'));
 			}
 			if ($request->filled('is_active')) {
-				$query->where('is_active', filter_var($request->get('is_active'), FILTER_VALIDATE_BOOLEAN));
+				$query->where('status', filter_var($request->get('in_active'), FILTER_VALIDATE_BOOLEAN));
 			}
 
 			if ($request->filled('q')) {
@@ -65,7 +65,6 @@ class SurveyController extends Controller
 			$session = $request->get('shopifySession');
 			$store = Store::where('store_url', $session->getShop())->firstOrFail();
 
-			// Use route parameter first, fallback to request body
 			$survey_uuid = $uuid ?? $request->get('survey_uuid');
 
 			$survey = $this->surveyService->saveOrUpdate($request->validated(), $store, $survey_uuid);
