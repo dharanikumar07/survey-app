@@ -8,9 +8,8 @@
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
-        "code": "",
-        "displayOn": "email",
-        "limitPerEmail": false
+        "discount_type": "generic",
+        "discount_value": "percentage"
       },
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
@@ -67,9 +66,8 @@
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
-        "code": "",
-        "displayOn": "email",
-        "limitPerEmail": false
+        "discount_type": "generic",
+        "discount_value": "percentage"
       },
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
@@ -118,9 +116,8 @@
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
-        "code": "",
-        "displayOn": "email",
-        "limitPerEmail": false
+        "discount_type": "generic",
+        "discount_value": "percentage"
       },
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
@@ -184,9 +181,8 @@
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
-        "code": "",
-        "displayOn": "email",
-        "limitPerEmail": false
+        "discount_type": "generic",
+        "discount_value": "percentage"
       },
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
@@ -235,9 +231,8 @@
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
-        "code": "",
-        "displayOn": "email",
-        "limitPerEmail": false
+        "discount_type": "generic",
+        "discount_value": "percentage"
       },
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
@@ -280,9 +275,8 @@
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
-        "code": "",
-        "displayOn": "email",
-        "limitPerEmail": false
+        "discount_type": "generic",
+        "discount_value": "percentage"
       },
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },

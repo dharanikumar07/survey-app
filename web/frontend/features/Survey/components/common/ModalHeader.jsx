@@ -120,9 +120,8 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
             },
             discount: {
                 enabled: discountEnabled,
-                code: discountSettings.code || "",
-                displayOn: discountSettings.displayOn || "email",
-                limitOnePerEmail: discountSettings.limitPerEmail || false
+                discount_type: discountSettings.discount_type || "generic",
+                discount_value: discountSettings.discount_value || "percentage"
             },
             channelTypes: channelItems
                 .filter(channel => channel.isEnabled)

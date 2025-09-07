@@ -166,9 +166,8 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
         channels: surveyData.channels || {},
         discount: surveyData.discount || {
             enabled: false,
-            code: '',
-            displayOn: 'email',
-            limitOnePerEmail: false
+            discount_type: 'generic',
+            discount_value: 'percentage'
         },
         htmlContent: htmlContent, // Use original HTML content directly
         cleanHTML: generateCleanSurveyHTML(surveyData, htmlContent), // Clean HTML with minimal sanitization
