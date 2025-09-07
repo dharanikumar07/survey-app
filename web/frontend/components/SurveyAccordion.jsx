@@ -1,6 +1,13 @@
 import React from 'react';
-import { Box, InlineStack, Text, Collapsible, Icon, Divider } from '@shopify/polaris';
+import {
+    Box,
+    InlineStack,
+    Text,
+    Collapsible,
+    Icon
+} from '@shopify/polaris';
 import Knob from '../features/Survey/components/common/Knob';
+import { ChannelConfigRenderer } from '../features/Survey/components/ChannelConfigMapping';
 import {
     PageAddIcon,
     StoreFilledIcon,
@@ -44,18 +51,32 @@ export default function SurveyAccordion({ item, onToggleExpand, onToggleEnabled 
             borderColor="border-disabled"
         >
             <InlineStack blockAlign="center" gap="800" wrap={false}>
-                <Box onClick={() => onToggleExpand(item.id)} className="th-sf-accordion-header">
+                <Box
+                    onClick={() => onToggleExpand(item.id)}
+                    className={`th-sf-accordion-header `}
+                    style={{
+                        cursor: 'pointer',
+                        padding: '8px',
+                        borderRadius: '4px',
+                        transition: 'background-color 0.2s ease',
+                        // backgroundColor: item.isExpanded ? '#f0f8ff' : 'transparent'
+                    }}
+                >
                     <InlineStack blockAlign="center" gap="300">
                         <Box>
                             <Icon
                                 source={item.isExpanded ? ChevronUpIcon : ChevronDownIcon}
-                                color="subdued"
+                                color={item.isExpanded ? "info" : "subdued"}
                             />
                         </Box>
                         <Box>
-                            <Icon source={getIcon(item.icon)} color="base" />
+                            <Icon source={getIcon(item.icon)} color={item.isExpanded ? "info" : "base"} />
                         </Box>
-                        <Text variant="bodyMd" fontWeight="medium">
+                        <Text
+                            variant="bodyMd"
+                            fontWeight={item.isExpanded ? "semibold" : "medium"}
+                            color={item.isExpanded ? "info" : "base"}
+                        >
                             {item.title}
                         </Text>
                     </InlineStack>
@@ -67,16 +88,24 @@ export default function SurveyAccordion({ item, onToggleExpand, onToggleEnabled 
                         ariaLabel={`Toggle ${item.title}`}
                     />
                 </Box>
-                {/* <Divider /> */}
             </InlineStack>
+
+            {/* Configuration options text - always visible for onsite survey */}
+            {/* {item.id === 'onsite' && (
+                <Box paddingBlockStart="200" paddingInlineStart="600">
+                    <Text variant="bodyMd" color="info" fontWeight="medium">
+                        Configuration options for {item.title}
+                    </Text>
+                </Box>
+            )} */}
 
             <Collapsible
                 id={`content-${item.id}`}
                 open={item.isExpanded}
                 transition={{ duration: '200ms' }}
             >
-                <Box paddingBlockStart="400" paddingInlineStart="600">
-                    <Text variant="bodyMd">Configuration options for {item.title}</Text>
+                <Box paddingBlockStart="400">
+                    <ChannelConfigRenderer item={item} />
                 </Box>
             </Collapsible>
         </Box>

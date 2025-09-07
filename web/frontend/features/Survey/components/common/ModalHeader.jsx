@@ -51,7 +51,8 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
         channelItems,
         discountEnabled,
         discountSettings,
-        surveyTitle
+        surveyTitle,
+        onsiteConfig
     } = useSurveyState();
 
     const { saveSurvey } = useSurveyApi();
@@ -96,11 +97,24 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
                 description: questions.find(q => q.id === 'thankyou')?.description || ""
             },
             channels: {
-                // Only include channels that exist in your store
-                ...(channelItems.find(c => c.id === 'branded') && {
+                // Include all enabled channels
+                ...(channelItems.find(c => c.id === 'onsite')?.isEnabled && {
+                    onsite: {
+                        type: "onsite",
+                        enabled: true,
+                        config: onsiteConfig
+                    }
+                }),
+                ...(channelItems.find(c => c.id === 'thankyou')?.isEnabled && {
+                    thankyou: {
+                        type: "thankyou",
+                        enabled: true
+                    }
+                }),
+                ...(channelItems.find(c => c.id === 'branded')?.isEnabled && {
                     dedicatedPageSurvey: {
                         type: "dedicatedPageSurvey",
-                        enabled: channelItems.find(c => c.id === 'branded')?.isEnabled || false
+                        enabled: true
                     }
                 })
             },

@@ -33,21 +33,18 @@ const SurveyModalContent = forwardRef(({ templateKey, uuid, onClose, ...props },
 
     // Load survey data when the component mounts
     useEffect(() => {
-        // Case 1: Editing an existing survey
+        // Always reset to empty state first
+        resetSurveyToDefault();
+
+        // Case 1: Editing an existing survey - load from API
         if (uuid) {
-            // In a real app, we would fetch the survey data from the API
-            // For now, we'll use mock data or reset to default
-            console.log(`Loading survey data for UUID: ${uuid}`);
-
-            // TODO: Replace with API call to fetch survey data
-            // The API call will be handled by SurveyLoader component
-            // Don't reset to default here - let SurveyLoader handle it
-
+            // API call will be handled by SurveyLoader component
             return;
         }
 
-        // Case 2: Creating from template
+        // Case 2: Creating from template - load template data for initial state only
         if (templateKey) {
+
             // Get AI data if available (for ai_creation template)
             let aiOverrides = {};
             if (templateKey === 'ai_creation') {
@@ -63,7 +60,7 @@ const SurveyModalContent = forwardRef(({ templateKey, uuid, onClose, ...props },
                 }
             }
 
-            // Load template data with AI overrides
+            // Load template data with AI overrides for initial state only
             const templateData = loadTemplateData(templateKey, aiOverrides);
             if (templateData) {
                 // Update store with template data (including AI overrides)
@@ -75,16 +72,12 @@ const SurveyModalContent = forwardRef(({ templateKey, uuid, onClose, ...props },
                 setDiscountSections?.(templateData.discountSections);
                 setSelectedTheme(templateData.selectedTheme);
                 setIsActive(templateData.isActive);
-            } else {
-                // Fallback to default data if template couldn't be loaded
-                resetSurveyToDefault();
             }
             return;
         }
 
-        // Case 3: No template or UUID, use default data
-        resetSurveyToDefault();
-    }, [templateKey, uuid]);
+        // Case 3: Creating new survey without template - start with empty state
+    }, [templateKey, uuid, resetSurveyToDefault, setSurveyTitle, setQuestions, setChannelItems, setDiscountEnabled, setDiscountSettings, setDiscountSections, setSelectedTheme, setIsActive]);
 
     return <SurveyLayout ref={ref} surveyId={uuid} onClose={onClose} />;
 });

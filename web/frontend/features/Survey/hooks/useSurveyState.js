@@ -11,6 +11,16 @@ export const useSurveyState = () => {
         toggleChannelExpand,
         toggleChannelEnabled,
         
+        // Onsite survey configuration state
+        onsiteConfig,
+        setOnsiteConfig,
+        updateOnsiteConfig,
+
+        // Thank you page configuration state
+        thankyouConfig,
+        setThankyouConfig,
+        updateThankyouConfig,
+        
         // Discount tab state
         discountEnabled,
         setDiscountEnabled,
@@ -77,6 +87,16 @@ export const useSurveyState = () => {
         channelItems,
         toggleChannelExpand,
         toggleChannelEnabled,
+        
+        // Onsite survey configuration state
+        onsiteConfig,
+        setOnsiteConfig,
+        updateOnsiteConfig,
+
+        // Thank you page configuration state
+        thankyouConfig,
+        setThankyouConfig,
+        updateThankyouConfig,
         
         // Discount tab state
         discountEnabled,

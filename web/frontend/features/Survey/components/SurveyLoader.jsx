@@ -5,8 +5,8 @@ import useStore from '../../../State/store';
 /**
  * SurveyLoader component
  * 
- * This component handles loading survey data from the API when available,
- * with fallback to the default JSON data.
+ * This component handles loading survey data from the API only.
+ * API is the single source of truth.
  * 
  * Props:
  * - surveyId: Optional ID of the survey to load
@@ -25,20 +25,20 @@ const SurveyLoader = ({ surveyId, children }) => {
             setError(null);
 
             try {
-                // If surveyId is provided, attempt to load from API
+                // If surveyId is provided, load from API
                 if (surveyId) {
                     const success = await loadSurveyFromApi(surveyId);
                     if (!success) {
-                        // If API fails, we fall back to the default data from JSON
-                        // which happens automatically in loadSurveyFromApi
-                        console.log('Using fallback data for survey');
+                        setError('Failed to load survey data from API. Please try again.');
+                        setLoading(false);
+                        return;
                     }
                 }
 
-                // If no surveyId, the store is already initialized with the default data
+                // If no surveyId, start with empty state
                 setLoading(false);
             } catch (err) {
-                console.log('Error loading survey:', err);
+                console.error('Error loading survey:', err);
                 setError('Failed to load survey data. Please try again.');
                 setLoading(false);
             }

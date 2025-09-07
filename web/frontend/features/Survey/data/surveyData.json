@@ -5,7 +5,7 @@
       "description": "Tell us your needs - we'll take care of everything.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "code": "",
@@ -15,14 +15,14 @@
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
         { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
-        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": false }
       ],
       "defaultValues": {
         "surveyTitle": "Blank Survey",
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
@@ -30,7 +30,21 @@
         "surveyPagePopoverActive": false,
         "selectedSurveyPage": "page",
         "discountEnabled": false,
-        "editModalOpen": false
+        "editModalOpen": false,
+        "onsiteConfig": {
+          "pageTargeting": "all",
+          "specificPages": "",
+          "excludePages": false,
+          "excludedPageTypes": [],
+          "userTargeting": "all",
+          "userTag": false,
+          "customerType": {
+            "newCustomer": false,
+            "returnCustomer": false
+          },
+          "productPurchased": false,
+          "widgetRecurrence": "every_time"
+        }
       },
       "questions": [
         { 
@@ -50,7 +64,7 @@
       "description": "Find out which marketing channels are most effective.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "code": "",
@@ -60,14 +74,14 @@
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
         { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
-        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": false }
       ],
       "defaultValues": {
         "surveyTitle": "Marketing Attribution Survey",
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
@@ -101,7 +115,7 @@
       "description": "Gauge customer experience and satisfaction across key touchpoints.",
      "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "code": "",
@@ -111,14 +125,14 @@
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
         { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
-        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": false }
       ],
       "defaultValues": {
         "surveyTitle": "Customer Experience Survey",
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
@@ -167,7 +181,7 @@
       "description": "Understand what's stopping users from purchasing on your site.",
      "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "code": "",
@@ -177,14 +191,14 @@
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
         { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
-        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": false }
       ],
       "defaultValues": {
         "surveyTitle": "Exit Survey",
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
@@ -218,7 +232,7 @@
       "description": "Understand what's stopping users from purchasing on your site.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "code": "",
@@ -228,14 +242,14 @@
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
         { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
-        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": false }
       ],
       "defaultValues": {
         "surveyTitle": "Exit Intent Survey",
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,
@@ -263,7 +277,7 @@
       "description": "AI-generated survey with custom title and questions.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": true, "isEnabled": true }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "code": "",
@@ -273,14 +287,14 @@
       "discountSections": [
         { "id": "banner", "title": "Discount banner", "icon": "page", "isExpanded": false },
         { "id": "requestEmail", "title": "Request email card", "icon": "email", "isExpanded": false },
-        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": true }
+        { "id": "discountEmail", "title": "Discount email", "icon": "email", "isExpanded": false }
       ],
       "defaultValues": {
         "surveyTitle": "AI Generated Survey",
         "selectedTab": 0,
         "selectedQuestionId": "1",
         "currentQuestionIndex": 0,
-        "selectedView": "desktop",
+        "selectedView": "mobile",
         "isActive": true,
         "selectedTheme": "default",
         "themePopoverActive": false,

@@ -229,6 +229,7 @@ export default function Survey() {
                     },
                 },
             ]}
+            fullWidth
         >
             <BlockStack gap="400">
                 <Banner
@@ -325,21 +326,21 @@ export default function Survey() {
                                                     icon: EditIcon,
                                                     onAction: () => handleSurveyAction('edit', survey.uuid)
                                                 },
-                                                {
-                                                    content: 'View live survey',
-                                                    icon: ViewIcon,
-                                                    onAction: () => handleSurveyAction('view', survey.uuid)
-                                                },
-                                                {
-                                                    content: 'Duplicate',
-                                                    icon: DuplicateIcon,
-                                                    onAction: () => handleSurveyAction('duplicate', survey.uuid)
-                                                },
-                                                {
-                                                    content: survey.status === 'active' ? 'Deactivate' : 'Activate',
-                                                    icon: survey.status === 'active' ? DisabledIcon : InfoIcon,
-                                                    onAction: () => handleSurveyAction('activate', survey.uuid)
-                                                },
+                                                // {
+                                                //     content: 'View live survey',
+                                                //     icon: ViewIcon,
+                                                //     onAction: () => handleSurveyAction('view', survey.uuid)
+                                                // },
+                                                // {
+                                                //     content: 'Duplicate',
+                                                //     icon: DuplicateIcon,
+                                                //     onAction: () => handleSurveyAction('duplicate', survey.uuid)
+                                                // },
+                                                // {
+                                                //     content: survey.status === 'active' ? 'Deactivate' : 'Activate',
+                                                //     icon: survey.status === 'active' ? DisabledIcon : InfoIcon,
+                                                //     onAction: () => handleSurveyAction('activate', survey.uuid)
+                                                // },
                                                 {
                                                     content: 'Delete',
                                                     icon: DeleteIcon,
