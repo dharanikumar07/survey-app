@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     Page,
@@ -49,18 +49,47 @@ export default function Survey() {
     const itemsPerPage = 10;
     const [totalPage, setTotalPage] = useState(1);
 
-    // Delete mutation
+    // Delete mutation with optimistic updates
     const deleteSurveyMutation = useMutation({
+        mutationKey: ["deleteSurvey"],
         mutationFn: deleteSurvey,
+        onMutate: async (surveyId) => {
+            // Cancel any outgoing refetches
+            await queryClient.cancelQueries({ queryKey: ["surveys"] });
+
+            // Snapshot the previous value
+            const previousSurveys = queryClient.getQueryData(["surveys", activeTab, currentPage, itemsPerPage]);
+
+            // Optimistically update to the new value
+            queryClient.setQueryData(["surveys", activeTab, currentPage, itemsPerPage], (old) => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    data: {
+                        ...old.data,
+                        data: old.data.data.filter(survey => survey.uuid !== surveyId)
+                    }
+                };
+            });
+
+            return { previousSurveys };
+        },
         onSuccess: (response) => {
             const message = response?.data?.message || "Survey deleted successfully";
             showToast({ message, type: "success" });
             setDeleteModalActive(false);
             setSurveyToDelete(null);
-            // Invalidate and refetch surveys
-            queryClient.invalidateQueries({ queryKey: ["surveys"] });
+            // Only invalidate specific query to prevent multiple calls
+            queryClient.invalidateQueries({
+                queryKey: ["surveys", activeTab, currentPage, itemsPerPage],
+                exact: true
+            });
         },
-        onError: (error) => {
+        onError: (error, surveyId, context) => {
+            // If the mutation fails, use the context returned from onMutate to roll back
+            if (context?.previousSurveys) {
+                queryClient.setQueryData(["surveys", activeTab, currentPage, itemsPerPage], context.previousSurveys);
+            }
             const errorMessage = error?.data?.error || "Failed to delete survey";
             showToast({ message: errorMessage, type: "error" });
             setDeleteModalActive(false);
@@ -72,19 +101,32 @@ export default function Survey() {
         }
     });
 
-    const { data, isLoading, isError, isPending } = useQueryEvents(
+    const { data, isLoading, isError, isPending, refetch } = useQueryEvents(
         useQuery({
-            queryKey: ["surveys", activeTab, currentPage, itemsPerPage, totalPage],
-            queryFn: () => getSurveys({ status: activeTab, page: currentPage, per_page: itemsPerPage }),
+            queryKey: ["surveys", activeTab, currentPage, itemsPerPage],
+            queryFn: () => getSurveys({ page: currentPage, per_page: itemsPerPage }),
+            staleTime: 0, // Always refetch on tab switch
+            gcTime: 1000 * 60 * 5, // 5 minutes cache
+            refetchOnWindowFocus: false,
+            refetchOnMount: true,
+            retry: 1,
         }),
         {
             onSuccess: (data) => {
-                console.log(data);
-                setSurveys(data.data.data);
-                setTotalPage(data.data.meta.total);
-
+                console.log('API Response:', data);
+                if (data?.data?.data) {
+                    setSurveys(data.data.data);
+                    setTotalPage(data.data.meta?.total || data.data.data.length);
+                } else {
+                    console.warn('Unexpected API response structure:', data);
+                    setSurveys([]);
+                    setTotalPage(0);
+                }
             },
             onError: (error) => {
+                console.error('Error fetching surveys:', error);
+                setSurveys([]);
+                setTotalPage(0);
             },
         }
     )
@@ -135,7 +177,10 @@ export default function Survey() {
     const handleTabChange = (selectedTabIndex) => {
         setActiveTab(selectedTabIndex);
         setCurrentPage(1); // Reset to first page when changing tabs
+        // Trigger refetch when tab changes to get fresh data
+        refetch();
     };
+
 
     const handleNext = () => {
         if (currentPage < totalPages) {
@@ -211,6 +256,40 @@ export default function Survey() {
         deleteSurveyMutation.reset();
     };
 
+    // Helper function to get channel badges from channels object
+    const getChannelBadges = (survey) => {
+        const channels = survey.survey_meta_data?.channels;
+        if (!channels) return null;
+
+        const enabledChannels = [];
+
+        // Iterate through channels object
+        Object.keys(channels).forEach(channelKey => {
+            const channelData = channels[channelKey];
+            if (channelData && channelData.enabled === true) {
+                // Map channel keys to display names
+                let displayName = channelKey;
+                switch (channelKey) {
+                    case 'onsite':
+                        displayName = 'On-site survey';
+                        break;
+                    case 'thankyou':
+                        displayName = 'Post-purchase page';
+                        break;
+                    case 'dedicatedPageSurvey':
+                        displayName = 'Branded survey page';
+                        break;
+                    default:
+                        displayName = channelKey;
+                        break;
+                }
+                enabledChannels.push(displayName);
+            }
+        });
+
+        return enabledChannels.length > 0 ? enabledChannels : null;
+    };
+
 
     return (
         <Page
@@ -245,7 +324,7 @@ export default function Survey() {
                     <Tabs tabs={tabs} selected={activeTab} onSelect={handleTabChange} />
                     <IndexTable
                         resourceName={resourceName}
-                        loading={isLoading || isPending || deleteSurveyMutation.isPending}
+                        loading={isLoading || deleteSurveyMutation.isPending || refetch.isPending}
                         itemCount={paginatedSurveys.length}
                         headings={[
                             { title: "Survey name" },
@@ -292,13 +371,18 @@ export default function Survey() {
                                 </IndexTable.Cell>
                                 <IndexTable.Cell>
                                     <InlineStack gap="200">
-                                        {survey.survey_meta_data?.channelTypes?.map((channel, idx) => (
-                                            <Badge key={idx} tone="info">
-                                                {channel === "dedicatedPageSurvey" ? "Branded survey page" :
-                                                    channel === "thankyou" ? "Post-purchase page" :
-                                                        channel === "onSite" ? "On-site survey" : channel}
-                                            </Badge>
-                                        )) || <Badge tone="info">No channels</Badge>}
+                                        {(() => {
+                                            const channelBadges = getChannelBadges(survey);
+                                            if (channelBadges && channelBadges.length > 0) {
+                                                return channelBadges.map((channelName, idx) => (
+                                                    <Badge key={idx} tone="info">
+                                                        {channelName}
+                                                    </Badge>
+                                                ));
+                                            } else {
+                                                return <Badge tone="info">No channels</Badge>;
+                                            }
+                                        })()}
                                     </InlineStack>
                                 </IndexTable.Cell>
                                 <IndexTable.Cell>
