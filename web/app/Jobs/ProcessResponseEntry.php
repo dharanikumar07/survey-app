@@ -5,15 +5,16 @@ namespace App\Jobs;
 use App\Cache\CacheKeys;
 use App\Cache\SurveyCacheService;
 use App\Http\Helper\Helper;
-use App\Models\Customer;
 use App\Models\Response;
 use App\Models\Store;
 use App\Models\Survey;
 use App\Services\ShopifyCustomerFetcher;
 use App\Services\ShopifyOrderFetcher;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class ProcessResponseEntry implements ShouldQueue
 {
@@ -30,7 +31,7 @@ class ProcessResponseEntry implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(Store $store, Survey $survey, $responseEntryId)
+    public function __construct(Store $store, $survey, $responseEntryId)
     {
         $this->store = $store;
         $this->survey = $survey;
@@ -93,4 +94,11 @@ class ProcessResponseEntry implements ShouldQueue
 
         info("response created successfully");
     }
+
+    public function generateDiscountCode(array $data)
+    {
+
+    }
+
+
 }

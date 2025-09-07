@@ -17,6 +17,8 @@ class Survey extends Model
 
     public const THANK_YOU_PAGE_SURVEY = 'thank_you_page';
 
+    public const SITE_WIDGET = 'site_widget';
+
     protected $fillable = [
         'name',
         'status',
@@ -71,5 +73,20 @@ class Survey extends Model
     public function impressions(): HasMany
     {
         return $this->hasMany(SurveyImpression::class, 'survey_uuid', 'uuid');
+    }
+
+    public function getChannelConfigType()
+    {
+        return $this->survey_meta_data['channels']['onsite']['config']['pageTargeting'] ?? 'all';
+    }
+
+    public function getExcludePages()
+    {
+        return $this->survey_meta_data['channels']['onsite']['config']['excludedPageTypes'] ?? [];
+    }
+
+    public function getExcludePageTrueOrNot()
+    {
+        return $this->survey_meta_data['channels']['onsite']['config']['excludePages'] ?? false;
     }
 }

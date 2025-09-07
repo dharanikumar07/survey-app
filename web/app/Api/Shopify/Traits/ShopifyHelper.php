@@ -76,6 +76,12 @@ trait ShopifyHelper
         return $json;
     }
 
+    protected function getRequest(string $endpoint, array $queryParams = [])
+    {
+        return Http::withHeaders($this->getHeaders())
+            ->get($this->buildUrl($endpoint), $queryParams);
+    }
+
     public function toBoolString($value)
     {
         if (is_bool($value)) {

@@ -1,17 +1,19 @@
 (function(){
     function runSurvey() {
-        const surveyUuids = JSON.parse(localStorage.getItem('onsite_survey_uuids') || '[]');
+        const storedSurveys = JSON.parse(localStorage.getItem('onsite_survey_uuids') || '[]');
 
-        if (surveyUuids.length === 0) {
-            localStorage.setItem('onsite_survey_uuids', JSON.stringify({ is_finished: true }));
+        const pendingSurveys = storedSurveys.filter(s => !s.is_finished);
+
+        if (pendingSurveys.length === 0) {
+            console.log("no survey to view");
             return;
         }
 
-        const firstSurveyUuid = surveyUuids[0];
+        const firstSurvey = pendingSurveys[0];
         const store_uuid = window.PostPurchaseSurveyData.value.data.store_uuid;
         const url = window.PostPurchaseSurveyData.value.data.url;
 
-        const iframeUrl = `${url}/api/get-survey/${store_uuid}/${firstSurveyUuid}`;
+        const iframeUrl = `${url}/api/get-survey/${store_uuid}/${firstSurvey.uuid}`;
         const iframe = document.createElement("iframe");
 
         iframe.src = iframeUrl;
@@ -52,8 +54,11 @@
                 const completedSurveyUuid = event.data.survey_uuid;
                 console.log("✅ Survey completed:", completedSurveyUuid);
 
-                const updatedUuids = surveyUuids.filter(uuid => uuid !== completedSurveyUuid);
-                localStorage.setItem('onsite_survey_uuids', JSON.stringify(updatedUuids));
+                const updatedSurveys = storedSurveys.map(s =>
+                    s.uuid === completedSurveyUuid ? { ...s, is_finished: true } : s
+                );
+
+                localStorage.setItem('onsite_survey_uuids', JSON.stringify(updatedSurveys));
 
                 iframe.remove();
                 window.removeEventListener("message", handleMessage);
