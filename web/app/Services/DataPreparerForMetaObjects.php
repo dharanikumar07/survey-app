@@ -20,8 +20,8 @@ class DataPreparerForMetaObjects
                     'url' => env('HOST'),
                     'access_token' => $store->getAccessToken(),
                 ],
-                'onsite_survey' => $this->getAllActiveSurveyBasedOnSurveyType($store, Survey::POST_PURCHASE_SURVEY),
-                'thank_you_page' => $this->getAllActiveSurveyBasedOnSurveyType($store, Survey::THANK_YOU_PAGE_SURVEY),
+                'onsite_survey' => $this->getAllActiveSurveyBasedOnSurveyType($store, Survey::SITE_WIDGET),
+                //'thank_you_page' => $this->getAllActiveSurveyBasedOnSurveyType($store, Survey::THANK_YOU_PAGE_SURVEY),
         ];
     }
 
@@ -29,7 +29,7 @@ class DataPreparerForMetaObjects
     {
         $surveys = Survey::where('status', 'active')
             ->where('store_uuid', $store->uuid)
-            ->where('survey_type', $type)
+            //->where('survey_type', $type)
             ->get();
 
         if ($surveys->isEmpty()) {
@@ -46,6 +46,20 @@ class DataPreparerForMetaObjects
 
     protected function getAllowedPagesForSurvey(Survey $survey)
     {
-        return [];
+        $type = $survey->getChannelConfigType();
+        $pages = $survey->getExcludePages();
+        $isNeedToShowExcludePages = $survey->getExcludePageTrueOrNot();
+
+        $mappedPages = array_map(function ($page) {
+            return $page === 'home' ? 'index' : $page;
+        }, $pages);
+
+        $allPages = ['index', 'cart', 'collection', 'products', 'blog'];
+
+        if ($type == 'all' && $isNeedToShowExcludePages) {
+            return array_values(array_diff($allPages, $mappedPages));
+        }
+
+        return $mappedPages;
     }
 }

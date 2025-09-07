@@ -1,0 +1,63 @@
+<div id="survey-app-backup-main-wrapper"></div>
+
+{% assign app_id = "279166844929" %}
+{% assign metaobject_type = "app--" | append: app_id | append: "--post_purchase_survey" %}
+{% assign metaobject_data = shop.metaobjects[metaobject_type] %}
+{% assign survey_data_json = metaobject_data.post_purchase_survey.settings | default: "{}" %}
+
+<script>
+    window.PostPurchaseSurveyData = {
+        value: {{ survey_data_json }},
+        customerId: {{ customer.id | default: 'null' }},
+        orderId: {% if order %}{{ order.id }}{% else %}null{% endif %},
+        pageType: "{{ template.name }}"
+    };
+
+    console.log("Page Type:", window.PostPurchaseSurveyData.pageType);
+    console.log("Survey Data:", window.PostPurchaseSurveyData.value.onsite_survey);
+
+    (function () {
+        if (!window.PostPurchaseSurveyData?.value?.onsite_survey?.length) return;
+
+        // Normalize helper
+        function normalizePageName(name) {
+            if (!name) return "";
+            const s = String(name).trim().toLowerCase();
+            if (s === "home" || s === "index") return "index";
+            if (s === "product" || s === "products") return "product";
+            if (s === "collection" || s === "collections") return "collection";
+            if (s === "cart" || s === "carts") return "cart";
+            if (s === "blog" || s === "blogs") return "blog";
+            return s;
+        }
+
+        const currentPage = normalizePageName(window.PostPurchaseSurveyData.pageType);
+
+        let existingSurveys = JSON.parse(localStorage.getItem("onsite_survey_uuids") || "[]");
+        if (!Array.isArray(existingSurveys)) existingSurveys = [];
+
+        // Loop through all surveys and add those that match current page
+        window.PostPurchaseSurveyData.value.onsite_survey.forEach(survey => {
+            const allowedPages = (survey.allowedPages || []).map(normalizePageName);
+            if (allowedPages.includes(currentPage)) {
+                const existing = existingSurveys.find(s => s.uuid === survey.uuid);
+                if (!existing) {
+                    existingSurveys.push({ uuid: survey.uuid, is_finished: false });
+                }
+            }
+        });
+
+        localStorage.setItem("onsite_survey_uuids", JSON.stringify(existingSurveys));
+
+    })();
+</script>
+
+<script src="{{ 'survey-app-main.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+    "name": "Survey App Assets",
+    "target": "body",
+    "settings": []
+}
+{% endschema %}
