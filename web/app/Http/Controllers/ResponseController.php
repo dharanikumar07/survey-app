@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Cache\CacheKeys;
 use App\Cache\SurveyCacheService;
 use App\Http\Helper\Helper;
+use App\Http\Resources\ResponseResource;
 use App\Http\Resources\SurveyResource;
 use App\Jobs\ProcessResponseEntry;
 use App\Models\Store;
@@ -56,7 +57,8 @@ class ResponseController extends Controller
 
             $responseService = new  ResponseService($store);
             $responseData = $responseService->resolveResponseByRequest($survey_uuid, $date);
-            return SurveyResource::collection($responseData);
+
+            return ResponseResource::collection($responseData);
         } catch(\Exception $e) {
             Helper::logError("Unable to get response data",__CLASS__, $e);
             return Response::json([
