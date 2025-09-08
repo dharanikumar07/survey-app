@@ -50,9 +50,11 @@ function TabsContent({ surveyPreviewRef }) {
                     Discount
                 </Button>
             </ButtonGroup>
-            <Box paddingBlockStart="400">
+            <Box paddingBlockStart="200">
                 <Divider />
-                {renderTabContent()}
+                <div style={{ marginTop: '10px' }}>
+                    {renderTabContent()}
+                </div>
             </Box>
         </Box>
     );

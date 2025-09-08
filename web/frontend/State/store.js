@@ -487,9 +487,8 @@ const useStore = create((set, get) => ({
     // Helper function to transform discount settings
     transformDiscountSettings: (discount) => {
         return {
-            code: discount.code,
-            displayOn: discount.displayOn,
-            limitPerEmail: discount.limitOnePerEmail
+            discount_type: discount.discount_type || "generic",
+            discount_value: discount.discount_value || "percentage"
         };
     },
     

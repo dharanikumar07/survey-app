@@ -1,120 +1,138 @@
-import React from 'react';
-import { Box, BlockStack, Text, Card, TextField, Select, Checkbox, Banner } from '@shopify/polaris';
-import SectionRow from '../../../../components/section/SectionRow';
-import CustomToggle from '../common/CustomToggle';
+import React, { useState, useEffect } from 'react';
+import {
+    Box,
+    BlockStack,
+    InlineStack,
+    Text,
+    RadioButton,
+    Card,
+    Icon
+} from '@shopify/polaris';
+import {
+    DiscountIcon
+} from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
-import { PageAddIcon, EmailIcon } from '@shopify/polaris-icons';
-import { formatSurveyForAPI } from '../../utils/surveyHelpers';
+import Knob from '../../components/common/Knob';
 
 export function DiscountTab() {
-    const {
-        discountEnabled,
-        setDiscountEnabled,
-        discountSettings,
-        setDiscountSettings,
-        discountSections,
-        toggleDiscountSection,
-        questions,
-        surveyTitle,
-        isActive
-    } = useSurveyState();
+    const { discountEnabled, setDiscountEnabled, discountSettings, setDiscountSettings } = useSurveyState();
 
-    // Handle discount settings update with survey formatting
-    const handleDiscountUpdate = (updates) => {
-        const newSettings = { ...discountSettings, ...updates };
-        setDiscountSettings(newSettings);
+    // Local state for the UI and keeping track of API values
+    const [discountType, setDiscountType] = useState('generic');
+    const [discountValue, setDiscountValue] = useState('percentage');
 
-        // Format survey data for discount configuration
-        const surveyData = {
-            name: surveyTitle,
-            isActive: isActive,
-            questions: questions.filter(q => q.id !== 'thankyou'),
-            discount: {
-                enabled: discountEnabled,
-                ...newSettings
-            }
-        };
+    // Initialize state from store
+    useEffect(() => {
+        if (discountSettings) {
+            // Get values directly from API structure
+            setDiscountType(discountSettings.discount_type || 'generic');
+            setDiscountValue(discountSettings.discount_value || 'percentage');
+        }
+    }, [discountSettings]);
 
-        const discountFormattedData = formatSurveyForAPI(surveyData);
-        console.log('Discount settings updated:', newSettings);
-        console.log('Survey data for discount:', discountFormattedData);
+    // Update API fields when UI changes
+    const handleDiscountTypeChange = (type) => {
+        setDiscountType(type);
+
+        // Update API fields
+        setDiscountSettings({
+            ...discountSettings,
+            discount_type: type,
+            discount_value: discountValue
+        });
     };
 
-    const displayOptions = [
-        { label: 'Email', value: 'email' },
-        { label: 'Thank you page', value: 'thankyou' },
-        { label: 'Discount banner', value: 'banner' },
-    ];
+    const handleDiscountValueChange = (value) => {
+        setDiscountValue(value);
+        setDiscountSettings({
+            ...discountSettings,
+            discount_value: value,
+            discount_type: discountType
+        });
+    };
+
+    const toggleDiscountEnabled = () => {
+        setDiscountEnabled(!discountEnabled);
+
+        // If enabling discount, ensure the settings object is initialized with default values
+        if (!discountEnabled) {
+            setDiscountSettings({
+                enabled: true,
+                discount_type: discountType,
+                discount_value: discountValue
+            });
+        }
+    };
 
     return (
         <BlockStack gap="400">
-            <Box padding="400">
-                <BlockStack gap="300">
-                    <Box>
-                        <BlockStack gap="150">
-                            <Box display="flex" alignItems="center" justifyContent="space-between">
-                                <Text variant="headingMd" as="h3">Discount</Text>
-                                <CustomToggle
-                                    checked={discountEnabled}
-                                    onChange={(val) => setDiscountEnabled(val)}
-                                />
+            <Card padding={"200"}>
+                <Box padding="0">
+                    <InlineStack blockAlign="center" gap="800" wrap={false}>
+                        <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Icon source={DiscountIcon} color={discountEnabled ? "success" : "base"} />
+                            <Text variant="headingMd" as="h2">Enable Discount</Text>
+                        </Box>
+                        <Box>
+                            <Knob
+                                selected={discountEnabled}
+                                onClick={toggleDiscountEnabled}
+                                ariaLabel="Toggle discount"
+                            />
+                        </Box>
+                    </InlineStack>
+                </Box>
+
+                {discountEnabled && (
+                    <Box padding="400">
+                        <BlockStack gap="400">
+                            <Text variant="headingMd" as="h2">Choose Discount Type</Text>
+
+                            {/* Radio buttons for discount type selection */}
+                            <RadioButton
+                                label="Generic Discount"
+                                helpText="A discount code anyone can use, but only once the discount code is valid."
+                                checked={discountType === 'generic'}
+                                id="generic-discount"
+                                name="discount-type"
+                                onChange={() => handleDiscountTypeChange('generic')}
+                            />
+
+                            <RadioButton
+                                label="Customer-Specific Discount"
+                                helpText="A discount code valid for a specific customer only, usable once."
+                                checked={discountType === 'customer-specific'}
+                                id="customer-specific-discount"
+                                name="discount-type"
+                                onChange={() => handleDiscountTypeChange('customer-specific')}
+                            />
+
+                            {/* Discount Value Type Options */}
+                            <Box paddingBlockStart="400">
+                                <BlockStack gap="300">
+                                    <Text variant="headingMd" as="h2">Discount Value Type Options</Text>
+
+                                    <RadioButton
+                                        label="Percentage Discount"
+                                        checked={discountValue === 'percentage'}
+                                        id="percentage-discount"
+                                        name="discount-value-type"
+                                        onChange={() => handleDiscountValueChange('percentage')}
+                                    />
+
+                                    <RadioButton
+                                        label="Fixed Amount Discount"
+                                        checked={discountValue === 'fixed'}
+                                        id="fixed-discount"
+                                        name="discount-value-type"
+                                        onChange={() => handleDiscountValueChange('fixed')}
+                                    />
+                                </BlockStack>
                             </Box>
-                            <Text variant="bodyMd" tone="subdued">
-                                We recommend offering discounts to boost survey responses.
-                            </Text>
                         </BlockStack>
                     </Box>
-
-                    {discountEnabled ? (
-                        <Card padding="400">
-                            <BlockStack gap="400">
-                                <TextField
-                                    label="Discount code"
-                                    value={discountSettings.code}
-                                    onChange={(value) => handleDiscountUpdate({ code: value })}
-                                    autoComplete="off"
-                                />
-
-                                <Banner title="" tone="info">
-                                    We cannot control if your customers share the discount code with others
-                                </Banner>
-
-                                <Select
-                                    label="Display discount code on"
-                                    options={displayOptions}
-                                    value={discountSettings.displayOn}
-                                    onChange={(value) => handleDiscountUpdate({ displayOn: value })}
-                                />
-                                {discountSettings.displayOn === 'email' ? (
-                                    <Text tone="subdued">
-                                        Your customers need to enter an email to receive Discount code
-                                    </Text>
-                                ) : null}
-
-                                <Checkbox
-                                    label="Limit one discount code per email address"
-                                    checked={discountSettings.limitPerEmail}
-                                    onChange={(checked) => handleDiscountUpdate({ limitPerEmail: checked })}
-                                />
-
-                                <Card padding="000">
-                                    {discountSections.map((sec) => (
-                                        <SectionRow
-                                            key={sec.id}
-                                            title={sec.title}
-                                            icon={sec.icon === 'page' ? PageAddIcon : EmailIcon}
-                                            isExpanded={sec.isExpanded}
-                                            onToggle={() => toggleDiscountSection(sec.id)}
-                                        >
-                                            <Text>Settings for {sec.title}</Text>
-                                        </SectionRow>
-                                    ))}
-                                </Card>
-                            </BlockStack>
-                        </Card>
-                    ) : null}
-                </BlockStack>
-            </Box>
+                )}
+            </Card>
         </BlockStack>
     );
 }
