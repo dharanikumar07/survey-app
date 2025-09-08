@@ -6,7 +6,8 @@ import {
     Text,
     RadioButton,
     Card,
-    Icon
+    Icon,
+    TextField
 } from '@shopify/polaris';
 import {
     DiscountIcon
@@ -20,6 +21,7 @@ export function DiscountTab() {
     // Local state for the UI and keeping track of API values
     const [discountType, setDiscountType] = useState('generic');
     const [discountValue, setDiscountValue] = useState('percentage');
+    const [discountValueAmount, setDiscountValueAmount] = useState('');
 
     // Initialize state from store
     useEffect(() => {
@@ -27,6 +29,7 @@ export function DiscountTab() {
             // Get values directly from API structure
             setDiscountType(discountSettings.discount_type || 'generic');
             setDiscountValue(discountSettings.discount_value || 'percentage');
+            setDiscountValueAmount(discountSettings.discount_value_amount || '');
         }
     }, [discountSettings]);
 
@@ -38,7 +41,8 @@ export function DiscountTab() {
         setDiscountSettings({
             ...discountSettings,
             discount_type: type,
-            discount_value: discountValue
+            discount_value: discountValue,
+            discount_value_amount: discountValueAmount
         });
     };
 
@@ -47,7 +51,18 @@ export function DiscountTab() {
         setDiscountSettings({
             ...discountSettings,
             discount_value: value,
-            discount_type: discountType
+            discount_type: discountType,
+            discount_value_amount: discountValueAmount
+        });
+    };
+
+    const handleDiscountValueAmountChange = (value) => {
+        setDiscountValueAmount(value);
+        setDiscountSettings({
+            ...discountSettings,
+            discount_value_amount: value,
+            discount_type: discountType,
+            discount_value: discountValue
         });
     };
 
@@ -59,7 +74,8 @@ export function DiscountTab() {
             setDiscountSettings({
                 enabled: true,
                 discount_type: discountType,
-                discount_value: discountValue
+                discount_value: discountValue,
+                discount_value_amount: discountValueAmount
             });
         }
     };
@@ -126,6 +142,25 @@ export function DiscountTab() {
                                         id="fixed-discount"
                                         name="discount-value-type"
                                         onChange={() => handleDiscountValueChange('fixed')}
+                                    />
+                                </BlockStack>
+                            </Box>
+
+                            {/* Discount Value Amount Input */}
+                            <Box paddingBlockStart="400">
+                                <BlockStack gap="300">
+                                    <Text variant="headingMd" as="h2">Discount Value</Text>
+
+                                    <TextField
+                                        label="Discount Amount"
+                                        type="number"
+                                        value={discountValueAmount}
+                                        onChange={handleDiscountValueAmountChange}
+                                        placeholder={discountValue === 'percentage' ? 'Enter percentage (e.g., 10)' : 'Enter amount (e.g., 5.00)'}
+                                        suffix={discountValue === 'percentage' ? '%' : '$'}
+                                        min="0"
+                                        step={discountValue === 'percentage' ? '1' : '0.01'}
+                                        helpText={discountValue === 'percentage' ? 'Enter the percentage discount (0-100)' : 'Enter the fixed amount discount'}
                                     />
                                 </BlockStack>
                             </Box>

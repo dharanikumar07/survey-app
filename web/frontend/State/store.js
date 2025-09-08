@@ -488,7 +488,8 @@ const useStore = create((set, get) => ({
     transformDiscountSettings: (discount) => {
         return {
             discount_type: discount.discount_type || "generic",
-            discount_value: discount.discount_value || "percentage"
+            discount_value: discount.discount_value || "percentage",
+            discount_value_amount: discount.discount_value_amount || ""
         };
     },
     

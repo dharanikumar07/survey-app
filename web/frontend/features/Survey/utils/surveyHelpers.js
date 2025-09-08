@@ -167,7 +167,9 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
         discount: surveyData.discount || {
             enabled: false,
             discount_type: 'generic',
-            discount_value: 'percentage'
+            discount_value: 'percentage',
+            discount_value_amount: ''
+
         },
         htmlContent: htmlContent, // Use original HTML content directly
         cleanHTML: generateCleanSurveyHTML(surveyData, htmlContent), // Clean HTML with minimal sanitization

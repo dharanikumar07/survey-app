@@ -121,7 +121,8 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
             discount: {
                 enabled: discountEnabled,
                 discount_type: discountSettings.discount_type || "generic",
-                discount_value: discountSettings.discount_value || "percentage"
+                discount_value: discountSettings.discount_value || "percentage",
+                discount_value_amount: discountSettings.discount_value_amount || ""
             },
             channelTypes: channelItems
                 .filter(channel => channel.isEnabled)
