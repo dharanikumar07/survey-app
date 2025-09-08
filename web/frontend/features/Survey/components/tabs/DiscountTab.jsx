@@ -138,10 +138,10 @@ export function DiscountTab() {
 
                                     <RadioButton
                                         label="Fixed Amount Discount"
-                                        checked={discountValue === 'fixed'}
+                                        checked={discountValue === 'fixed_amount'}
                                         id="fixed-discount"
                                         name="discount-value-type"
-                                        onChange={() => handleDiscountValueChange('fixed')}
+                                        onChange={() => handleDiscountValueChange('fixed_amount')}
                                     />
                                 </BlockStack>
                             </Box>
