@@ -23,7 +23,10 @@ import {
     ExportIcon,
     SortIcon
 } from "@shopify/polaris-icons";
-import { mockResponses } from './mockData';
+// import { mockResponses } from './mockData';
+import { useQueryEvents } from '../../components/helper/use-query-event';
+import { useQuery } from '@tanstack/react-query';
+import { useResponseApi } from './action/use-response-api';
 
 export default function Response() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -31,6 +34,7 @@ export default function Response() {
     const [showExportBanner, setShowExportBanner] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedResponse, setSelectedResponse] = useState(null);
+    const [responses, setResponses] = useState([]);
 
     // IndexFilters state
     const [queryValue, setQueryValue] = useState('');
@@ -42,25 +46,42 @@ export default function Response() {
     const [itemStrings, setItemStrings] = useState(['All', 'Active', 'Archived']);
     const [selected, setSelected] = useState(0);
 
+    const { getResponses } = useResponseApi();
+
+    const { data: responseData = [] } = useQueryEvents(
+        useQuery({
+            queryKey: ['responses'],
+            queryFn: getResponses
+        }),
+        {
+            onSuccess: (data) => {
+                console.log(data);
+                setResponses(data.data.data);
+            },
+            onError: (error) => {
+                console.log(error);
+            }
+        }
+    )
+
     // Filter responses based on IndexFilters
-    const filteredResponses = mockResponses.filter(response => {
-        // Filter by status based on tab selection
-        if (selected === 1) return response.status === 'Active';
-        if (selected === 2) return response.status === 'Archived';
+    const filteredResponses = responses.filter(response => {
+        // For now, we're showing all responses since we don't have status in the new data format
+        // You can add status filtering logic when that field is available
+        if (selected === 1) return true; // Active tab (can be updated based on your criteria)
+        if (selected === 2) return false; // Archived tab (can be updated based on your criteria)
         return true; // 'All' tab
     }).filter(response => {
-        // Filter by answer type
-        if (taggedWith === 'number_scale') return response.questions.some(q => q.answerType === "Number scale");
-        if (taggedWith === 'short_answer') return response.questions.some(q => q.answerType === "Short answer");
-        if (taggedWith === 'yes_no') return response.questions.some(q => q.answerType === "Yes/No");
+        // Since we don't have answerType in the new data structure, we'll skip this filtering for now
+        // You can add custom filtering based on answer content or other criteria if needed
         return true;
     });
 
     // Search and filter responses
     const searchedResponses = filteredResponses.filter(response => {
         if (queryValue) {
-            return response.id.toLowerCase().includes(queryValue.toLowerCase()) ||
-                response.surveyName.toLowerCase().includes(queryValue.toLowerCase());
+            return response.id.toString().includes(queryValue.toLowerCase()) ||
+                response.survey_name.toLowerCase().includes(queryValue.toLowerCase());
         }
         return true;
     });
@@ -76,20 +97,21 @@ export default function Response() {
 
     // Flatten responses for table display
     const tableRows = paginatedResponses.flatMap(response =>
-        response.questions.map((question, index) => ({
-            id: `${response.id}-${question.id}`,
+        response.answers.map((answer, index) => ({
+            id: `${response.id}-${index}`,
             responseId: response.id,
-            survey: response.surveyName,
-            question: question.question,
-            answerType: question.answerType,
-            answer: question.answer,
-            date: response.date,
+            survey: response.survey_name,
+            question: answer.question,
+            // Since we don't have answerType in the new format, we'll set a default
+            answerType: "Text",
+            answer: answer.answer,
+            date: new Date(response.created_at).toLocaleDateString(),
             actions: response.id
         }))
     );
 
     // Bulk actions state using useIndexResourceState hook
-    const { selectedResources, allResourcesSelected, handleSelectionChange } = useIndexResourceState(mockResponses);
+    const { selectedResources, allResourcesSelected, handleSelectionChange } = useIndexResourceState(responses);
 
     // IndexFilters configuration
     const filters = [
@@ -181,7 +203,7 @@ export default function Response() {
     };
 
     const handleViewResponse = (responseId) => {
-        const response = mockResponses.find(r => r.id === responseId);
+        const response = responses.find(r => r.id === parseInt(responseId));
         setSelectedResponse(response);
         setModalOpen(true);
     };
@@ -233,15 +255,9 @@ export default function Response() {
                     </Badge>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    {answerType === "Number scale" || answerType === "Yes/No" ? (
-                        <Badge tone="info" size="small">
-                            {answer}
-                        </Badge>
-                    ) : (
-                        <Text variant="bodyMd" as="span">
-                            {answer}
-                        </Text>
-                    )}
+                    <Text variant="bodyMd" as="span">
+                        {answer}
+                    </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <div className='flex gap-2'>
@@ -368,23 +384,23 @@ export default function Response() {
                         <BlockStack gap="4">
                             <Box padding="4" background="bg-surface-secondary">
                                 <Text variant="bodyMd" as="p">
-                                    <strong>Survey:</strong> {selectedResponse.surveyName}
+                                    <strong>Survey:</strong> {selectedResponse.survey_name}
                                 </Text>
                                 <Text variant="bodyMd" as="p">
-                                    <strong>Date:</strong> {selectedResponse.date}
+                                    <strong>Platform:</strong> {selectedResponse.platform}
+                                </Text>
+                                <Text variant="bodyMd" as="p">
+                                    <strong>Date:</strong> {new Date(selectedResponse.created_at).toLocaleString()}
                                 </Text>
                             </Box>
 
-                            {selectedResponse.questions.map((question, index) => (
-                                <Box key={question.id} padding="4" border="divider" borderRadius="2">
+                            {selectedResponse.answers.map((answer, index) => (
+                                <Box key={index} padding="4" border="divider" borderRadius="2">
                                     <Text variant="bodyMd" as="p" fontWeight="semibold">
-                                        Question {index + 1}: {question.question}
+                                        Question {index + 1}: {answer.question}
                                     </Text>
                                     <Text variant="bodyMd" as="p">
-                                        <strong>Answer Type:</strong> {question.answerType}
-                                    </Text>
-                                    <Text variant="bodyMd" as="p">
-                                        <strong>Answer:</strong> {question.answer}
+                                        <strong>Answer:</strong> {answer.answer}
                                     </Text>
                                 </Box>
                             ))}
