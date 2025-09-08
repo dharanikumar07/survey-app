@@ -465,6 +465,7 @@ const useStore = create((set, get) => ({
             'number-scale': 'Number scale',
             'single-choice': 'Single choice',
             'multiple-choice': 'Multiple choice',
+            'consent': 'Consent',
             'card': 'Card'
         };
         return typeMap[type] || 'Question';

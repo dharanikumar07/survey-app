@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Banner, Card, Spinner } from '@shopify/polaris';
 import useStore from '../../../State/store';
+import { useSurveyState } from '../hooks/useSurveyState';
 
 /**
  * SurveyLoader component
@@ -17,6 +18,7 @@ const SurveyLoader = ({ surveyId, children }) => {
     const [error, setError] = useState(null);
 
     const { loadSurveyFromApi } = useStore();
+    const { discountEnabled } = useSurveyState();
 
     // Load survey data when component mounts
     useEffect(() => {
@@ -49,8 +51,8 @@ const SurveyLoader = ({ surveyId, children }) => {
 
     if (loading) {
         return (
-            <div className="th-sf-survey-loading" style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
-                <Spinner size="large" />
+            <div className="th-sf-survey-loading" style={{ display: 'flex', justifyContent: 'center', padding: '2rem', alignItems: 'center', height: '100%' }}>
+                <Spinner size="small" />
             </div>
         );
     }
@@ -65,7 +67,18 @@ const SurveyLoader = ({ surveyId, children }) => {
         );
     }
 
-    return <>{children}</>;
+    // Clone the children and pass the isDiscountEnabled prop
+    return (
+        <>
+            {React.Children.map(children, child => {
+                if (React.isValidElement(child)) {
+                    // Pass the discount enabled state to the child component
+                    return React.cloneElement(child, { isDiscountEnabled: discountEnabled });
+                }
+                return child;
+            })}
+        </>
+    );
 };
 
 export default SurveyLoader;

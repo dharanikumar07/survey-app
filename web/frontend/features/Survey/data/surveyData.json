@@ -404,6 +404,14 @@
       "questionType": "Date",
       "isDraggable": true,
       "answerOptions": []
+    },
+    "consent": {
+      "content": "Do you agree to receive promotional emails and discounts?",
+      "type": "consent",
+      "description": "By checking this box, you agree to receive promotional emails and discount offers from us.",
+      "questionType": "Consent",
+      "isDraggable": true,
+      "answerOptions": []
     }
   }
 }

@@ -53,6 +53,7 @@ export const getQuestionTypeDisplayName = (type) => {
         'rating': 'Star Rating',
         'satisfaction': 'Satisfaction',
         'number-scale': 'Number Scale',
+        'consent': 'Consent',
         'date': 'Date',
         'thankyou': 'Thank You',
         // Legacy mappings for backward compatibility

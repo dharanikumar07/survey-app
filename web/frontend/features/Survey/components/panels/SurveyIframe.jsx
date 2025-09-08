@@ -11,7 +11,7 @@ import useStore from '../../../../State/store';
  * The iframe will contain pure HTML with inline styles and vanilla JavaScript,
  * making it easy to embed in storefronts later.
  */
-const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete }, ref) => {
+const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, isDiscountEnabled }, ref) => {
     const iframeRef = useRef(null);
     const [iframeContent, setIframeContent] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -490,6 +490,24 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
                     selectedView = data.selectedView;
                     currentQuestionIndex = data.initialQuestionIndex || 0;
                     answers = {};
+                    
+                    // Check if discount is enabled and add discount question if needed
+                    if (data.isDiscountEnabled && surveyData.questions) {
+                        // Add discount question before the last question
+                        const discountQuestion = {
+                            id: 'discount-slide',
+                            content: 'Enter your email to receive your discount',
+                            description: 'We will send the discount code to your email.',
+                            type: 'discount'
+                        };
+                        
+                        // Insert before the last question or at the end if there's only 1 question
+                        const insertAt = surveyData.questions.length > 1 ? 
+                            surveyData.questions.length - 1 : surveyData.questions.length;
+                        
+                        surveyData.questions.splice(insertAt, 0, discountQuestion);
+                    }
+                    
                     initSurvey();
                     sendMessageToParent('SURVEY_READY', { currentQuestionIndex });
                     break;
@@ -598,6 +616,12 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
                 questionHTML += renderSatisfactionQuestion(question);
             } else if (question.type === 'number-scale') {
                 questionHTML += renderNumberScaleQuestion(question);
+            // } else if (question.type === 'discount') {
+            //     questionHTML += renderDiscountQuestion(question);
+            } else if (question.type === 'consent') {
+                questionHTML += renderDiscountQuestion(question);
+
+                // questionHTML += renderConsentQuestion(question);
             } else if (question.answerOptions && question.answerOptions.length > 0) {
                 questionHTML += renderMultipleChoiceQuestion(question);
             } else if (question.type === 'text') {
@@ -804,6 +828,63 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             \`;
         }
         
+        // Render discount question
+        function renderDiscountQuestion(question) {
+            const storedValue = answers[currentQuestionIndex] || {};
+            const emailValue = storedValue.email || '';
+            const acceptedTerms = storedValue.acceptedTerms || false;
+        
+            return \`
+                <div class="th-sf-survey-discount-container" style="display: flex; flex-direction: column; gap: 12px; max-width: 400px;">
+                    <input type="email"
+                           id="discount-email-input"
+                           placeholder="Enter your email"
+                           value="\${emailValue}"
+                           style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%;" />
+        
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #333;">
+                        <input type="checkbox" id="discount-privacy-checkbox" \${acceptedTerms ? 'checked' : ''} />
+                        I agree to receive promotional emails.
+                    </label>
+                </div>
+            \`;
+        }
+        
+        // Render consent question
+        function renderConsentQuestion(question) {
+            const storedValue = answers[currentQuestionIndex] || {};
+            const emailValue = storedValue.email || '';
+            const acceptedTerms = storedValue.acceptedTerms || false;
+        
+            // Check if discount is enabled to show the discount widget
+            if (surveyData && surveyData.discountEnabled) {
+                return \`
+                    <div class="th-sf-survey-consent-container" style="display: flex; flex-direction: column; gap: 12px; max-width: 400px;">
+                        <input type="email"
+                               id="consent-email-input"
+                               placeholder="Enter your email"
+                               value="\${emailValue}"
+                               style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%;" />
+            
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #333;">
+                            <input type="checkbox" id="consent-privacy-checkbox" \${acceptedTerms ? 'checked' : ''} />
+                            I agree to receive promotional emails and discount offers.
+                        </label>
+                    </div>
+                \`;
+            } else {
+                // Simple consent without discount widget
+                return \`
+                    <div class="th-sf-survey-consent-container" style="display: flex; flex-direction: column; gap: 12px; max-width: 400px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #333;">
+                            <input type="checkbox" id="consent-privacy-checkbox" \${acceptedTerms ? 'checked' : ''} />
+                            I agree to the terms and conditions.
+                        </label>
+                    </div>
+                \`;
+            }
+        }
+        
         // Add event listeners to question elements
         function addQuestionEventListeners() {
             // Star rating container
@@ -907,6 +988,38 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             if (textInput) {
                 textInput.addEventListener('input', (e) => {
                     handleTextInput(e.target.value);
+                });
+            }
+            
+            // Discount email input
+            const discountEmailInput = document.getElementById('discount-email-input');
+            if (discountEmailInput) {
+                discountEmailInput.addEventListener('input', (e) => {
+                    handleDiscountEmailInput(e.target.value);
+                });
+            }
+            
+            // Discount privacy checkbox
+            const discountCheckbox = document.getElementById('discount-privacy-checkbox');
+            if (discountCheckbox) {
+                discountCheckbox.addEventListener('change', (e) => {
+                    handleDiscountTermsChange(e.target.checked);
+                });
+            }
+            
+            // Consent email input
+            const consentEmailInput = document.getElementById('consent-email-input');
+            if (consentEmailInput) {
+                consentEmailInput.addEventListener('input', (e) => {
+                    handleConsentEmailInput(e.target.value);
+                });
+            }
+            
+            // Consent privacy checkbox
+            const consentCheckbox = document.getElementById('consent-privacy-checkbox');
+            if (consentCheckbox) {
+                consentCheckbox.addEventListener('change', (e) => {
+                    handleConsentTermsChange(e.target.checked);
                 });
             }
         }
@@ -1050,6 +1163,70 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             });
         }
         
+        // Handle discount email input
+        function handleDiscountEmailInput(value) {
+            answers[currentQuestionIndex] = {
+                ...answers[currentQuestionIndex],
+                email: value
+            };
+            updateNavigationButtons();
+            
+            // Sync with parent
+            sendMessageToParent('ANSWER_SELECTED', {
+                questionIndex: currentQuestionIndex,
+                answer: answers[currentQuestionIndex],
+                questionType: 'discount'
+            });
+        }
+        
+        // Handle discount terms checkbox
+        function handleDiscountTermsChange(checked) {
+            answers[currentQuestionIndex] = {
+                ...answers[currentQuestionIndex],
+                acceptedTerms: checked
+            };
+            updateNavigationButtons();
+            
+            // Sync with parent
+            sendMessageToParent('ANSWER_SELECTED', {
+                questionIndex: currentQuestionIndex,
+                answer: answers[currentQuestionIndex],
+                questionType: 'discount'
+            });
+        }
+        
+        // Handle consent email input
+        function handleConsentEmailInput(value) {
+            answers[currentQuestionIndex] = {
+                ...answers[currentQuestionIndex],
+                email: value
+            };
+            updateNavigationButtons();
+            
+            // Sync with parent
+            sendMessageToParent('ANSWER_SELECTED', {
+                questionIndex: currentQuestionIndex,
+                answer: answers[currentQuestionIndex],
+                questionType: 'consent'
+            });
+        }
+        
+        // Handle consent terms checkbox
+        function handleConsentTermsChange(checked) {
+            answers[currentQuestionIndex] = {
+                ...answers[currentQuestionIndex],
+                acceptedTerms: checked
+            };
+            updateNavigationButtons();
+            
+            // Sync with parent
+            sendMessageToParent('ANSWER_SELECTED', {
+                questionIndex: currentQuestionIndex,
+                answer: answers[currentQuestionIndex],
+                questionType: 'consent'
+            });
+        }
+        
         // Update question display after selection
         function updateQuestionDisplay() {
             renderQuestion();
@@ -1108,6 +1285,27 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
             // Handle text questions
             if (question.type === 'text') {
                 return answer && answer.trim().length > 0;
+            }
+            
+            // Handle discount questions
+            if (question.type === 'discount') {
+                // Check if email is valid and terms are accepted
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const isEmailValid = answer.email && emailRegex.test(answer.email);
+                return isEmailValid && answer.acceptedTerms === true;
+            }
+            
+            // Handle consent questions
+            if (question.type === 'consent') {
+                // If discount is enabled, check email and terms
+                if (surveyData && surveyData.discountEnabled) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    const isEmailValid = answer.email && emailRegex.test(answer.email);
+                    return isEmailValid && answer.acceptedTerms === true;
+                } else {
+                    // Simple consent - just check if terms are accepted
+                    return answer.acceptedTerms === true;
+                }
             }
             
             // For choice questions (single or multiple), check if at least one option is selected
@@ -1303,7 +1501,8 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete },
                 data: {
                     surveyData,
                     selectedView,
-                    initialQuestionIndex
+                    initialQuestionIndex,
+                    isDiscountEnabled
                 }
             }, '*');
 

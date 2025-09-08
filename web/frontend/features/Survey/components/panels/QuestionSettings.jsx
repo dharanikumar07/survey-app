@@ -474,7 +474,7 @@ function QuestionSettings({ surveyPreviewRef }) {
                             </BlockStack>
                         )}
 
-                    {selectedQuestionId !== 'thankyou' && (
+                    {/* {selectedQuestionId !== 'thankyou' && (
                         <BlockStack gap="300">
                             <Box paddingBlockStart="300">
                                 <Checkbox
@@ -484,9 +484,9 @@ function QuestionSettings({ surveyPreviewRef }) {
                                 />
                             </Box>
                         </BlockStack>
-                    )}
+                    )} */}
 
-                    {selectedQuestionId !== 'thankyou' && (
+                    {/* {selectedQuestionId !== 'thankyou' && (
                         <BlockStack gap="300">
                             <Text variant="bodySm" as="h3">Image</Text>
                             <div className="th-sf-image-upload-area">
@@ -498,7 +498,7 @@ function QuestionSettings({ surveyPreviewRef }) {
                                 </BlockStack>
                             </div>
                         </BlockStack>
-                    )}
+                    )} */}
 
                     <Divider />
 

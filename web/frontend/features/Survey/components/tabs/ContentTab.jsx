@@ -11,7 +11,8 @@ import {
     DuplicateIcon,
     DeleteIcon,
     CalendarIcon,
-    ListNumberedIcon
+    ListNumberedIcon,
+    CheckboxIcon
 } from '@shopify/polaris-icons';
 import { useSurveyState } from '../../hooks/useSurveyState';
 import { validateQuestion, getQuestionTypeDisplayName } from '../../utils/surveyHelpers';
@@ -26,6 +27,8 @@ function getTypeIcon(type) {
             return IdentityCardIcon;
         case 'number-scale':
             return ListNumberedIcon;
+        case 'consent':
+            return CheckboxIcon;
         case 'date':
             return CalendarIcon;
         default:
@@ -191,6 +194,7 @@ export function ContentTab({ surveyPreviewRef }) {
                                         { content: 'Star rating', onAction: () => insertQuestionByType('rating') },
                                         { content: 'Satisfaction', onAction: () => insertQuestionByType('satisfaction') },
                                         { content: 'Short answer', onAction: () => insertQuestionByType('text') },
+                                        { content: 'Consent', onAction: () => insertQuestionByType('consent') },
                                     ]}
                                 />
                             </Popover>
