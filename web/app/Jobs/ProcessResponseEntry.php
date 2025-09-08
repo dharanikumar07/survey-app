@@ -5,9 +5,11 @@ namespace App\Jobs;
 use App\Cache\CacheKeys;
 use App\Cache\SurveyCacheService;
 use App\Http\Helper\Helper;
+use App\Mail\DiscountCodeMail;
 use App\Models\Response;
 use App\Models\Store;
 use App\Models\Survey;
+use App\Services\DiscountCodeQuery;
 use App\Services\ShopifyCustomerFetcher;
 use App\Services\ShopifyOrderFetcher;
 use Carbon\Carbon;
@@ -15,6 +17,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class ProcessResponseEntry implements ShouldQueue
 {
@@ -28,10 +32,12 @@ class ProcessResponseEntry implements ShouldQueue
 
     public $responseEntryId;
 
+    public $responseData;
+
     /**
      * Create a new job instance.
      */
-    public function __construct(Store $store, $survey, $responseEntryId)
+    public function __construct(Store $store, Survey $survey, $responseEntryId)
     {
         $this->store = $store;
         $this->survey = $survey;
@@ -47,6 +53,8 @@ class ProcessResponseEntry implements ShouldQueue
 
         $surveyCacheService = app(SurveyCacheService::class);
         $surveyData = $surveyCacheService->getResponseData($key);
+
+        $this->responseData = $surveyData;
 
         DB::beginTransaction();
         try {
@@ -66,12 +74,17 @@ class ProcessResponseEntry implements ShouldQueue
             }
 
             $customer = null;
-            if ($platformCustomerId) {
-                $shopifyCustomerFetcher = new ShopifyCustomerFetcher($this->store);
-                $customer = $shopifyCustomerFetcher->getCustomerByPlatformCustomerId($platformCustomerId);
-            }
+//            if ($platformCustomerId) {
+//                $shopifyCustomerFetcher = new ShopifyCustomerFetcher($this->store);
+//                info("eneteredddd");
+//                $customer = $shopifyCustomerFetcher->getCustomerByPlatformCustomerId($platformCustomerId);
+//            }
 
             $this->createResponseData($surveyData, $customer, $order);
+
+            if($this->survey->getDiscountEnabledOrNot() === true) {
+                $this->getDiscountCode();
+            }
             DB::commit();
         } catch(\Exception $e){
             DB::rollBack();
@@ -95,10 +108,45 @@ class ProcessResponseEntry implements ShouldQueue
         info("response created successfully");
     }
 
-    public function generateDiscountCode(array $data)
+    public function getDiscountCode()
     {
+        $discountHelper = new DiscountCodeQuery($this->store);
+        info('response data: ',$this->responseData);
+        $data = [
+            'title' => 'Survey_app_discount ' . Str::random(4),
+            'discount_type' => $this->survey->getDiscountValue(),
+            'type' => $this->survey->getDiscountType() ?? 'generic',
+            'code' =>  Str::upper(Str::random(10)),
+            'customer_email' => $this->responseData['email'] ?? null
+        ];
 
+        if ($data['discount_type'] === 'percentage') {
+            $data['percentage'] = $this->survey->getDiscountValueAmount() ?? 10;
+        } elseif ($data['discount_type'] === 'fixed_amount') {
+            $data['amount'] = $this->survey->getDiscountValueAmount() ?? 5.00;
+        }
+
+        $customerName = null;
+
+        if ($data['type'] === 'customer-specific' && !empty($data['customer_email'])) {
+            $customer = $discountHelper->getCustomerByEmail($data['customer_email']);
+
+            if (!empty($customer)) {
+                $firstName = $customer['first_name'] ?? '';
+                $lastName = $customer['last_name'] ?? '';
+
+                $customerName = trim($firstName . ' ' . $lastName);
+            }
+        }
+        info(print_r($data, true));
+
+        $result = $discountHelper->createDiscount($data);
+        info(print_r($result, true));
+        if (!empty($result)) {
+            Mail::to($data['customer_email'])->send(
+                new DiscountCodeMail($data['code'], $customerName, $data['customer_email'] ?? null)
+            );
+        }
     }
-
 
 }

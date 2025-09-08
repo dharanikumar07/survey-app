@@ -21,8 +21,22 @@ class SurveyViewController
                 'uuid' => $survey->getSurveyUuid(),
                 'store_uuid' => $storeUuid,
                 'backend_url' => env('HOST'),
-                'questions' => $surveyData['questions']
+                'questions' => $surveyData['questions'],
+                'discount' => $surveyData['discount'],
             ];
+
+            $isEnabledDiscount = $surveyData['discount']['enabled'] ?? false;
+
+            if ($isEnabledDiscount) {
+                $discountQuestion = [
+                    'type' => 'discount',
+                    'heading' => '🎁 Unlock Your Reward!',
+                    'content' => 'Discount Offer',
+                    'data' => $surveyData['discount']
+                ];
+
+                $surveyData['questions'][] = $discountQuestion;
+            }
 
 
             return view('survey.widget', [

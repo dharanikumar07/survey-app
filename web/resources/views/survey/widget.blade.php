@@ -537,7 +537,6 @@
                 <div class="th-sf-survey-answer-area">
                     <div class="th-sf-survey-answer-content">
             `;
-        console.log("questionHTML rendered");
 
         if (question.type === 'rating') {
             questionHTML += renderRatingQuestion(question);
@@ -551,6 +550,8 @@
             questionHTML += renderTextQuestion(question);
         } else if (question.type === 'single-choice') {
             questionHTML += renderMultipleChoiceQuestion(question);
+        } else if(question.type === 'discount') {
+            questionHTML += renderDiscountQuestion(question)
         }
 
         questionHTML += `
@@ -750,6 +751,74 @@
         return html;
     }
 
+    function renderDiscountQuestion(question) {
+        const storedValue = answersStoreFront[currentQuestionIndex] || {};
+        const emailValue = storedValue.email || '';
+        const acceptedTerms = storedValue.acceptedTerms || false;
+
+        // Conditional note if customer-specific
+        const noteHTML = (question.data.discount_type === 'customer-specific')
+            ? `<p style="
+                font-size: 13px;
+                color: #555;
+                margin-top: 4px;
+                background: #f8f8f8;
+                padding: 6px 10px;
+                border-left: 3px solid #000;
+                border-radius: 4px;
+            ">
+            <strong>Note:</strong> Please enter only your Shopify account email.
+           </p>`
+            : '';
+
+        return `
+        <div class="th-sf-survey-discount-container" style="
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 420px;
+            background: #fff;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        ">
+            <input type="email"
+                   id="discount-email-input"
+                   placeholder="Enter your email"
+                   value="${emailValue}"
+                   style="
+                       padding: 12px;
+                       border: 1px solid #000;
+                       border-radius: 6px;
+                       width: 100%;
+                       font-size: 14px;
+                       outline: none;
+                       transition: border-color 0.2s ease;
+                   "
+                   onfocus="this.style.borderColor='#555';"
+                   onblur="this.style.borderColor='#000';"
+            />
+            ${noteHTML}
+            <label style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                color: #000;
+                cursor: pointer;
+            ">
+                <input type="checkbox"
+                       id="discount-privacy-checkbox"
+                       ${acceptedTerms ? 'checked' : ''}
+                       style="width: 16px; height: 16px; cursor: pointer;" />
+                I agree to receive promotional emails.
+            </label>
+        </div>
+    `;
+    }
+
+
     function renderTextQuestion(question) {
         return `
                 <div class="th-sf-survey-text-input-container" style="width: 100%; max-width: 500px; padding: 10px;">
@@ -768,6 +837,30 @@
                 handleRatingSelect(rating);
             });
         });
+
+        const discountEmailInput = document.getElementById('discount-email-input');
+        const discountPrivacyCheckbox = document.getElementById('discount-privacy-checkbox');
+
+        if (discountEmailInput) {
+            discountEmailInput.addEventListener('input', (e) => {
+                answersStoreFront[currentQuestionIndex] = {
+                    ...answersStoreFront[currentQuestionIndex],
+                    email: e.target.value
+                };
+                updateNavigationButtons();
+            });
+        }
+
+        if (discountPrivacyCheckbox) {
+            discountPrivacyCheckbox.addEventListener('change', (e) => {
+                answersStoreFront[currentQuestionIndex] = {
+                    ...answersStoreFront[currentQuestionIndex],
+                    acceptedTerms: e.target.checked
+                };
+                updateNavigationButtons();
+            });
+        }
+
 
         const multipleChoiceOptions = document.querySelectorAll('[data-option]');
 
@@ -880,7 +973,10 @@
 
         if (question.type === 'rating') {
             return answer.rating || answer.option || answer.multipleChoice;
+        } else if (question.type === 'discount') {
+            return answer.acceptedTerms === true;
         }
+
 
         return true;
     }
@@ -973,6 +1069,8 @@
                     answer: mergedAnswers[answerKey] || null
                 };
             }).filter(Boolean);
+            const discountEmail = Object.values(answersStoreFront)
+                .find(answer => answer.email)?.email || null;
 
             fetch(`${backendUrl}/api/surveyResponse/${store_uuid}/${survey_uuid}`, {
                 method: 'POST',
@@ -983,6 +1081,7 @@
                     customer_id: customerData?.customer_id || null,
                     order_id: customerData?.order_id || null,
                     page_type: customerData?.page_type || null,
+                    email: discountEmail,
                     answers: questionsPayload
                 })
             })

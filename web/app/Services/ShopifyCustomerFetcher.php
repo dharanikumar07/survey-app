@@ -197,7 +197,7 @@ GRAPHQL;
         $customerData = $this->handleCustomerData($response);
 
         return Customer::updateOrCreate(
-            ['platform_customer_id' => $platformCustomerId],
+            ['platform_customer_id' => (string) $platformCustomerId],
             $customerData
         );
 

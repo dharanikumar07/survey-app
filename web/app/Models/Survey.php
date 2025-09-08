@@ -89,4 +89,24 @@ class Survey extends Model
     {
         return $this->survey_meta_data['channels']['onsite']['config']['excludePages'] ?? false;
     }
+
+    public function getDiscountEnabledOrNot()
+    {
+        return $this->survey_meta_data['discount']['enabled'] ?? false;
+    }
+
+    public function getDiscountValue()
+    {
+        return $this->survey_meta_data['discount']['discount_value'] ?? 'percentage';
+    }
+
+    public function getDiscountType()
+    {
+        return $this->survey_meta_data['discount']['discount_type'] ?? 'generic';
+    }
+
+    public function getDiscountValueAmount()
+    {
+        return $this->survey_meta_data['discount']['discount_value_amount'] ?? 5;
+    }
 }

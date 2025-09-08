@@ -23,6 +23,8 @@ class DiscountCodeQuery
         $customerEmail = $data['customer_email'] ?? null;
         $code = $data['code'];
 
+        info("customer email: " . $customerEmail);
+
         $discountType = $data['discount_type'] ?? 'percentage';
 
         if ($discountType === 'percentage') {
@@ -36,7 +38,6 @@ class DiscountCodeQuery
         $existingRule = $this->findExistingPriceRule($title, $discountType, $value, $type, $customerEmail);
 
         if (!$existingRule) {
-            // 2️⃣ Create Price Rule payload
             $priceRulePayload = [
                 "price_rule" => [
                     "title" => $title,
@@ -51,14 +52,27 @@ class DiscountCodeQuery
                     "customer_selection" => $type === 'generic' ? "all" : "prerequisite",
                 ]
             ];
+            info($type);
+            info($customerEmail);
+            if ($type === 'customer-specific' && $customerEmail) {
+                info("eneter in this part");
+                $customer = $this->getCustomerByEmail($customerEmail);
+                info(print_r($customer, true));
+                if (!$customer) {
+                    throw new \Exception("Customer with email {$customerEmail} not found in Shopify");
+                }
 
-            if ($type === 'customer_specific' && $customerEmail) {
-                $priceRulePayload['price_rule']['prerequisite_customer_emails'] = [$customerEmail];
+                $priceRulePayload['price_rule']['prerequisite_customer_ids'] = [$customer['id']];
             }
 
             $createRuleResponse = $this->post("price_rules.json", $priceRulePayload);
 
             if ($createRuleResponse->failed()) {
+                \Log::error('Shopify Price Rule creation failed', [
+                    'status' => $createRuleResponse->status(),
+                    'body'   => $createRuleResponse->json(),
+                    'payload' => $priceRulePayload
+                ]);
                 throw new \Exception('Failed to create price rule in Shopify');
             }
 
@@ -76,8 +90,14 @@ class DiscountCodeQuery
         $createCodeResponse = $this->post("price_rules/{$priceRuleId}/discount_codes.json", $discountCodePayload);
 
         if ($createCodeResponse->failed()) {
+            \Log::error('Shopify Discount Code creation failed', [
+                'status' => $createCodeResponse->status(),
+                'body'   => $createCodeResponse->json(),
+                'payload' => $discountCodePayload
+            ]);
             throw new \Exception('Failed to create discount code in Shopify');
         }
+
 
         return [
             'price_rule' => $existingRule,
@@ -112,6 +132,19 @@ class DiscountCodeQuery
         }
 
         return null;
+    }
+
+    public function getCustomerByEmail($email)
+    {
+        $response = $this->getRequest("customers/search.json?query=email:{$email}");
+
+        if ($response->failed()) {
+            throw new \Exception("Failed to fetch customer for email: {$email}");
+        }
+
+        $customers = $response->json()['customers'] ?? [];
+
+        return !empty($customers) ? $customers[0] : null;
     }
 
 }
