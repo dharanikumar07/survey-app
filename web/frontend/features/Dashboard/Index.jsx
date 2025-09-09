@@ -98,7 +98,7 @@ export default function Dashboard() {
     }
 
     return (
-        <Page title={`Hi ${shopName}! 👋`} subtitle="Welcome to SEA Customer Survey">
+        <Page title={`Hi ${shopName}! 👋`} subtitle="Welcome to Customer Survey">
             <Layout>
                 <Layout.Section>
                     <Quickstart />

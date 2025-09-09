@@ -63,22 +63,22 @@ export default function TemplateSelection() {
             buttonText: "Create",
             badge: { status: "success", content: "New" },
         },
-        {
-            key: "ai_creation",
-            title: "AI-assisted creation",
-            description: "Tell us what you're looking for and our AI will create a custom survey for you.",
-            image: null,
-            buttonText: "Create with AI",
-            badge: { status: "magic", content: "AI-assisted", progress: "complete" },
-            customContent: (
-                <div className="text-center">
-                    <div className="text-5xl mb-4">✨</div>
-                    <div className="text-white text-xl font-bold">AI Generated</div>
-                    <div className="text-white opacity-80 text-sm mt-1">Powered by Gemini ✨</div>
-                </div>
-            ),
-            customBackground: "bg-gradient-to-r from-blue-500 to-purple-600"
-        }
+        // {
+        //     key: "ai_creation",
+        //     title: "AI-assisted creation",
+        //     description: "Tell us what you're looking for and our AI will create a custom survey for you.",
+        //     image: null,
+        //     buttonText: "Create with AI",
+        //     badge: { status: "magic", content: "AI-assisted", progress: "complete" },
+        //     customContent: (
+        //         <div className="text-center">
+        //             <div className="text-5xl mb-4">✨</div>
+        //             <div className="text-white text-xl font-bold">AI Generated</div>
+        //             <div className="text-white opacity-80 text-sm mt-1">Powered by Gemini ✨</div>
+        //         </div>
+        //     ),
+        //     customBackground: "bg-gradient-to-r from-blue-500 to-purple-600"
+        // }
     ];
 
     const handleTemplateSelect = (templateKey) => {

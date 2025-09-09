@@ -80,7 +80,7 @@ export default function Quickstart() {
     } = useExtensionStatus();
 
     const [statusByStep, setStatusByStep] = useState({
-        activate: "idle",
+        activate: "complete",
         create: "idle",
         visualize: "idle",
     });
@@ -113,23 +113,15 @@ export default function Quickstart() {
         [],
     );
 
-    const [activeStepId, setActiveStepId] = useState("activate");
+    const [activeStepId, setActiveStepId] = useState("create");
 
     // Check extension status on component mount
     useEffect(() => {
         checkStatus();
     }, [checkStatus]);
 
-    // Update activate step status based on extension status
-    useEffect(() => {
-        if (extensionLoading) {
-            setStatusByStep(prev => ({ ...prev, activate: "loading" }));
-        } else if (isExtensionEnabled) {
-            setStatusByStep(prev => ({ ...prev, activate: "complete" }));
-        } else {
-            setStatusByStep(prev => ({ ...prev, activate: "idle" }));
-        }
-    }, [isExtensionEnabled, extensionLoading]);
+    // Removed the effect that updates the activate step based on extension status
+    // The first step is now always complete regardless of API response
 
     const completedCount = useMemo(
         () => Object.values(statusByStep).filter((s) => s === "complete").length,

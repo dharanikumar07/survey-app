@@ -28,7 +28,7 @@ class DiscountCodeMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Your Special Discount Code')
+        return $this->subject('Claim Your Discount')
             ->view('emails.discount_code')
             ->with([
                 'customerName' => $this->customer_name,

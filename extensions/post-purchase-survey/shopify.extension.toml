@@ -8,6 +8,7 @@ api_version = "2025-07"
 [[extensions]]
 name = "post-purchase-survey"
 handle = "post-purchase-survey"
+uid = "5bbce4d5-0610-0b76-fa6d-c6fef535cee9f855bf02"
 type = "ui_extension"
 
 

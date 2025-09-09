@@ -4,7 +4,7 @@
 {% assign metaobject_type = "app--" | append: app_id | append: "--post_purchase_survey" %}
 {% assign metaobject_data = shop.metaobjects[metaobject_type] %}
 {% assign survey_data_json = metaobject_data.post_purchase_survey.settings | default: "{}" %}
-
+<pre> {{ survey_data_json  }}</pre>
 <script>
     window.PostPurchaseSurveyData = {
         value: {{ survey_data_json }},

@@ -72,15 +72,18 @@ export default function Response() {
         if (selected === 2) return false; // Archived tab (can be updated based on your criteria)
         return true; // 'All' tab
     }).filter(response => {
-        // Since we don't have answerType in the new data structure, we'll skip this filtering for now
-        // You can add custom filtering based on answer content or other criteria if needed
+        // Filter by answer type if specified
+        if (taggedWith !== 'all') {
+            // Check if any answer in the response matches the selected type
+            return response.answers.some(answer => answer.type === taggedWith);
+        }
         return true;
     });
 
     // Search and filter responses
     const searchedResponses = filteredResponses.filter(response => {
         if (queryValue) {
-            return response.id.toString().includes(queryValue.toLowerCase()) ||
+            return response.uuid.toLowerCase().includes(queryValue.toLowerCase()) ||
                 response.survey_name.toLowerCase().includes(queryValue.toLowerCase());
         }
         return true;
@@ -98,15 +101,19 @@ export default function Response() {
     // Flatten responses for table display
     const tableRows = paginatedResponses.flatMap(response =>
         response.answers.map((answer, index) => ({
-            id: `${response.id}-${index}`,
-            responseId: response.id,
+            id: `${response.uuid}-${index}`,
+            responseId: response.uuid,
             survey: response.survey_name,
             question: answer.question,
-            // Since we don't have answerType in the new format, we'll set a default
-            answerType: "Text",
-            answer: answer.answer,
+            // Use the answer type from the API response
+            answerType: answer.type,
+            // Handle different answer formats
+            answer: answer.type === 'multiple' ? 
+                (Array.isArray(answer.answers) && answer.answers[0] ? 
+                    answer.answers[0].join(', ') : '') : 
+                answer.answer,
             date: new Date(response.created_at).toLocaleDateString(),
-            actions: response.id
+            actions: response.uuid
         }))
     );
 
@@ -142,9 +149,11 @@ export default function Response() {
                     titleHidden
                     choices={[
                         { label: 'All types', value: 'all' },
-                        { label: 'Number scale', value: 'number_scale' },
-                        { label: 'Short answer', value: 'short_answer' },
-                        { label: 'Yes/No', value: 'yes_no' },
+                        { label: 'Number scale', value: 'number-scale' },
+                        { label: 'Rating', value: 'rating' },
+                        { label: 'Satisfaction', value: 'satisfaction' },
+                        { label: 'Multiple choice', value: 'multiple' },
+                        { label: 'Text', value: 'text' },
                     ]}
                     selected={[taggedWith]}
                     onChange={([selectedType]) => setTaggedWith(selectedType)}
@@ -164,9 +173,17 @@ export default function Response() {
         });
     }
     if (taggedWith !== 'all') {
+        const typeLabels = {
+            'number-scale': 'Number scale',
+            'rating': 'Rating',
+            'satisfaction': 'Satisfaction',
+            'multiple': 'Multiple choice',
+            'text': 'Text'
+        };
+        
         appliedFilters.push({
             key: 'taggedWith',
-            label: `Answer type: ${taggedWith === 'number_scale' ? 'Number scale' : taggedWith === 'short_answer' ? 'Short answer' : 'Yes/No'}`,
+            label: `Answer type: ${typeLabels[taggedWith] || taggedWith}`,
             onRemove: () => setTaggedWith('all'),
         });
     }
@@ -203,7 +220,7 @@ export default function Response() {
     };
 
     const handleViewResponse = (responseId) => {
-        const response = responses.find(r => r.id === parseInt(responseId));
+        const response = responses.find(r => r.uuid === responseId);
         setSelectedResponse(response);
         setModalOpen(true);
     };
@@ -268,14 +285,14 @@ export default function Response() {
                             onClick={() => handleViewResponse(responseId)}
                             aria-label={`View response ${responseId}`}
                         />
-                        <Button
+                        {/* <Button
                             icon={DeleteIcon}
                             size="slim"
                             variant='plain'
                             tone="critical"
                             onClick={() => handleDeleteResponse(responseId)}
                             aria-label={`Delete response ${responseId}`}
-                        />
+                        /> */}
                     </div>
                 </IndexTable.Cell>
             </IndexTable.Row>
@@ -373,7 +390,7 @@ export default function Response() {
             <Modal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
-                title={`Response #${selectedResponse?.id}`}
+                title={`Response #${selectedResponse?.uuid?.substring(0, 8) || ''}`}
                 primaryAction={{
                     content: 'Close',
                     onAction: () => setModalOpen(false),
@@ -387,7 +404,7 @@ export default function Response() {
                                     <strong>Survey:</strong> {selectedResponse.survey_name}
                                 </Text>
                                 <Text variant="bodyMd" as="p">
-                                    <strong>Platform:</strong> {selectedResponse.platform}
+                                    <strong>Page Type:</strong> {selectedResponse.page_type}
                                 </Text>
                                 <Text variant="bodyMd" as="p">
                                     <strong>Date:</strong> {new Date(selectedResponse.created_at).toLocaleString()}
@@ -400,7 +417,12 @@ export default function Response() {
                                         Question {index + 1}: {answer.question}
                                     </Text>
                                     <Text variant="bodyMd" as="p">
-                                        <strong>Answer:</strong> {answer.answer}
+                                        <strong>Answer:</strong> {
+                                            answer.type === 'multiple' ? 
+                                            (Array.isArray(answer.answers) && answer.answers[0] ? 
+                                                answer.answers[0].join(', ') : 'No answer') : 
+                                            answer.answer || 'No answer'
+                                        }
                                     </Text>
                                 </Box>
                             ))}

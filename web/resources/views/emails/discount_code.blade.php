@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Your Discount Code</title>
+    <title>Discount Code</title>
     <style>
         body {
             font-family: Arial, sans-serif;
