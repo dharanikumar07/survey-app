@@ -7,6 +7,8 @@ import TemplateSelection from "../features/Survey/TemplateSelection.jsx";
 import SurveyForm from "../features/Survey/SurveyForm.jsx";
 import AISurveyCreation from "../features/Survey/components/AI/Index.jsx";
 import Analytics from "../features/Analytics/Index.jsx";
+import Integrations from "../features/Integrations/Index.jsx";
+import KlaviyoIntegration from "../features/Integrations/Klaviyo/Klaviyo.jsx";
 
 const router = createBrowserRouter([
     {
@@ -40,6 +42,14 @@ const router = createBrowserRouter([
     {
         path: "/analytics",
         element: <Analytics />,
+    },
+    {
+        path: "/integrations",
+        element: <Integrations />,
+    },
+    {
+        path: "/integrations/klaviyo",
+        element: <KlaviyoIntegration />,
     },
     {
         path: "/ExitIframe",
