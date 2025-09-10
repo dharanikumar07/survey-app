@@ -70,6 +70,8 @@ class UpdateAppMetaObjects implements ShouldQueue
         {
             $cacheService = app(SurveyCacheService::class);
             $cacheService->saveSurveyData($this->store, $this->survey);
+        } else {
+            CreateMetaObjectDefinition::dispatch($this->store);
         }
     }
 }
