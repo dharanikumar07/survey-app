@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Page, Card, Layout, Text, Button, BlockStack, InlineStack, Icon, Badge } from "@shopify/polaris";
 import { LinkIcon } from '@shopify/polaris-icons';
-import '../../assets/integrations.css';
 import klaviyoIcon from '../../assets/images/klaviyo.png';
 
 function Integrations() {
