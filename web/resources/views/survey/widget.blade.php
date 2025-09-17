@@ -488,6 +488,7 @@
     let progressIndicators = null;
 
     initSurvey();
+    createCloseButton();
 
     function initSurvey() {
         questionContent = document.getElementById('question-content');
@@ -506,6 +507,43 @@
             setTimeout(initSurvey, 100);
         }
     }
+
+    function createCloseButton() {
+        const closeBtn = document.createElement("button");
+        closeBtn.innerHTML = "&#10005;";
+
+        closeBtn.style.position = "absolute";
+        closeBtn.style.top = "10px";
+        closeBtn.style.right = "10px";
+        closeBtn.style.width = "32px";
+        closeBtn.style.height = "32px";
+        closeBtn.style.border = "none";
+        closeBtn.style.borderRadius = "50%";
+        closeBtn.style.background="none";
+        closeBtn.style.color = "#000000";
+        closeBtn.style.fontSize = "18px";
+        closeBtn.style.cursor = "pointer";
+
+        const contentWrapper = document.querySelector(".th-sf-survey-content");
+
+        if (contentWrapper) {
+            contentWrapper.style.position = "relative";
+            contentWrapper.appendChild(closeBtn);
+        }
+
+        closeBtn.addEventListener("click", () => {
+            const message = surveyData.is_branded === "1"
+                ? "branded-survey-close"
+                : "survey-widget-close";
+            console.log("close button clicked");
+            console.log("message: ", message)
+            window.parent.postMessage({
+                type: message,
+                value: surveyData.uuid
+            }, "*");
+        });
+    }
+
 
     function renderProgressIndicators() {
         if (!progressIndicators || !surveyData) return;
@@ -1173,6 +1211,5 @@
         listenResizeObserver();
     });
 </script>
-<script src="{{ asset('assets/js/survey-widget.js') }}"></script>
 </body>
 </html>

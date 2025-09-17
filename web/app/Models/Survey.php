@@ -65,7 +65,7 @@ class Survey extends Model
         return $this->belongsTo(Store::class, 'store_uuid', 'uuid');
     }
 
-    public function responses(): HasMany
+    public function responses()
     {
         return $this->hasMany(Response::class, 'survey_uuid', 'uuid');
     }

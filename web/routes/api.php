@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\SurveyAssistantController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SurveyViewController;
@@ -37,6 +38,8 @@ Route::middleware('shopify.auth')->group(function () {
 
     //response
     Route::get('/response', [ResponseController::class, 'getResponse']);
+    //analytics
+    Route::get('/analytics', [AnalyticsController::class, 'getAnalytics']);
 
     //AI Assistance
     Route::post('/assistant/generate-title', [SurveyAssistantController::class, 'generateTitle']);
