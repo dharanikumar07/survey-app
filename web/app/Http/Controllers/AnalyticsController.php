@@ -3,15 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Response;
+use App\Models\Store;
+use App\Models\Survey;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
 {
-    public function getAnalytics()
+    public function getAnalytics(Request $request)
     {
+        $session = $request->get('shopifySession');
+        $store = Store::where('store_url', $session->getShop())->firstOrFail();
+
         return [
             'ratings' => $this->getStarAnalytics(),
-            'questions' => $this->getQuestionTypeAnalytics()
+            'questions' => $this->getQuestionTypeAnalytics(),
+            'surveys' => $this->getSurveyAnalytics(),
+            'overall' => $this->getOverallAnalytics()
         ];
     }
 
@@ -30,7 +37,7 @@ class AnalyticsController extends Controller
         foreach ($responses as $response) {
             $answers = $response->answers;
 
-            if(is_string($response->answers)) {
+            if (is_string($response->answers)) {
                 $answers = json_decode($response->answers, true);
             }
 
@@ -100,5 +107,62 @@ class AnalyticsController extends Controller
             $questionTypeCounts,
             ['highest_response_type' => $highestResponseType]
         );
+    }
+
+    public function getSurveyAnalytics()
+    {
+        $surveys = Survey::withCount('responses')->get();
+
+        $analytics = [];
+
+        foreach ($surveys as $survey) {
+            $analytics[$survey->uuid] = [
+                'name' => $survey->name,
+                'type' => $survey->survey_type,
+                'total_responses' => $survey->responses_count
+            ];
+        }
+
+        $highestSurvey = $surveys->sortByDesc('responses_count')->first();
+
+        return [
+            'surveys' => $analytics,
+            'highest_response_survey' => $highestSurvey ? [
+                'uuid' => $highestSurvey->uuid,
+                'name' => $highestSurvey->name,
+                'type' => $highestSurvey->survey_type
+            ] : null
+        ];
+    }
+
+    public function getOverallAnalytics()
+    {
+        $totalResponses = Response::count();
+
+        $pageTypes = [
+            'home' => 0,
+            'cart' => 0,
+            'collection' => 0,
+            'products' => 0,
+            'blog' => 0
+        ];
+
+        // Fetch counts from DB grouped by page_type
+        $countsByPage = Response::select('page_type')
+            ->selectRaw('COUNT(*) as total')
+            ->groupBy('page_type')
+            ->pluck('total', 'page_type')
+            ->toArray();
+
+        foreach ($pageTypes as $type => $count) {
+            if (isset($countsByPage[$type])) {
+                $pageTypes[$type] = $countsByPage[$type];
+            }
+        }
+
+        return [
+            'total_responses' => $totalResponses,
+            'page_type_counts' => $pageTypes
+        ];
     }
 }

@@ -18,12 +18,6 @@ class Response extends Model
         'answers' => 'array',
     ];
 
-    // Relationships
-    public function survey(): BelongsTo
-    {
-        return $this->belongsTo(Survey::class, 'survey_uuid', 'uuid');
-    }
-
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class, 'store_uuid', 'uuid');
@@ -32,5 +26,10 @@ class Response extends Model
     public function impressions(): HasMany
     {
         return $this->hasMany(SurveyImpression::class, 'response_uuid', 'uuid');
+    }
+
+    public function survey()
+    {
+        return $this->belongsTo(Survey::class, 'survey_uuid', 'uuid');
     }
 }

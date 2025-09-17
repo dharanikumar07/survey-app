@@ -74,8 +74,6 @@ class SyncCustomers implements ShouldQueue
         if ($rawCustomersData['pageInfo']['hasNextPage']) {
             self::dispatch($this->store, $rawCustomersData['pageInfo']['endCursor'])
                 ->delay(now()->addSeconds(2));
-        } else {
-            SyncProducts::dispatch($this->store);
         }
 
     }

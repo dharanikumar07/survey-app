@@ -18,9 +18,6 @@ class WebHook implements ShouldQueue
         Topics::CUSTOMERS_CREATE,
         Topics::CUSTOMERS_UPDATE,
         Topics::CUSTOMERS_DELETE,
-        Topics::PRODUCTS_CREATE,
-        Topics::PRODUCTS_UPDATE,
-        Topics::PRODUCTS_DELETE,
         Topics::DISCOUNTS_DELETE,
         Topics::APP_UNINSTALLED,
     ];
