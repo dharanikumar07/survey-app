@@ -28,6 +28,31 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
     const generateIframeContent = () => {
         const { questions, name } = surveyData;
 
+        // Get branded colors from store
+        const store = useStore.getState();
+        const brandedColors = store.brandedConfig?.colors || {
+            primary: '#008060',
+            secondary: '#6c757d',
+            accent: '#17a2b8',
+            background: '#ffffff',
+            text: '#333333'
+        };
+
+        const brandedFonts = store.brandedConfig?.fonts || {
+            primary: 'Arial, sans-serif',
+            heading: 'Arial, sans-serif'
+        };
+
+        const displaySettings = store.brandedConfig?.displaySettings || {
+            customBorderRadius: false,
+            borderRadius: '8'
+        };
+
+        // Determine border radius based on settings
+        const borderRadius = displaySettings.customBorderRadius
+            ? displaySettings.borderRadius + 'px'
+            : (selectedView === 'mobile' ? '20px' : '8px');
+
         // Create the HTML structure with inline styles
         const htmlContent = `
 <!DOCTYPE html>
@@ -44,9 +69,10 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f6f6f7;
+            font-family: ${brandedFonts.primary || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'};
+            background: ${brandedColors.background || '#f6f6f7'};
             overflow: hidden;
+            color: ${brandedColors.text || '#333333'};
         }
         
         @keyframes checkmarkAnimation {
@@ -69,7 +95,7 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
         
         .th-sf-survey-container {
             padding: 16px;
-            background: #f6f6f7;
+            background: ${brandedColors.background || '#f6f6f7'};
             height: 100vh;
             overflow: hidden;
         }
@@ -87,7 +113,7 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
         
         .th-sf-survey-card {
             background: white;
-            border-radius: ${selectedView === 'mobile' ? '20px' : '8px'};
+            border-radius: ${borderRadius};
             box-shadow: ${selectedView === 'mobile'
                 ? '0 4px 20px rgba(0, 0, 0, 0.15)'
                 : '0 1px 3px rgba(0, 0, 0, 0.1)'};
@@ -125,15 +151,16 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
             font-size: ${selectedView === 'mobile' ? '20px' : '24px'};
             font-weight: 600;
             margin: 0;
-            color: #202223;
+            color: ${brandedColors.text || '#202223'};
             text-align: center;
             padding: ${selectedView === 'mobile' ? '0 16px' : '0'};
+            font-family: ${brandedFonts.heading || brandedFonts.primary || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'};
         }
         
         .th-sf-survey-question-description {
             font-size: ${selectedView === 'mobile' ? '14px' : '16px'};
             margin: 0;
-            color: #6d7175;
+            color: ${brandedColors.secondary || '#6d7175'};
             text-align: center;
             padding: ${selectedView === 'mobile' ? '0 16px' : '0'};
         }
@@ -172,18 +199,18 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
         }
         
         .th-sf-survey-rating-option.hovered {
-            color: #ffd700;
+            color: ${brandedColors.accent || '#ffd700'};
             transform: scale(1.1);
         }
         
         .th-sf-survey-rating-option:hover {
-            color: #ffd700;
+            color: ${brandedColors.accent || '#ffd700'};
             transform: scale(1.1);
         }
         
         .th-sf-survey-rating-option.selected {
-            color: #ffd700;
-            filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+            color: ${brandedColors.accent || '#ffd700'};
+            filter: drop-shadow(0 0 4px ${brandedColors.accent ? brandedColors.accent + '80' : 'rgba(255, 215, 0, 0.5)'});
         }
         
         /* Number scale hover effect */
@@ -218,11 +245,11 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
         }
         
         .th-sf-survey-multiple-choice-option.selected {
-            border-color: #2c6ecb;
-            background: #f1f8ff;
+            border-color: ${brandedColors.primary || '#2c6ecb'};
+            background: ${brandedColors.primary ? brandedColors.primary + '10' : '#f1f8ff'};
             transform: scale(1.02);
         }
-        
+
         .th-sf-survey-multiple-choice-checkbox {
             width: 20px;
             height: 20px;
@@ -232,20 +259,20 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
             position: relative;
             flex-shrink: 0;
         }
-        
+
         /* Radio button style for single choice questions */
         .th-sf-survey-multiple-choice-checkbox.radio-style {
             border-radius: 50%;
         }
-        
+
         /* Checkbox style for multiple choice questions */
         .th-sf-survey-multiple-choice-checkbox.checkbox-style {
             border-radius: 4px;
         }
-        
+
         .th-sf-survey-multiple-choice-option.selected .th-sf-survey-multiple-choice-checkbox {
-            border-color: #2c6ecb;
-            background: #2c6ecb;
+            border-color: ${brandedColors.primary || '#2c6ecb'};
+            background: ${brandedColors.primary || '#2c6ecb'};
         }
         
         /* Radio button indicator (circular dot) */
@@ -314,12 +341,12 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
         }
         
         .th-sf-survey-next-button {
-            background: #1a1a1a;
+            background: ${brandedColors.primary || '#1a1a1a'};
             color: white;
         }
         
         .th-sf-survey-next-button:hover:not(:disabled) {
-            background: #333;
+            background: ${brandedColors.primary ? brandedColors.primary + 'dd' : '#333'};
             transform: scale(1.05);
         }
         
@@ -1332,12 +1359,12 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
             questionContent.innerHTML = \`
                 <div class="th-sf-survey-thank-you-card">
                     <div style="display: flex; flex-direction: column; gap: 16px; align-items: center;">
-                        <div class="th-sf-survey-checkmark" style="width: 80px; height: 80px; border-radius: 50%; background-color: #008060; display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
+                        <div class="th-sf-survey-checkmark" style="width: 80px; height: 80px; border-radius: 50%; background-color: \${brandedColors.primary || '#008060'}; display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
                             <svg width="40" height="40" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M16.7 5.3c-.4-.4-1-.4-1.4 0l-6.8 6.8-3.8-3.8c-.4-.4-1-.4-1.4 0-.4.4-.4 1 0 1.4l4.5 4.5c.2.2.4.3.7.3.3 0 .5-.1.7-.3l7.5-7.5c.4-.4.4-1 0-1.4z" fill="white"/>
                             </svg>
                         </div>
-                        <h3 class="th-sf-survey-thank-you-heading">Thank you for your feedback!</h3>
+                        <h3 class="th-sf-survey-thank-you-heading" style="font-family: \${brandedFonts.heading || brandedFonts.primary || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'};">Thank you for your feedback!</h3>
                         <p class="th-sf-survey-thank-you-description">We appreciate your time and input.</p>
                     </div>
                 </div>

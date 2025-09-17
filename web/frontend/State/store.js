@@ -35,6 +35,30 @@ const useStore = create((set, get) => ({
         newCustomer: false,
         returnCustomer: false
     },
+
+    // Branded survey configuration state
+    brandedConfig: {
+        logo: '',
+        colors: {
+            primary: '#008060',
+            secondary: '#6c757d',
+            accent: '#17a2b8',
+            background: '#ffffff',
+            text: '#333333'
+        },
+        fonts: {
+            primary: 'Arial, sans-serif',
+            heading: 'Arial, sans-serif',
+            customFamily: ''
+        },
+        displaySettings: {
+            position: 'bottom-right',
+            showLogo: true,
+            customBorderRadius: false,
+            borderRadius: '8'
+        },
+        customCss: ''
+    },
     discountEnabled: false,
     discountSettings: {},
     discountSections: [],
@@ -108,6 +132,14 @@ const useStore = create((set, get) => ({
     })),
     updateThankyouConfig: (key, value) => set((state) => ({
         thankyouConfig: { ...state.thankyouConfig, [key]: value }
+    })),
+
+    // Branded survey configuration actions
+    setBrandedConfig: (updates) => set((state) => ({
+        brandedConfig: { ...state.brandedConfig, ...updates }
+    })),
+    updateBrandedConfig: (key, value) => set((state) => ({
+        brandedConfig: { ...state.brandedConfig, [key]: value }
     })),
 
     // Discount tab state
@@ -391,6 +423,12 @@ const useStore = create((set, get) => ({
             // Transform onsite config from channels.onsite.config
             const onsiteConfig = get().transformOnsiteConfig(surveyMeta.channels?.onsite?.config || {});
             
+            // Transform thankyou config from channels.thankyou.config
+            const thankyouConfig = get().transformThankyouConfig(surveyMeta.channels?.thankyou?.config || {});
+            
+            // Transform branded config from channels.dedicatedPageSurvey.config
+            const brandedConfig = get().transformBrandedConfig(surveyMeta.channels?.dedicatedPageSurvey?.config || {});
+            
             const transformedData = {
                 // Survey basic info
                 surveyTitle: surveyMeta.name || apiData.name || 'Survey',
@@ -405,6 +443,12 @@ const useStore = create((set, get) => ({
                 
                 // Onsite config
                 onsiteConfig: onsiteConfig,
+                
+                // Thankyou config
+                thankyouConfig: thankyouConfig,
+                
+                // Branded config
+                brandedConfig: brandedConfig,
                 
                 // Discount
                 discountEnabled: surveyMeta.discount?.enabled || false,
@@ -476,6 +520,7 @@ const useStore = create((set, get) => ({
         const defaultChannels = [
             { id: 'onsite', title: 'On-site survey', icon: 'store', isExpanded: false, isEnabled: false },
             { id: 'thankyou', title: 'Thank you page', icon: 'checkmark', isExpanded: false, isEnabled: false },
+            { id: 'dedicatedPageSurvey', title: 'Branded survey', icon: 'code', isExpanded: false, isEnabled: false },
         ];
         
         // Update enabled status based on API data
@@ -516,6 +561,47 @@ const useStore = create((set, get) => ({
             widgetRecurrence: config.widgetRecurrence
         };
     },
+
+    // Helper function to transform branded config from API
+    transformBrandedConfig: (config) => {
+        return {
+            logo: config.logo || '',
+            colors: {
+                primary: config.colors?.primary || '#008060',
+                secondary: config.colors?.secondary || '#6c757d',
+                accent: config.colors?.accent || '#17a2b8',
+                background: config.colors?.background || '#ffffff',
+                text: config.colors?.text || '#333333'
+            },
+            fonts: {
+                primary: config.fonts?.primary || 'Arial, sans-serif',
+                heading: config.fonts?.heading || 'Arial, sans-serif',
+                customFamily: config.fonts?.customFamily || ''
+            },
+            displaySettings: {
+                position: config.displaySettings?.position || 'bottom-right',
+                showLogo: config.displaySettings?.showLogo !== undefined ? config.displaySettings.showLogo : true,
+                customBorderRadius: config.displaySettings?.customBorderRadius || false,
+                borderRadius: config.displaySettings?.borderRadius || '8'
+            },
+            customCss: config.customCss || ''
+        };
+    },
+    
+    // Helper function to transform thankyou config from API
+    transformThankyouConfig: (config) => {
+        return {
+            message: config.message || 'Thank you for your feedback!',
+            action: config.action || 'message',
+            socialSharing: config.socialSharing || false,
+            emailCollection: config.emailCollection || false,
+            userTargeting: config.userTargeting || 'all',
+            userTag: config.userTag || false,
+            productPurchased: config.productPurchased || false,
+            newCustomer: config.newCustomer || false,
+            returnCustomer: config.returnCustomer || false
+        };
+    },
     
     // Reset the store to empty state - API will be the source of truth
     resetSurveyToDefault: () => {
@@ -548,6 +634,28 @@ const useStore = create((set, get) => ({
                 productPurchased: false,
                 newCustomer: false,
                 returnCustomer: false
+            },
+            brandedConfig: {
+                logo: '',
+                colors: {
+                    primary: '#008060',
+                    secondary: '#6c757d',
+                    accent: '#17a2b8',
+                    background: '#ffffff',
+                    text: '#333333'
+                },
+                fonts: {
+                    primary: 'Arial, sans-serif',
+                    heading: 'Arial, sans-serif',
+                    customFamily: ''
+                },
+                displaySettings: {
+                    position: 'bottom-right',
+                    showLogo: true,
+                    customBorderRadius: false,
+                    borderRadius: '8'
+                },
+                customCss: ''
             },
             discountEnabled: false,
             discountSettings: {},
@@ -590,11 +698,16 @@ const useStore = create((set, get) => ({
     saveSurveyToApi: async () => {
         try {
             const state = get();
+            
+            // Structure the data according to API expectations
             const dataToSave = {
                 surveyTitle: state.surveyTitle,
                 isActive: state.isActive,
                 questions: state.questions,
                 channelItems: state.channelItems,
+                onsiteConfig: state.onsiteConfig,
+                thankyouConfig: state.thankyouConfig,
+                brandedConfig: state.brandedConfig,
                 discountEnabled: state.discountEnabled,
                 discountSettings: state.discountSettings,
                 selectedTheme: state.selectedTheme

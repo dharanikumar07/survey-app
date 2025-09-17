@@ -1,11 +1,13 @@
 import React from 'react';
 import { OnsiteSurveyConfig } from './OnsiteSurveyConfig';
 import { ThankYouConfig } from './ThankYouConfig';
+import { BrandedSurveyConfig } from './BrandedSurveyConfig';
 
 // Component mapping for different channel types
 export const CHANNEL_CONFIG_COMPONENTS = {
     onsite: OnsiteSurveyConfig,
     thankyou: ThankYouConfig,
+    dedicatedPageSurvey: BrandedSurveyConfig,
     // Add more channel types here as needed
     // email: EmailConfig,
     // exit: ExitIntentConfig,
