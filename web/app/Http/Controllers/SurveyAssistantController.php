@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Schema\ObjectSchema;
 use Prism\Prism\Schema\StringSchema;
@@ -102,14 +103,14 @@ class SurveyAssistantController extends Controller
         // Add UUIDs and format for frontend compatibility
         $questions = [];
         foreach ($aiData['questions'] as $index => $question) {
-            $questionId = (string)($index + 1);
+            $questionId = (string) Str::uuid();
             
             // Process answer options with UUIDs
             $answerOptions = [];
             if (isset($question['answerOptions']) && is_array($question['answerOptions'])) {
                 foreach ($question['answerOptions'] as $optIndex => $option) {
                     $answerOptions[] = [
-                        'id' => 'opt' . ($optIndex + 1),
+                        'id' => 'opt-' . (string) Str::uuid(),
                         'text' => $option['text'] ?? ''
                     ];
                 }

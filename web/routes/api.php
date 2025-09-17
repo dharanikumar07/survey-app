@@ -43,12 +43,12 @@ Route::middleware('shopify.auth')->group(function () {
     Route::get('/analytics', [AnalyticsController::class, 'getAnalytics']);
 
     //AI Assistance
+    Route::post('/assistant/generate-survey', [SurveyAssistantController::class, 'generateSurvey']);
 
     //integrations
     Route::post('/integrations', [IntegrationController::class, 'saveIntegration']);
 
     Route::get('/integrations', [IntegrationController::class, 'getIntegration']);
-    Route::post('/assistant/generate-survey', [SurveyAssistantController::class, 'generateSurvey']);
 });
 
 Route::get('/get-survey/{store_uuid}/{survey_uuid?}', [SurveyViewController::class, 'getSurveyWidget']);
