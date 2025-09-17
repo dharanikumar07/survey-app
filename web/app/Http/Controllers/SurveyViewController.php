@@ -14,6 +14,7 @@ class SurveyViewController
     {
         try {
             $survey = new SurveyWidget($storeUuid, $surveyUuid);
+            $is_branded = $request->input("is_branded") ?? null;
 
             $surveyData = $survey->getSurveyMetaData() ?? [];
 
@@ -23,6 +24,7 @@ class SurveyViewController
                 'backend_url' => env('HOST'),
                 'questions' => $surveyData['questions'],
                 'discount' => $surveyData['discount'],
+                'is_branded' => $is_branded,
             ];
 
             $isEnabledDiscount = $surveyData['discount']['enabled'] ?? false;

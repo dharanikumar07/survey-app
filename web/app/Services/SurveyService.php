@@ -75,6 +75,11 @@ class SurveyService
             throw new \Exception('Failed to delete survey.');
 		}
 	}
+
+    public function createBrandedSurveyPageUrl($storeUrl, $storeUuid, $surveyUuid)
+    {
+        return "$storeUrl/?45673={$surveyUuid}&6789={$storeUuid}&is_branded=1";
+    }
 }
 
 
