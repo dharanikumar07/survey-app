@@ -77,7 +77,7 @@ const SurveyModalContent = forwardRef(({ templateKey, uuid, onClose, ...props },
         }
 
         // Case 3: Creating new survey without template - start with empty state
-    }, [templateKey, uuid, resetSurveyToDefault, setSurveyTitle, setQuestions, setChannelItems, setDiscountEnabled, setDiscountSettings, setDiscountSections, setSelectedTheme, setIsActive]);
+    }, [templateKey, uuid]);
 
     return <SurveyLayout ref={ref} surveyId={uuid} onClose={onClose} />;
 });

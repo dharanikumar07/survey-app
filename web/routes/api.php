@@ -40,6 +40,7 @@ Route::middleware('shopify.auth')->group(function () {
 
     //AI Assistance
     Route::post('/assistant/generate-title', [SurveyAssistantController::class, 'generateTitle']);
+    Route::post('/assistant/generate-survey', [SurveyAssistantController::class, 'generateSurvey']);
 });
 
 Route::get('/get-survey/{store_uuid}/{survey_uuid?}', [SurveyViewController::class, 'getSurveyWidget']);

@@ -10,15 +10,13 @@ import {
     Banner 
 } from '@shopify/polaris';
 import { apiClient } from '../../../../api';
-import useStore from '../../../../State/store';
 
 export default function AIAssistantSetup({ onBack, onProceed }) {
     const [prompt, setPrompt] = useState('');
     const [generatedTitle, setGeneratedTitle] = useState('');
+    const [generatedQuestions, setGeneratedQuestions] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState('');
-
-    const setSurveyTitle = useStore(state => state.setSurveyTitle);
 
     const handleGenerate = async () => {
         const base = prompt.trim();
@@ -28,17 +26,20 @@ export default function AIAssistantSetup({ onBack, onProceed }) {
         setError('');
         
         try {
-            const res = await apiClient('POST', '/assistant/generate-title', { prompt: base });
-            const title = res?.data?.title || '';
-            if (title) {
-                setGeneratedTitle(title);
-                setSurveyTitle(title);
+            // Call the new comprehensive generation endpoint
+            const res = await apiClient('POST', '/assistant/generate-survey', { prompt: base });
+            const surveyData = res?.data;
+            
+            if (surveyData?.surveyTitle && surveyData?.questions) {
+                setGeneratedTitle(surveyData.surveyTitle);
+                setGeneratedQuestions(surveyData.questions);
+                // Don't call setSurveyTitle here - let template loading handle it
             } else {
-                throw new Error('No title generated');
+                throw new Error('Invalid survey data generated');
             }
         } catch (e) {
-            console.error('AI title generation failed', e);
-            setError(e.data?.message || e.message || 'Failed to generate title. Please try again.');
+            console.error('AI survey generation failed', e);
+            setError(e.data?.message || e.message || 'Failed to generate survey. Please try again.');
         } finally {
             setIsGenerating(false);
         }
@@ -47,14 +48,16 @@ export default function AIAssistantSetup({ onBack, onProceed }) {
     const handleClear = () => {
         setPrompt('');
         setGeneratedTitle('');
+        setGeneratedQuestions([]);
         setError('');
     };
 
     const handleProceed = () => {
-        if (generatedTitle) {
-            // Store AI data for template loading
+        if (generatedTitle && generatedQuestions.length > 0) {
+            // Store complete AI data for template loading
             const aiData = {
-                surveyTitle: generatedTitle
+                surveyTitle: generatedTitle,
+                questions: generatedQuestions
             };
             localStorage.setItem('aiSurveyData', JSON.stringify(aiData));
             console.log('AI data stored for template loading:', aiData);
@@ -79,7 +82,7 @@ export default function AIAssistantSetup({ onBack, onProceed }) {
 
                 <Card padding="400" shadow="md">
                     <BlockStack gap="300">
-                        <Text variant="headingMd" as="h3">Generate survey title</Text>
+                        <Text variant="headingMd" as="h3">Generate complete survey</Text>
                         <TextField
                             label="Describe your survey goal"
                             value={prompt}
@@ -105,9 +108,9 @@ export default function AIAssistantSetup({ onBack, onProceed }) {
                                 disabled={!prompt.trim() || isGenerating}
                                 loading={isGenerating}
                             >
-                                {isGenerating ? 'Generating...' : 'Generate title'}
+                                {isGenerating ? 'Generating...' : 'Generate survey'}
                             </Button>
-                            {generatedTitle && (
+                            {generatedTitle && generatedQuestions.length > 0 && (
                                 <Button 
                                     size="slim" 
                                     variant="primary" 
@@ -118,20 +121,28 @@ export default function AIAssistantSetup({ onBack, onProceed }) {
                                 </Button>
                             )}
                         </InlineStack>
-                        {generatedTitle && (
-                            <BlockStack gap="100">
-                                <Text tone="subdued">✨ Suggested title</Text>
+                        {generatedTitle && generatedQuestions.length > 0 && (
+                            <BlockStack gap="200">
+                                <Text tone="subdued">✨ Generated survey</Text>
                                 <Text variant="headingMd" as="p">"{generatedTitle}"</Text>
+                                <BlockStack gap="100">
+                                    <Text variant="bodyMd" tone="subdued">Questions generated:</Text>
+                                    {generatedQuestions.slice(0, -1).map((question, index) => (
+                                        <Text key={question.id} variant="bodyMd" tone="subdued">
+                                            {index + 1}. {question.content} ({question.questionType})
+                                        </Text>
+                                    ))}
+                                </BlockStack>
                                 <Text variant="bodyMd" tone="subdued">
-                                    You can always edit this title later in the survey builder.
+                                    You can always edit the survey later in the survey builder.
                                 </Text>
                             </BlockStack>
                         )}
                         {isGenerating && (
                             <BlockStack gap="100">
-                                <Text tone="subdued">🤖 AI is working its magic...</Text>
+                                <Text tone="subdued">🤖 AI is generating your complete survey...</Text>
                                 <Text variant="bodyMd" tone="subdued">
-                                    This usually takes just a few seconds. Powered by Gemini 2.0 Flash ✨
+                                    Creating title, questions, and answers. This usually takes just a few seconds. Powered by Gemini 2.0 Flash ✨
                                 </Text>
                             </BlockStack>
                         )}

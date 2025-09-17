@@ -52,8 +52,8 @@ export const loadTemplateData = (templateKey, aiOverrides = {}) => {
       ...baseData,
       // Override survey title if AI-generated title is provided
       surveyTitle: aiOverrides.surveyTitle || baseData.surveyTitle,
-      // Future: questions can be overridden here
-      // questions: aiOverrides.questions ? processAIQuestions(aiOverrides.questions) : baseData.questions
+      // Override questions if AI-generated questions are provided
+      questions: aiOverrides.questions || baseData.questions
     };
 
     return finalData;

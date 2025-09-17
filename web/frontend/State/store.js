@@ -62,39 +62,6 @@ const useStore = create((set, get) => ({
         )
     })),
     
-    // Onsite survey configuration state
-    onsiteConfig: {
-        pageTargeting: 'all', // 'all' or 'specific'
-        specificPages: '',
-        excludePages: false,
-        excludedPageTypes: [], // Array of page types to exclude
-        // TODO: Timing feature - commented out for now, can be re-enabled in future
-        // timing: {
-        //     delay: 10,
-        //     unit: 'seconds'
-        // },
-        userTargeting: 'all', // 'all' or 'segment'
-        userTag: false, // User tag checkbox
-        customerType: {
-            newCustomer: false,
-            returnCustomer: false
-        },
-        productPurchased: false, // Product purchased checkbox
-        widgetRecurrence: 'every_time'
-    },
-
-    // Thank you page configuration state
-    thankyouConfig: {
-        message: 'Thank you for your feedback!',
-        action: 'message', // 'message', 'redirect', 'discount'
-        socialSharing: false,
-        emailCollection: false,
-        userTargeting: 'all', // 'all' or 'segment'
-        userTag: false,
-        productPurchased: false,
-        newCustomer: false,
-        returnCustomer: false
-    },
     setOnsiteConfig: (updates) => set((state) => ({
         onsiteConfig: { ...state.onsiteConfig, ...updates }
     })),
