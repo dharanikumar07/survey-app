@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Page,
     Card,
@@ -22,18 +22,42 @@ import { useToast } from '../../../components/helper/toast-helper';
 function Klaviyo() {
     const [apiKey, setApiKey] = useState('');
     const [selectedSurvey, setSelectedSurvey] = useState('');
+    const [connectionStatus, setConnectionStatus] = useState('disconnected');
+    const [connectionData, setConnectionData] = useState(null);
     const navigate = useNavigate();
     const { showToast } = useToast();
     const { getIntegrations, saveIntegration } = useIntegrationApi();
 
-    const { data } = useQueryEvents(
+    // Query to fetch integration status when component loads
+    const { data: integrationData, isLoading: isLoadingIntegration } = useQueryEvents(
         useQuery({
             queryKey: ['integrations'],
             queryFn: getIntegrations
         }),
         {
-            onSuccess: (data) => {
-                console.log(data);
+            onSuccess: (response) => {
+                console.log('Integration data:', response);
+                
+                // Check if we have an array of integrations
+                if (response?.data?.data && Array.isArray(response.data.data)) {
+                    // Find the klaviyo integration
+                    const klaviyoIntegration = response.data.data.find(integration => 
+                        integration.type === 'klaviyo'
+                    );
+                    
+                    // If we found it, check its status
+                    if (klaviyoIntegration) {
+                        // Convert to lowercase for consistency
+                        const status = klaviyoIntegration.status.toLowerCase() === 'connected' ? 'connected' : 'disconnected';
+                        setConnectionStatus(status);
+                        setConnectionData(klaviyoIntegration);
+                        
+                        // Pre-fill API key field if available
+                        if (klaviyoIntegration.config && klaviyoIntegration.config.apiKey) {
+                            setApiKey(klaviyoIntegration.config.apiKey);
+                        }
+                    }
+                }
             }
         },
         {
@@ -43,10 +67,34 @@ function Klaviyo() {
         }
     )
 
-    const { data: saveIntegrationData } = useMutation({
+    const { mutate: saveIntegrationMutation, isLoading } = useMutation({
         mutationFn: saveIntegration,
-        onSuccess: (data) => {
-            showToast({ message: data?.data?.message || "Integration saved successfully", type: "success" });
+        onSuccess: (response) => {
+            showToast({ message: response?.data?.message || "Integration saved successfully", type: "success" });
+            
+            // Update connection status based on response
+            if (response?.data?.data) {
+                const integrationData = response.data.data;
+                
+                // Check if we received a single integration object or an array
+                if (Array.isArray(integrationData)) {
+                    // If it's an array, find the klaviyo integration
+                    const klaviyoIntegration = integrationData.find(integration => 
+                        integration.type === 'klaviyo'
+                    );
+                    
+                    if (klaviyoIntegration) {
+                        const status = klaviyoIntegration.status.toLowerCase() === 'connected' ? 'connected' : 'disconnected';
+                        setConnectionStatus(status);
+                        setConnectionData(klaviyoIntegration);
+                    }
+                } else if (integrationData.type === 'klaviyo') {
+                    // If it's a single object and it's klaviyo
+                    const status = integrationData.status.toLowerCase() === 'connected' ? 'connected' : 'disconnected';
+                    setConnectionStatus(status);
+                    setConnectionData(integrationData);
+                }
+            }
         },
         onError: (error) => {
             showToast({ message: error?.data?.error || "Failed to save integration", type: "error" });
@@ -66,8 +114,11 @@ function Klaviyo() {
     };
 
     const handleConnect = () => {
-        // Handle API connection logic here
-        console.log('Connecting with API key:', apiKey);
+        // Call the API to connect with Klaviyo
+        saveIntegrationMutation({ 
+            type: 'klaviyo',
+            apiKey: apiKey
+        });
     };
 
     return (
@@ -75,8 +126,8 @@ function Klaviyo() {
             title={
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     Klaviyo
-                    <Badge tone={apiKey ? 'success' : 'attention'}>
-                        {apiKey ? 'Connected' : 'Not connected'}
+                    <Badge tone={connectionStatus === 'connected' ? 'success' : 'attention'}>
+                        {connectionStatus === 'connected' ? 'Connected' : 'Not connected'}
                     </Badge>
                 </span>
             }
@@ -109,7 +160,7 @@ function Klaviyo() {
                     <Card>
                         <div style={{ padding: '24px' }}>
                             <BlockStack gap="400">
-                                <Text as="h2" variant="headingMd">Step 1: Connect to Klaviyo API</Text>
+                                <Text as="h2" variant="headingMd"> Connect to Klaviyo API</Text>
 
                                 <Text as="p" variant="bodyMd">
                                     Follow the guide{' '}
@@ -133,10 +184,11 @@ function Klaviyo() {
                                         <Button
                                             variant="primary"
                                             onClick={handleConnect}
-                                            disabled={!apiKey.trim()}
+                                            disabled={!apiKey.trim() || isLoading}
+                                            loading={isLoading}
                                             icon={ExternalIcon}
                                         >
-                                            Connect
+                                            {isLoading ? 'Connecting...' : connectionStatus === 'connected' ? 'Reconnect' : 'Connect'}
                                         </Button>
                                     </Box>
                                 </BlockStack>
@@ -150,29 +202,7 @@ function Klaviyo() {
                             </BlockStack>
                         </div>
                     </Card>
-
-                    {/* Step 2: Sync survey Card */}
-                    <Card>
-                        <div style={{ padding: '24px' }}>
-                            <BlockStack gap="400">
-                                <Text as="h2" variant="headingMd">Step 2: Sync survey</Text>
-
-                                <Text as="p" variant="bodyMd">
-                                    Select survey that you want to sync
-                                </Text>
-
-                                <BlockStack gap="300">
-                                    <Select
-                                        label="Survey"
-                                        options={surveyOptions}
-                                        value={selectedSurvey}
-                                        onChange={handleSurveyChange}
-                                        disabled={true}
-                                    />
-                                </BlockStack>
-                            </BlockStack>
-                        </div>
-                    </Card>
+            
                 </BlockStack>
                 <Button
                     variant="primary"
