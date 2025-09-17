@@ -42,7 +42,6 @@ Route::middleware('shopify.auth')->group(function () {
     Route::get('/analytics', [AnalyticsController::class, 'getAnalytics']);
 
     //AI Assistance
-    Route::post('/assistant/generate-title', [SurveyAssistantController::class, 'generateTitle']);
     Route::post('/assistant/generate-survey', [SurveyAssistantController::class, 'generateSurvey']);
 });
 
