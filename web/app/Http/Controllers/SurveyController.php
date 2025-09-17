@@ -69,9 +69,22 @@ class SurveyController extends Controller
 
 			$survey = $this->surveyService->saveOrUpdate($request->validated(), $store, $survey_uuid);
 
-			$resource = new SurveyResource($survey);
-			$status = $survey->wasRecentlyCreated ? HttpResponse::HTTP_CREATED : HttpResponse::HTTP_OK;
-			$message = $survey->wasRecentlyCreated ? 'Survey created successfully' : 'Survey updated successfully';
+            $metaData = $survey->survey_meta_data ?? [];
+
+            if (!is_array($metaData)) {
+                $metaData = json_decode($metaData, true) ?? [];
+            }
+
+            $brandedSurveyPageUrl = $this->surveyService->createBrandedSurveyPageUrl($store->store_url, $store->uuid, $survey->uuid);
+            $metaData['channels']['branded_survey'] = $brandedSurveyPageUrl;
+            $survey->survey_meta_data = $metaData;
+            $survey->save();
+
+            $resource = new SurveyResource($survey);
+            $status = $survey->wasRecentlyCreated ? HttpResponse::HTTP_CREATED : HttpResponse::HTTP_OK;
+            $message = $survey->wasRecentlyCreated ? 'Survey created successfully' : 'Survey updated successfully';
+
+
             UpdateAppMetaObjects::dispatch($store, $survey);
 			return Response::json([
 				'item' => $resource,
