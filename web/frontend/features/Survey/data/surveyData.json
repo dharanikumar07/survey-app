@@ -6,7 +6,7 @@
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
-        { "id": "dedicatedPageSurvey", "title": "Branded survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -88,7 +88,7 @@
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
-        { "id": "dedicatedPageSurvey", "title": "Branded survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -139,7 +139,8 @@
       "description": "Gauge customer experience and satisfaction across key touchpoints.",
      "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -205,7 +206,8 @@
       "description": "Understand what's stopping users from purchasing on your site.",
      "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -257,7 +259,7 @@
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
-        { "id": "dedicatedPageSurvey", "title": "Branded survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -303,7 +305,7 @@
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
         { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
-        { "id": "dedicatedPageSurvey", "title": "Branded survey", "icon": "code", "isExpanded": false, "isEnabled": false }
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
