@@ -80,7 +80,7 @@ export default function Quickstart() {
     } = useExtensionStatus();
 
     const [statusByStep, setStatusByStep] = useState({
-        activate: "complete",
+        activate: "idle",
         create: "idle",
         visualize: "idle",
     });
