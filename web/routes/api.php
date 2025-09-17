@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SurveyViewController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\ResponseController;
+use App\Http\Controllers\IntegrationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,11 @@ Route::middleware('shopify.auth')->group(function () {
 
     //AI Assistance
     Route::post('/assistant/generate-title', [SurveyAssistantController::class, 'generateTitle']);
+
+    //integrations
+    Route::post('/integrations', [IntegrationController::class, 'saveIntegration']);
+
+    Route::get('/integrations', [IntegrationController::class, 'getIntegration']);
 });
 
 Route::get('/get-survey/{store_uuid}/{survey_uuid?}', [SurveyViewController::class, 'getSurveyWidget']);
