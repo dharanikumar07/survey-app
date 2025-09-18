@@ -65,72 +65,6 @@ export const getQuestionTypeDisplayName = (type) => {
     return typeMap[type] || type;
 };
 
-/**
- * Generates clean HTML content for survey storage and storefront rendering
- * @param {Object} surveyData - The survey data object
- * @param {string} htmlContent - The HTML content from the preview component
- * @returns {string} Clean HTML content ready for backend storage
- */
-export const generateCleanSurveyHTML = (surveyData, htmlContent) => {
-    // Extract the main content from the preview
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlContent;
-    
-    // Get the content inside data-preview-content attribute
-    const mainContent = tempDiv.querySelector('[data-preview-content]');
-    
-    // If we found the preview content, use it, otherwise use the original content
-    if (mainContent) {
-        return mainContent.outerHTML;
-    }
-    
-    // If no preview content found, return the original with minimal cleaning
-    return htmlContent;
-};
-
-/**
- * Generates container div content for survey storage (no full HTML document)
- * @param {Object} surveyData - The survey data object
- * @param {string} htmlContent - The HTML content from the preview component
- * @returns {string} Container div content only, wrapped in th-sf-survey-container
- */
-export const generateCompleteSurveyHTML = (surveyData, htmlContent) => {
-    // Extract the main content from the preview
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlContent;
-    
-    // Get the content inside data-preview-content attribute
-    const mainContent = tempDiv.querySelector('[data-preview-content]');
-    
-    // If we found the preview content, use it
-    if (mainContent) {
-        return mainContent.outerHTML;
-    }
-    
-    // If no preview content found, wrap the original content in a container
-    return `<div class="th-sf-survey-container">${htmlContent}</div>`;
-};
-
-/**
- * Generates container div content for embedding in existing pages
- * @param {string} htmlContent - The HTML content from the preview component
- * @returns {string} Container div content wrapped in th-sf-survey-container
- */
-export const generateSurveyBodyContent = (htmlContent) => {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlContent;
-    
-    // Get the content inside data-preview-content attribute
-    const mainContent = tempDiv.querySelector('[data-preview-content]');
-    
-    // If we found the preview content, use it
-    if (mainContent) {
-        return mainContent.outerHTML;
-    }
-    
-    // If no preview content found, wrap the original content in a container
-    return `<div class="th-sf-survey-container">${htmlContent}</div>`;
-};
 
 /**
  * Sanitizes HTML content to prevent XSS attacks
@@ -170,12 +104,8 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
             discount_type: 'generic',
             discount_value: 'percentage',
             discount_value_amount: ''
-
         },
         htmlContent: htmlContent, // Use original HTML content directly
-        cleanHTML: generateCleanSurveyHTML(surveyData, htmlContent), // Clean HTML with minimal sanitization
-        completeHTML: generateCompleteSurveyHTML(surveyData, htmlContent), // Complete HTML with minimal sanitization
-        // No JavaScript content included in API
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };

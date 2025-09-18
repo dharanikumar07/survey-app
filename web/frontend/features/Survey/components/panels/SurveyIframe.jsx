@@ -1640,14 +1640,6 @@ const SurveyIframe = forwardRef(({ surveyData, selectedView, onSurveyComplete, i
             return '';
         },
 
-        getCleanHTML: () => {
-            if (iframeRef.current && (iframeRef.current.contentDocument || iframeRef.current.contentWindow)) {
-                const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
-                const container = doc.querySelector('.th-sf-survey-container');
-                return container ? container.outerHTML : '';
-            }
-            return '';
-        },
 
         getJavaScriptContent: () => {
             // Return the iframe's JavaScript content

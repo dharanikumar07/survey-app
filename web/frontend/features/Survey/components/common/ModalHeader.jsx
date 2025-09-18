@@ -132,19 +132,14 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
             updatedAt: new Date().toISOString()
         };
 
-        // Capture HTML content from the survey preview using enhanced methods
+        // Capture HTML content from the survey preview
         let htmlContent = '';
-        let cleanHTML = '';
-        let completeHTML = '';
 
         if (surveyPreviewRef && surveyPreviewRef.current) {
             htmlContent = surveyPreviewRef.current.getBodyContent();
-            cleanHTML = surveyPreviewRef.current.getCleanHTML();
-            completeHTML = surveyPreviewRef.current.getCompleteHTML();
 
             // Simple debugging
             console.log('HTML Content Length:', htmlContent?.length);
-            console.log('Complete HTML Length:', completeHTML?.length);
         }
 
         // Use helper for API formatting
@@ -160,11 +155,6 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
         // console.log('Is Active:', completeSurveyData.is_active);
         // console.log('Survey Meta Data:', completeSurveyData.survey_meta_data);
         // console.log('Container HTML Content (th-sf-survey-container):', completeSurveyData.survey_meta_data?.htmlContent);
-        // console.log('Clean Container HTML:', completeSurveyData.survey_meta_data?.cleanHTML);
-        // console.log('Complete Container HTML:', completeSurveyData.survey_meta_data?.completeHTML);
-        // console.log('Complete HTML:', completeHTML);
-        // console.log('Clean HTML:', cleanHTML);
-        // console.log('HTML Content:', htmlContent);
         console.log('Complete Survey Data:', completeSurveyData);
 
         // Validate the data structure before sending to API
