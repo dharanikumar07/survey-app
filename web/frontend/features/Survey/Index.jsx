@@ -277,7 +277,7 @@ export default function Survey() {
                         displayName = 'Post-purchase page';
                         break;
                     case 'dedicatedPageSurvey':
-                        displayName = 'Branded survey page';
+                        displayName = 'Custom branded page';
                         break;
                     default:
                         displayName = channelKey;

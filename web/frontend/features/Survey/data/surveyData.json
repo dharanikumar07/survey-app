@@ -5,7 +5,8 @@
       "description": "Tell us your needs - we'll take care of everything.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -44,6 +45,28 @@
           },
           "productPurchased": false,
           "widgetRecurrence": "every_time"
+        },
+        "brandedConfig": {
+          "logo": "",
+          "colors": {
+            "primary": "#008060",
+            "secondary": "#6c757d",
+            "accent": "#17a2b8",
+            "background": "#ffffff",
+            "text": "#333333"
+          },
+          "fonts": {
+            "primary": "Arial, sans-serif",
+            "heading": "Arial, sans-serif",
+            "customFamily": ""
+          },
+          "displaySettings": {
+            "position": "bottom-right",
+            "showLogo": true,
+            "customBorderRadius": false,
+            "borderRadius": "8"
+          },
+          "customCss": ""
         }
       },
       "questions": [
@@ -64,7 +87,8 @@
       "description": "Find out which marketing channels are most effective.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -115,7 +139,8 @@
       "description": "Gauge customer experience and satisfaction across key touchpoints.",
      "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -181,7 +206,8 @@
       "description": "Understand what's stopping users from purchasing on your site.",
      "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -232,7 +258,8 @@
       "description": "Understand what's stopping users from purchasing on your site.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -277,7 +304,8 @@
       "description": "AI-generated survey with custom title and questions.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",

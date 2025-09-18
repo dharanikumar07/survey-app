@@ -124,18 +124,12 @@ const SurveyIframeProduction = forwardRef((props, ref) => {
             }
             return '';
         },
-        getCompleteHTML: () => {
-            if (iframeRef.current) {
-                return iframeRef.current.getCompleteHTML();
-            }
-            return '';
-        },
-        getCleanHTML: () => {
-            if (iframeRef.current) {
-                return iframeRef.current.getCleanHTML();
-            }
-            return '';
-        },
+        // getCompleteHTML: () => {
+        //     if (iframeRef.current) {
+        //         return iframeRef.current.getCompleteHTML();
+        //     }
+        //     return '';
+        // },
         getJavaScriptContent: () => {
             if (iframeRef.current) {
                 return iframeRef.current.getJavaScriptContent();

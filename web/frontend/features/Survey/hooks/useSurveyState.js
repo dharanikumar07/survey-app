@@ -20,6 +20,11 @@ export const useSurveyState = () => {
         thankyouConfig,
         setThankyouConfig,
         updateThankyouConfig,
+
+        // Branded survey configuration state
+        brandedConfig,
+        setBrandedConfig,
+        updateBrandedConfig,
         
         // Discount tab state
         discountEnabled,
@@ -97,6 +102,11 @@ export const useSurveyState = () => {
         thankyouConfig,
         setThankyouConfig,
         updateThankyouConfig,
+
+        // Branded survey configuration state
+        brandedConfig,
+        setBrandedConfig,
+        updateBrandedConfig,
         
         // Discount tab state
         discountEnabled,
