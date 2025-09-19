@@ -6,37 +6,31 @@ use App\Cache\CacheKeys;
 use App\Cache\SurveyCacheService;
 use App\Http\Helper\Helper;
 use App\Mail\DiscountCodeMail;
+use App\Models\Integrations;
 use App\Models\Response;
 use App\Models\Store;
 use App\Models\Survey;
 use App\Services\DiscountCodeQuery;
+use App\Services\KlaviyoService;
+use App\Services\RetainfulService;
 use App\Services\ShopifyCustomerFetcher;
 use App\Services\ShopifyOrderFetcher;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class ProcessResponseEntry implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, CacheKeys;
 
-    use CacheKeys;
+    protected $store;
+    protected $survey;
+    protected $responseEntryId;
+    protected $responseData;
 
-    public $store;
-
-    public $survey;
-
-    public $responseEntryId;
-
-    public $responseData;
-
-    /**
-     * Create a new job instance.
-     */
     public function __construct(Store $store, Survey $survey, $responseEntryId)
     {
         $this->store = $store;
@@ -44,80 +38,87 @@ class ProcessResponseEntry implements ShouldQueue
         $this->responseEntryId = $responseEntryId;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $key = $this->getResponseCacheKey($this->store->uuid, $this->survey->uuid, $this->responseEntryId);
-
         $surveyCacheService = app(SurveyCacheService::class);
-        $surveyData = $surveyCacheService->getResponseData($key);
-
-        $this->responseData = $surveyData;
+        $this->responseData = $surveyCacheService->getResponseData($key);
 
         DB::beginTransaction();
         try {
-            $platformOrderId = $surveyData['order_id'] ?? null;
-            $platformCustomerId = $surveyData['customer_id'] ?? null;
+            $order = $this->fetchOrder($this->responseData['order_id'] ?? null);
+            $customer = $this->fetchCustomer(
+                $this->responseData['customer_id'] ?? null,
+                $order
+            );
 
-            $order = null;
-            if ($platformOrderId) {
-                $shopifyOrderFetcher = new ShopifyOrderFetcher($this->store);
-                $order = $shopifyOrderFetcher->fetchShopifyOrder($platformOrderId);
-                if ($order) {
-                    $platformOrderId = $order['id'];
-                    if (!$platformCustomerId && isset($order['customer']['id'])) {
-                        $platformCustomerId = $order['customer']['id'];
-                    }
-                }
-            }
+            $this->createResponseData($this->responseData, $customer, $order);
 
-            $customer = null;
-//            if ($platformCustomerId) {
-//                $shopifyCustomerFetcher = new ShopifyCustomerFetcher($this->store);
-//                info("eneteredddd");
-//                $customer = $shopifyCustomerFetcher->getCustomerByPlatformCustomerId($platformCustomerId);
-//            }
-
-            $this->createResponseData($surveyData, $customer, $order);
-
-            if($this->survey->getDiscountEnabledOrNot() === true) {
+            if ($this->survey->getDiscountEnabledOrNot()) {
                 $this->getDiscountCode();
             }
+
+            $this->handleIntegrations($customer);
+
             DB::commit();
-        } catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
-            Helper::logError("Unable to process response",__CLASS__,$e);
+            Helper::logError("Unable to process response", __CLASS__, $e);
             throw new \Exception('Failed to process response.');
         }
     }
 
-    public function createResponseData($surveyData, $customer, $order)
+    protected function fetchOrder($platformOrderId)
+    {
+        if (!$platformOrderId) {
+            return null;
+        }
+
+        $shopifyOrderFetcher = new ShopifyOrderFetcher($this->store);
+        $order = $shopifyOrderFetcher->fetchShopifyOrder($platformOrderId);
+
+        if ($order && isset($order['customer']['id'])) {
+            $this->responseData['customer_id'] = $order['customer']['id'];
+        }
+
+        return $order;
+    }
+
+    protected function fetchCustomer($platformCustomerId, $order)
+    {
+        if (!$platformCustomerId) {
+            return null;
+        }
+
+        $shopifyCustomerFetcher = new ShopifyCustomerFetcher($this->store);
+        return $shopifyCustomerFetcher->getCustomerByPlatformCustomerId($platformCustomerId);
+    }
+
+    protected function createResponseData($surveyData, $customer, $order)
     {
         Response::create([
             'survey_uuid' => $this->survey->uuid,
             'store_uuid' => $this->store->uuid,
             'survey_name' => $this->survey->name,
-            'platform_customer_id' => !empty($customer) ? (int) $customer->platform_customer_id : null,
-            'platform_order_id' => !empty($order) ? (int) $order['id'] : null,
+            'platform_customer_id' => $customer ? (int) $customer->platform_customer_id : null,
+            'platform_order_id' => $order ? (int) $order['id'] : null,
             'answers' => $surveyData['answers'],
-            'page_type' => $surveyData['page_type']
+            'page_type' => $surveyData['page_type'],
         ]);
 
         info("response created successfully");
     }
 
-    public function getDiscountCode()
+    protected function getDiscountCode()
     {
         $discountHelper = new DiscountCodeQuery($this->store);
-        info('response data: ',$this->responseData);
+
         $data = [
             'title' => 'Survey_app_discount ' . Str::random(4),
             'discount_type' => $this->survey->getDiscountValue(),
             'type' => $this->survey->getDiscountType() ?? 'generic',
             'code' =>  Str::upper(Str::random(10)),
-            'customer_email' => $this->responseData['email'] ?? null
+            'customer_email' => $this->responseData['email'] ?? null,
         ];
 
         if ($data['discount_type'] === 'percentage') {
@@ -130,18 +131,13 @@ class ProcessResponseEntry implements ShouldQueue
 
         if ($data['type'] === 'customer-specific' && !empty($data['customer_email'])) {
             $customer = $discountHelper->getCustomerByEmail($data['customer_email']);
-
-            if (!empty($customer)) {
-                $firstName = $customer['first_name'] ?? '';
-                $lastName = $customer['last_name'] ?? '';
-
-                $customerName = trim($firstName . ' ' . $lastName);
+            if ($customer) {
+                $customerName = trim(($customer['first_name'] ?? '') . ' ' . ($customer['last_name'] ?? ''));
             }
         }
-        info(print_r($data, true));
 
         $result = $discountHelper->createDiscount($data);
-        info(print_r($result, true));
+
         if (!empty($result)) {
             Mail::to($data['customer_email'])->send(
                 new DiscountCodeMail($data['code'], $customerName, $data['customer_email'] ?? null)
@@ -149,4 +145,48 @@ class ProcessResponseEntry implements ShouldQueue
         }
     }
 
+    protected function handleIntegrations($customer)
+    {
+        if (!$customer) {
+            return;
+        }
+
+        $integrations = Integrations::where('store_uuid', $this->store->uuid)
+            ->where('status', 'CONNECTED')
+            ->get();
+
+        $surveyData = $this->constructSurveyEventData();
+
+        foreach ($integrations as $integration) {
+            $config = json_decode($integration->config, true) ?? [];
+
+            switch ($integration->type && $this->survey->getIntegrationKlaviyoEnabled()) {
+                case 'klaviyo':
+                    if (!empty($config['apiKey'])) {
+                        $service = new KlaviyoService($config['apiKey']);
+                        $listIds = $this->survey->getIntegrationKlaviyoListId();
+                        $service->handleKlaviyoIntegration($customer, $listIds, $surveyData);
+                    }
+                    break;
+
+//                case 'retainful':
+//                    if (!empty($config['apiKey'])) {
+//                        $service = new RetainfulService($config['apiKey']);
+//                        $service->handleRetainfulIntegration($customer, $config);
+//                    }
+//                    break;
+
+                default:
+                    info("No handler for integration type: {$integration->type}");
+            }
+        }
+    }
+
+    public function constructSurveyEventData()
+    {
+        return [
+            'survey' => $this->survey,
+            'response' => $this->responseData,
+        ];
+    }
 }

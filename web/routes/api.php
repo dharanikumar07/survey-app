@@ -47,8 +47,9 @@ Route::middleware('shopify.auth')->group(function () {
 
     //integrations
     Route::post('/integrations', [IntegrationController::class, 'saveIntegration']);
-
     Route::get('/integrations', [IntegrationController::class, 'getIntegration']);
+    Route::get('/integrations/data', [IntegrationController::class, 'getIntegrationData']);
+
 });
 
 Route::get('/get-survey/{store_uuid}/{survey_uuid?}', [SurveyViewController::class, 'getSurveyWidget']);

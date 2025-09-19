@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { generateSurveyJavaScript } from './surveyStorefront';
+import Integrations from '../../Integrations/Index';
 
 // Helper function to generate unique IDs for questions and options
 export const generateId = (prefix = 'item') => {
@@ -39,7 +40,8 @@ export const formatSurveyForAPI = (surveyData) => {
                 text: q.content || q.heading || q.text || ''
             })) || [],
             channels: surveyData.channels || [],
-            discount: surveyData.discount || null
+            discount: surveyData.discount || null,
+            integrations: surveyData.integrations || null // Use lowercase for consistency
         }
     };
 };
@@ -105,6 +107,11 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
             discount_value: 'percentage',
             discount_value_amount: ''
         },
+        integrations: surveyData.integrations || {
+            enabled: false,
+            klaviyo: { enabled: false, listId: '' },
+            retainful: { enabled: false, listId: '' }
+        }, // Using lowercase 'integrations' for consistency
         htmlContent: htmlContent, // Use original HTML content directly
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
