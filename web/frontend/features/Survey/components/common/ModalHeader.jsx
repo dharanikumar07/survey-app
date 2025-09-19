@@ -52,7 +52,8 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
         discountEnabled,
         discountSettings,
         surveyTitle,
-        onsiteConfig
+        onsiteConfig,
+        integrations
     } = useSurveyState();
 
     const { saveSurvey } = useSurveyApi();
@@ -74,6 +75,7 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
 
     // Handle save functionality
     const handleSave = () => {
+        console.log('Integrations:', integrations);
         // Build survey data using only what exists in store
         const surveyData = {
             name: surveyTitle,
@@ -124,6 +126,11 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
                 discount_value: discountSettings.discount_value || "percentage",
                 discount_value_amount: discountSettings.discount_value_amount || ""
             },
+            integrations: integrations || {
+                enabled: false,
+                klaviyo: { enabled: false, listId: '' },
+                retainful: { enabled: false, listId: '' }
+            }, // Using lowercase 'integrations' key for consistency
             channelTypes: channelItems
                 .filter(channel => channel.isEnabled)
                 .map(channel => channel.id),

@@ -34,6 +34,15 @@ export const useSurveyState = () => {
         discountSections,
         toggleDiscountSection,
         
+        // Integrations state
+        integrations,
+        setIntegrationsEnabled,
+        setKlaviyoEnabled,
+        setKlaviyoListId,
+        setRetainfulEnabled,
+        setRetainfulListId,
+        setIntegrations,
+        
         // Sidebar state
         editModalOpen,
         setEditModalOpen,
@@ -115,6 +124,15 @@ export const useSurveyState = () => {
         setDiscountSettings,
         discountSections,
         toggleDiscountSection,
+        
+        // Integrations state
+        integrations,
+        setIntegrationsEnabled,
+        setKlaviyoEnabled,
+        setKlaviyoListId,
+        setRetainfulEnabled,
+        setRetainfulListId,
+        setIntegrations,
         
         // Sidebar state
         editModalOpen,

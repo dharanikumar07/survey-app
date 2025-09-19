@@ -13,7 +13,7 @@ import {
 import { EditIcon } from '@shopify/polaris-icons';
 import { ContentTab } from '../tabs/ContentTab';
 import { ChannelTab } from '../tabs/ChannelTab';
-import { DiscountTab } from '../tabs/DiscountTab';
+import { AdvancedTab } from '../tabs/AdvancedTab';
 import { useSurveyState } from '../../hooks/useSurveyState';
 
 function Sidebar({ items = [], onSelectItem = () => { } }) {
@@ -44,10 +44,10 @@ function Sidebar({ items = [], onSelectItem = () => { } }) {
             panelID: 'channel-panel',
         },
         {
-            id: 'discount',
-            content: 'Discount',
-            accessibilityLabel: 'Discount tab',
-            panelID: 'discount-panel',
+            id: 'advanced',
+            content: 'Advanced',
+            accessibilityLabel: 'Advanced tab',
+            panelID: 'advanced-panel',
         },
     ];
 
@@ -58,7 +58,7 @@ function Sidebar({ items = [], onSelectItem = () => { } }) {
             case 1:
                 return <ChannelTab />;
             case 2:
-                return <DiscountTab />;
+                return <AdvancedTab />;
             default:
                 return <ContentTab items={items} onSelectItem={onSelectItem} />;
         }
@@ -106,7 +106,7 @@ function Sidebar({ items = [], onSelectItem = () => { } }) {
                             onClick={() => handleTabChange(2)}
                             variant='tertiary'
                         >
-                            Discount
+                            Advanced
                         </Button>
                     </ButtonGroup>
                     <Box paddingBlockStart="400">

@@ -13,33 +13,32 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class IntegrationController extends Controller
 {
-    public function saveIntegration(Request $request)
+    public function saveIntegration(Request $request, IntegrationService $service)
     {
         $session = $request->get('shopifySession');
-        $store = Store::where('store_url', $session->getShop())->firstOrFail();
+        $store   = Store::where('store_url', $session->getShop())->firstOrFail();
 
-        $type   = $request->input('type', null);
-        $apiKey = $request->input('apiKey', null);
+        $type   = $request->input('type');
+        $apiKey = $request->input('apiKey');
 
-        $service = new IntegrationService($apiKey, $type);
-        $result  = $service->validate();
+        $result = $service->validateIntegration($type, $apiKey);
 
         if (!$result) {
             return Response::json([
-                'error' => "Enter a valid $type integration api key",
+                'error' => "Enter a valid $type integration API key",
             ], HttpResponse::HTTP_BAD_REQUEST);
         }
 
         $integration = Integrations::updateOrCreate(
             [
                 'store_uuid' => $store->uuid,
-                'type' => $type,
+                'type'       => $type,
             ],
             [
-                'status' => $result['status'] ? 'CONNECTED' : 'DISCONNECTED',
+                'status' => $result['status'],
                 'config' => [
-                    'apiKey' => $result['apiKey'],
-                    'listIds'  => $result['listIds'],
+                    'apiKey'  => $result['apiKey'],
+                    'listIds' => $result['listIds'],
                 ],
             ]
         );
@@ -47,21 +46,20 @@ class IntegrationController extends Controller
         return Response::json([
             'message' => 'Integration saved successfully',
             'data'    => [
-                'uuid'     => $integration->uuid,
-                'apiKey'   => $result['apiKey'],
-                'listIds'  => $result['listIds'],
-                'status'=> $result['status'],
+                'uuid'    => $integration->uuid,
+                'apiKey'  => $result['apiKey'],
+                'listIds' => $result['listIds'],
+                'status'  => $result['status'],
             ],
-        ], HttpResponse::HTTP_OK);
+        ]);
     }
 
-    public function getIntegration(Request $request){
-
+    public function getIntegration(Request $request)
+    {
         try {
             $session = $request->get('shopifySession');
-            $store = Store::where('store_url', $session->getShop())->firstOrFail();
-
-            $type   = $request->input('type', null);
+            $store   = Store::where('store_url', $session->getShop())->firstOrFail();
+            $type    = $request->input('type');
 
             if ($type) {
                 $integration = Integrations::where('store_uuid', $store->uuid)
@@ -69,17 +67,33 @@ class IntegrationController extends Controller
                     ->firstOrFail();
 
                 return new IntegrationResource($integration);
-            } else {
-                $integrations = Integrations::where('store_uuid', $store->uuid)
-                    ->get();
-
-                return IntegrationResource::collection($integrations);
             }
 
+            $integrations = Integrations::where('store_uuid', $store->uuid)->get();
+            return IntegrationResource::collection($integrations);
         } catch (\Exception $exception) {
             Helper::logError("Unable to get the $type integration", [__CLASS__, __FUNCTION__], $exception, $request->toArray());
             return Response::json([
                 'error' => "An error occurred while fetching $type integration",
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getIntegrationData(Request $request, IntegrationService $service)
+    {
+        try {
+            $session = $request->get('shopifySession');
+            $store   = Store::where('store_url', $session->getShop())->firstOrFail();
+
+            $data = $service->getIntegrationsData($store->uuid);
+
+            return Response::json([
+                'data' => $data,
+            ]);
+        } catch (\Exception $exception) {
+            Helper::logError("Unable to get the integration data", [__CLASS__, __FUNCTION__], $exception, $request->toArray());
+            return Response::json([
+                'error' => "An error occurred while fetching integration data",
             ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

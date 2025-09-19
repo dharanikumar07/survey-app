@@ -24,6 +24,11 @@ const useStore = create((set, get) => ({
         productPurchased: false,
         widgetRecurrence: 'every_time'
     },
+    integrations: {
+        enabled: false,
+        klaviyo: { enabled: false, listId: '' },
+        retainful: { enabled: false, listId: '' }
+    },
     thankyouConfig: {
         message: 'Thank you for your feedback!',
         action: 'message', // 'message', 'redirect', 'discount'
@@ -123,6 +128,38 @@ const useStore = create((set, get) => ({
         discountSections: state.discountSections.map((s) =>
             s.id === id ? { ...s, isExpanded: !s.isExpanded } : s
         )
+    })),
+    
+    // Integration state actions
+    setIntegrationsEnabled: (enabled) => set((state) => ({
+        integrations: { ...state.integrations, enabled }
+    })),
+    setKlaviyoEnabled: (enabled) => set((state) => ({
+        integrations: { 
+            ...state.integrations, 
+            klaviyo: { ...state.integrations.klaviyo, enabled }
+        }
+    })),
+    setKlaviyoListId: (listId) => set((state) => ({
+        integrations: { 
+            ...state.integrations, 
+            klaviyo: { ...state.integrations.klaviyo, listId }
+        }
+    })),
+    setRetainfulEnabled: (enabled) => set((state) => ({
+        integrations: { 
+            ...state.integrations, 
+            retainful: { ...state.integrations.retainful, enabled }
+        }
+    })),
+    setRetainfulListId: (listId) => set((state) => ({
+        integrations: { 
+            ...state.integrations, 
+            retainful: { ...state.integrations.retainful, listId }
+        }
+    })),
+    setIntegrations: (updates) => set((state) => ({
+        integrations: { ...state.integrations, ...updates }
     })),
     toggleChannelEnabled: (id) => set((state) => ({
         channelItems: state.channelItems.map(item => 
@@ -426,6 +463,14 @@ const useStore = create((set, get) => ({
                     { id: 'discountEmail', title: 'Discount email', icon: 'email', isExpanded: true }
                 ],
                 
+                // Integrations - initialize from survey metadata or default to empty state
+                // Handle both capitalization variants ('Integrations' and 'integrations')
+                integrations: surveyMeta.integrations || surveyMeta.Integrations || {
+                    enabled: false,
+                    klaviyo: { enabled: false, listId: '' },
+                    retainful: { enabled: false, listId: '' }
+                },
+                
                 // UI state
                 selectedTab: 0,
                 editModalOpen: false,
@@ -453,6 +498,11 @@ const useStore = create((set, get) => ({
                 discountEnabled: false,
                 discountSettings: {},
                 discountSections: [],
+                integrations: {
+                    enabled: false,
+                    klaviyo: { enabled: false, listId: '' },
+                    retainful: { enabled: false, listId: '' }
+                },
                 selectedTab: 0,
                 editModalOpen: false,
                 selectedQuestionId: '',
@@ -627,6 +677,11 @@ const useStore = create((set, get) => ({
             discountEnabled: false,
             discountSettings: {},
             discountSections: [],
+            integrations: {
+                enabled: false,
+                klaviyo: { enabled: false, listId: '' },
+                retainful: { enabled: false, listId: '' }
+            },
             selectedTab: 0,
             editModalOpen: false,
             selectedQuestionId: '',
@@ -677,7 +732,10 @@ const useStore = create((set, get) => ({
                 brandedConfig: state.brandedConfig,
                 discountEnabled: state.discountEnabled,
                 discountSettings: state.discountSettings,
-                selectedTheme: state.selectedTheme
+                selectedTheme: state.selectedTheme,
+                survey_meta_data: {
+                    integrations: state.integrations
+                }
             };
             
             // This would be an API call when implemented

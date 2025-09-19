@@ -14,8 +14,6 @@ import styles from './Knob.module.css';
  * @returns {JSX.Element} The rendered Knob component
  */
 export const Knob = ({ ariaLabel, selected, onClick }) => {
-    console.log('Knob rendering:', { ariaLabel, selected, styles });
-
     return (
         <button
             id=':rgi:'

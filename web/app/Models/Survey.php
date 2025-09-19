@@ -109,4 +109,14 @@ class Survey extends Model
     {
         return $this->survey_meta_data['discount']['discount_value_amount'] ?? 5;
     }
+
+    public function getIntegrationKlaviyoEnabled()
+    {
+        return $this->survey_meta_data['Integrations']['klaviyo']["enabled"] ?? false;
+    }
+
+    public function getIntegrationKlaviyoListId()
+    {
+        return $this->survey_meta_data['Integrations']['klaviyo']["listId"] ?? null;
+    }
 }
