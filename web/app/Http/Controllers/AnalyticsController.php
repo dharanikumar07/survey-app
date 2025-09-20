@@ -111,19 +111,78 @@ class AnalyticsController extends Controller
 
     public function getSurveyAnalytics()
     {
-        $surveys = Survey::withCount('responses')->get();
+        $surveys = Survey::with('responses')->get();
 
         $analytics = [];
 
         foreach ($surveys as $survey) {
+            $questionAnalytics = [
+                'rating' => [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0],
+                'satisfaction' => [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0],
+                'number-scale' => [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0],
+                'short_answer' => ['total_count' => 0],
+                'single' => ['total_count' => 0],
+                'multiple' => ['total_count' => 0],
+            ];
+
+            foreach ($survey->responses as $response) {
+                $answers = $response->answers;
+
+                if (is_string($answers)) {
+                    $answers = json_decode($answers, true);
+                }
+
+                if (!is_array($answers)) {
+                    continue;
+                }
+
+                foreach ($answers as $answer) {
+                    $type = $answer['type'] ?? null;
+
+                    if (!$type) {
+                        continue;
+                    }
+
+                    switch ($type) {
+                        case 'rating':
+                        case 'satisfaction':
+                        case 'number-scale':
+                            $score = isset($answer['answer']) ? (int) $answer['answer'] : null;
+                            if ($score >= 1 && $score <= 5) {
+                                $questionAnalytics[$type][$score]++;
+                            }
+                            break;
+
+                        case 'short_answer':
+                            if (!empty($answer['answer'])) {
+                                $questionAnalytics['short_answer']['total_count']++;
+                            }
+                            break;
+
+                        case 'single':
+                            if (!empty($answer['answer'])) {
+                                $questionAnalytics['single']['total_count']++;
+                            }
+                            break;
+
+                        case 'multiple':
+                            if (!empty($answer['answers']) && is_array($answer['answers'])) {
+                                $questionAnalytics['multiple']['total_count']++;
+                            }
+                            break;
+                    }
+                }
+            }
+
             $analytics[$survey->uuid] = [
                 'name' => $survey->name,
                 'type' => $survey->survey_type,
-                'total_responses' => $survey->responses_count
+                'total_responses' => $survey->responses->count(),
+                'questions' => $questionAnalytics
             ];
         }
 
-        $highestSurvey = $surveys->sortByDesc('responses_count')->first();
+        $highestSurvey = $surveys->sortByDesc(fn($s) => $s->responses->count())->first();
 
         return [
             'surveys' => $analytics,
@@ -134,6 +193,7 @@ class AnalyticsController extends Controller
             ] : null
         ];
     }
+
 
     public function getOverallAnalytics()
     {
