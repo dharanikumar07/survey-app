@@ -51,7 +51,7 @@ class IntegrationController extends Controller
                 'listIds' => $result['listIds'],
                 'status'  => $result['status'],
             ],
-        ]);
+        ],HttpResponse::HTTP_OK);
     }
 
     public function getIntegration(Request $request)
@@ -89,7 +89,7 @@ class IntegrationController extends Controller
 
             return Response::json([
                 'data' => $data,
-            ]);
+            ],HttpResponse::HTTP_OK);
         } catch (\Exception $exception) {
             Helper::logError("Unable to get the integration data", [__CLASS__, __FUNCTION__], $exception, $request->toArray());
             return Response::json([
