@@ -430,8 +430,8 @@ const useStore = create((set, get) => ({
             // Transform thankyou config from channels.thankyou.config
             const thankyouConfig = get().transformThankyouConfig(surveyMeta.channels?.thankyou?.config || {});
             
-            // Transform branded config from channels.dedicatedPageSurvey.config
-            const brandedConfig = get().transformBrandedConfig(surveyMeta.channels?.dedicatedPageSurvey?.config || {});
+            // Transform branded config from preferences.branding
+            const brandedConfig = get().transformBrandedConfig(surveyMeta.preferences?.branding || {});
             
             const transformedData = {
                 // Survey basic info
@@ -537,7 +537,6 @@ const useStore = create((set, get) => ({
         const defaultChannels = [
             { id: 'onsite', title: 'On-site survey', icon: 'store', isExpanded: false, isEnabled: false },
             { id: 'thankyou', title: 'Thank you page', icon: 'checkmark', isExpanded: false, isEnabled: false },
-            { id: 'dedicatedPageSurvey', title: 'Branded survey', icon: 'code', isExpanded: false, isEnabled: false },
         ];
         
         // Update enabled status based on API data

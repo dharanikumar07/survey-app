@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, BlockStack, Button, ButtonGroup, Divider } from '@shopify/polaris';
 import { ContentTab } from '../tabs/ContentTab';
 import { ChannelTab } from '../tabs/ChannelTab';
+import { PreferencesTab } from '../tabs/PreferencesTab';
 import { useSurveyState } from '../../hooks/useSurveyState';
 import AdvancedTab from '../tabs/AdvancedTab';
 
@@ -20,6 +21,8 @@ function TabsContent({ surveyPreviewRef }) {
                 return <ChannelTab />;
             case 2:
                 return <AdvancedTab />;
+            case 3:
+                return <PreferencesTab />;
             default:
                 return <ContentTab surveyPreviewRef={surveyPreviewRef} />;
         }
@@ -48,6 +51,13 @@ function TabsContent({ surveyPreviewRef }) {
                     variant='tertiary'
                 >
                     Advance
+                </Button>
+                <Button
+                    pressed={selectedTab === 3}
+                    onClick={() => handleTabChange(3)}
+                    variant='tertiary'
+                >
+                    Preferences
                 </Button>
             </ButtonGroup>
             <Box paddingBlockStart="200">
