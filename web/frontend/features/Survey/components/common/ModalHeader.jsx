@@ -53,6 +53,7 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
         discountSettings,
         surveyTitle,
         onsiteConfig,
+        brandedConfig,
         integrations
     } = useSurveyState();
 
@@ -112,13 +113,10 @@ function ModalHeader({ title, surveyPreviewRef, onClose }) {
                         type: "thankyou",
                         enabled: true
                     }
-                }),
-                ...(channelItems.find(c => c.id === 'branded')?.isEnabled && {
-                    dedicatedPageSurvey: {
-                        type: "dedicatedPageSurvey",
-                        enabled: true
-                    }
                 })
+            },
+            preferences: {
+                branding: brandedConfig
             },
             discount: {
                 enabled: discountEnabled,

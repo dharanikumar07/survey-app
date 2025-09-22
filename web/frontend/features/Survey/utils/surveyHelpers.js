@@ -101,11 +101,9 @@ export const prepareSurveyForBackend = (surveyData, htmlContent) => {
         isActive: surveyData.isActive !== undefined ? surveyData.isActive : true,
         questions: surveyData.questions || [],
         channels: surveyData.channels || {},
+        preferences: surveyData.preferences || {}, // Include preferences (branding config)
         discount: surveyData.discount || {
-            enabled: false,
-            discount_type: 'generic',
-            discount_value: 'percentage',
-            discount_value_amount: ''
+            
         },
         integrations: surveyData.integrations || {
             enabled: false,

@@ -7,7 +7,6 @@ import { BrandedSurveyConfig } from './BrandedSurveyConfig';
 export const CHANNEL_CONFIG_COMPONENTS = {
     onsite: OnsiteSurveyConfig,
     thankyou: ThankYouConfig,
-    dedicatedPageSurvey: BrandedSurveyConfig,
     // Add more channel types here as needed
     // email: EmailConfig,
     // exit: ExitIntentConfig,

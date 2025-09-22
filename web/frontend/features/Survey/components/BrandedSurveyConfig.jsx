@@ -182,17 +182,7 @@ export function BrandedSurveyConfig() {
     ];
 
     return (
-        <div
-            className="th-sf-branded-config-container"
-            style={{
-                maxHeight: '400px',
-                overflowY: 'auto',
-                padding: '16px',
-                border: '1px solid #e1e3e5',
-                borderRadius: '8px',
-                backgroundColor: '#fafafa'
-            }}
-        >
+        <>
             <BlockStack gap="400">
                 {/* Brand Identity Section */}
                 <Box>
@@ -372,6 +362,6 @@ export function BrandedSurveyConfig() {
                     </Box>
                 </Box>
             </BlockStack>
-        </div>
+        </>
     );
 }
