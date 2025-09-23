@@ -1,0 +1,100 @@
+/* Rich Text Editor Styles */
+
+.rich-text-editor {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.quill-container {
+  border-radius: 4px;
+}
+
+/* Fix Quill toolbar height */
+.quill-container .ql-toolbar.ql-snow {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  background-color: #f9fafb;
+  padding: 6px 8px;
+}
+
+/* Fix Quill editor height */
+.quill-container .ql-container.ql-snow {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  min-height: 100px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Disabled state */
+.quill-container.disabled .ql-toolbar.ql-snow,
+.quill-container.disabled .ql-container.ql-snow {
+  background-color: #f4f6f8;
+  border-color: #e1e3e5;
+  opacity: 0.8;
+}
+
+/* Error state */
+.quill-container.error .ql-toolbar.ql-snow,
+.quill-container.error .ql-container.ql-snow {
+  border-color: #d82c0d;
+}
+
+/* Quill active button styles - GREEN */
+.quill-container .ql-toolbar button.ql-active {
+  background-color: #008060;
+  border-radius: 3px;
+  color: white !important;
+}
+
+.quill-container .ql-toolbar button.ql-active svg {
+  filter: brightness(0) invert(1);
+}
+
+/* Quill hover button styles */
+.quill-container .ql-toolbar button:hover:not(.ql-active) {
+  background-color: #f1f2f3;
+  border-radius: 3px;
+}
+
+/* Quill dropdown styles */
+.quill-container .ql-toolbar .ql-picker-options {
+  border-color: #c4cdd5;
+  box-shadow: 0 0 0 1px rgba(63, 63, 68, 0.05), 0 1px 3px 0 rgba(63, 63, 68, 0.15);
+}
+
+/* Fix Quill editor content padding */
+.quill-container .ql-editor {
+  padding: 12px 15px;
+}
+
+/* Hide specific icons in Quill toolbar */
+.quill-container .ql-toolbar .ql-formats button.ql-list[value="ordered"],
+.quill-container .ql-toolbar .ql-formats button.ql-list[value="bullet"] {
+  display: none;
+}
+
+/* Add top margin to the editor to match toolbar */
+.quill-container .ql-container {
+  margin-top: -1px;
+}
+
+/* Ensure buttons have proper size and alignment */
+.quill-container .ql-toolbar .ql-formats {
+  margin-right: 10px;
+}
+
+/* Ensure clean button has enough space */
+.quill-container .ql-toolbar .ql-formats button.ql-clean {
+  margin-right: 5px;
+}
+
+/* Fix alignment for SVG icons */
+.quill-container .ql-toolbar svg {
+  vertical-align: middle;
+}
+
+/* Hide keyboard shortcut button */
+.quill-container .ql-toolbar button.ql-keyboard {
+  display: none;
+}

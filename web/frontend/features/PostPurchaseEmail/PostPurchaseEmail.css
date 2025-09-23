@@ -1,0 +1,270 @@
+/* Post Purchase Email Styles */
+
+/* Hide scrollbar on the whole page */
+html, body {
+  overflow: hidden;
+}
+
+.email-editor-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 120px); /* Increased height to take full page */
+  overflow: hidden; /* Ensure no scrollbar at container level */
+}
+
+.email-editor-two-panel {
+  display: flex;
+  width: 100%;
+  gap: 2px;
+  height: 100%;
+  overflow: hidden; /* Ensure no scrollbar at panel container level */
+}
+
+/* Left panel (editor) - smaller width */
+.email-editor-panel:first-child {
+  flex: 0 0 35%;
+  min-width: 0; /* Prevents flex items from overflowing */
+  overflow-y: auto; /* Allow scrolling for long content */
+  height: 100%;
+  border-radius: 8px; /* Add border-radius to panel */
+}
+
+/* Customize scrollbar for the left panel */
+.email-editor-panel:first-child::-webkit-scrollbar {
+  width: 6px; /* Reduced width for left panel scrollbar */
+}
+
+.email-editor-panel:first-child::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.email-editor-panel:first-child::-webkit-scrollbar-thumb {
+  background: #c4cdd5;
+  border-radius: 3px;
+}
+
+.email-editor-panel:first-child::-webkit-scrollbar-thumb:hover {
+  background: #a4adb7;
+}
+
+/* Right panel (preview) - larger width */
+.email-editor-panel:last-child {
+  flex: 0 0 65%;
+  min-width: 0; /* Prevents flex items from overflowing */
+  height: 100%;
+  overflow: hidden; /* Hide overflow at panel level to prevent double scrollbars */
+  border-radius: 8px; /* Add border-radius to panel */
+}
+
+.email-editor-fullscreen {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  height: 100%;
+  overflow: hidden; /* Hide overflow at container level */
+  border-radius: 8px; /* Add border-radius to fullscreen container */
+}
+
+/* Header actions styles */
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(63, 63, 68, 0.05), 0 1px 3px 0 rgba(63, 63, 68, 0.15);
+  width: 100%;
+  position: relative;
+}
+
+.filter-dropdown {
+  width: 300px;
+  position: relative;
+}
+
+/* Custom Select Styling */
+.select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  white-space: normal;
+}
+
+.select-option span {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Override Polaris Select styling */
+.filter-dropdown .Polaris-Select__Content {
+  display: flex;
+  align-items: center;
+}
+
+.filter-dropdown .Polaris-Select__SelectedOption {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.filter-dropdown .Polaris-Select__Icon {
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.filter-search-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* Search with cancel layout */
+.search-with-cancel {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  gap: 8px;
+}
+
+.search-field-wrapper {
+  flex-grow: 1;
+  width: 300px;
+}
+
+/* Fix Polaris Autocomplete width */
+.search-field-wrapper .Polaris-Autocomplete {
+  width: 100%;
+}
+
+/* Hide Polaris Autocomplete dropdown */
+.search-field-wrapper .Polaris-Autocomplete__Listbox {
+  display: none;
+}
+
+/* Fix Polaris TextField padding */
+.search-field-wrapper .Polaris-TextField {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.search-field-wrapper .Polaris-TextField__Input {
+  height: 32px;
+  min-height: 32px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.cancel-button-container {
+  margin-left: 0;
+}
+
+/* Animation for search expansion */
+@keyframes expand {
+  from { width: 0; opacity: 0; }
+  to { width: 100%; opacity: 1; }
+}
+
+.search-with-cancel {
+  animation: expand 0.3s ease forwards;
+}
+
+/* Responsive styles */
+@media (max-width: 767px) {
+  .email-editor-two-panel {
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .email-editor-panel:first-child,
+  .email-editor-panel:last-child {
+    width: 100%;
+    flex: auto;
+    height: auto;
+    max-height: 50vh;
+  }
+  
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .filter-dropdown {
+    width: 100%;
+  }
+  
+  .search-with-cancel {
+    width: 100%;
+  }
+  
+  .search-field-wrapper {
+    width: 100%;
+  }
+}
+
+/* Ensure cards have consistent height */
+.email-editor-panel .Polaris-Card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Hide overflow at card level */
+  border-radius: 8px !important; /* Add border-radius to cards */
+}
+
+/* Make card content take full height */
+.email-editor-panel .Polaris-Card > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent scrollbar at card content level */
+}
+
+/* Make tabs content take full height */
+.email-editor-panel .Polaris-Tabs__Panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.email-editor-panel .Polaris-Box {
+  flex: 1;
+  overflow: auto;
+}
+
+/* Customize scrollbar for the Polaris-Box in left panel */
+.email-editor-panel:first-child .Polaris-Box::-webkit-scrollbar {
+  width: 6px; /* Reduced width */
+}
+
+.email-editor-panel:first-child .Polaris-Box::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.email-editor-panel:first-child .Polaris-Box::-webkit-scrollbar-thumb {
+  background: #c4cdd5;
+  border-radius: 3px;
+}
+
+.email-editor-panel:first-child .Polaris-Box::-webkit-scrollbar-thumb:hover {
+  background: #a4adb7;
+}
+
+/* Add border-radius to view mode buttons */
+.email-editor-panel .Polaris-ButtonGroup {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Add border-radius to card sections */
+.email-editor-panel .Polaris-Card__Section {
+  border-radius: 8px;
+}

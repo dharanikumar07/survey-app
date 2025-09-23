@@ -8,7 +8,6 @@ export const CHANNEL_CONFIG_COMPONENTS = {
     onsite: OnsiteSurveyConfig,
     thankyou: ThankYouConfig,
     // Add more channel types here as needed
-    // email: EmailConfig,
     // exit: ExitIntentConfig,
     // embed: EmbedConfig,
 };

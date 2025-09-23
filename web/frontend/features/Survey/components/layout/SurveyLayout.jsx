@@ -1,5 +1,5 @@
 import React, { forwardRef, useRef } from 'react';
-import { Box, Grid } from '@shopify/polaris';
+import { Box, Grid, Text } from '@shopify/polaris';
 import QuestionList from '../panels/QuestionList';
 import QuestionSettings from '../panels/QuestionSettings';
 import ModalHeader from '../common/ModalHeader';
@@ -26,16 +26,10 @@ import SurveyIframeProduction from '../panels/SurveyIframeProduction';
 const SurveyLayout = forwardRef(({ surveyId, onClose }, ref) => {
     const surveyPreviewRef = ref || useRef(null);
     const { selectedView } = useSurveyState();
-
+    
     // Determine column spans based on view mode
     const getColumnSpans = () => {
         switch (selectedView) {
-            // case 'mobile':
-            //     return {
-            //         left: { xs: 12, sm: 12, md: 2, lg: 2, xl: 2 },
-            //         center: { xs: 12, sm: 12, md: 8, lg: 8, xl: 8 },
-            //         right: { xs: 12, sm: 12, md: 2, lg: 2, xl: 2 }
-            //     };
             case 'maximize':
                 return {
                     left: { xs: 0, sm: 0, md: 0, lg: 0, xl: 0 },

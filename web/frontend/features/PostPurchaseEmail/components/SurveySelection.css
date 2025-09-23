@@ -1,0 +1,33 @@
+/* Survey Selection Styles */
+
+.survey-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.survey-details {
+  flex: 1;
+}
+
+.survey-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.survey-actions {
+  margin-left: 16px;
+}
+
+.selected-survey {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 4px;
+  border: 1px solid #e1e3e5;
+}

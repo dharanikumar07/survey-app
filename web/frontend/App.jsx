@@ -34,6 +34,7 @@ export default function App() {
                     Home
                 </a>
                 <a href="/survey">Survey</a>
+                <a href="/post-purchase-email">Post Purchase Email</a>
                 <a href="/response">Response</a>
                 <a href="/analytics">Analytics</a>
                 <a href="/integrations">Integrations</a>

@@ -7,6 +7,7 @@ use App\Http\Controllers\SurveyViewController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\ResponseController;
 use App\Http\Controllers\IntegrationController;
+use App\Http\Controllers\PostPurchaseEmailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,9 @@ Route::middleware('shopify.auth')->group(function () {
     Route::post('/integrations', [IntegrationController::class, 'saveIntegration']);
     Route::get('/integrations', [IntegrationController::class, 'getIntegration']);
     Route::get('/integrations/data', [IntegrationController::class, 'getIntegrationData']);
+
+    Route::get('/post-purchase-email', [PostPurchaseEmailController::class, 'getPostPurchaseEmail']);
+    Route::post('/post-purchase-email', [PostPurchaseEmailController::class, 'savePostPurchaseEmail']);
 
 });
 

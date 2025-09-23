@@ -20,8 +20,19 @@ class IntegrationController extends Controller
 
         $type   = $request->input('type');
         $apiKey = $request->input('apiKey');
+        $measurement_id = $request->input('measurementId') ?? null;
+        $api_secret = $request->input('apiSecret') ?? null;
+        $appId = $request->input('appId') ?? null;
 
-        $result = $service->validateIntegration($type, $apiKey);
+        $config = [
+            'type' => $type,
+            'apiKey' => $apiKey,
+            'measurement_id' => $measurement_id,
+            'api_secret' => $api_secret,
+            'app_id' => $appId,
+        ];
+
+        $result = $service->validateIntegration($config['type'], $config);
 
         if (!$result) {
             return Response::json([

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Box, BlockStack, Text, Card } from '@shopify/polaris';
 import { useSurveyState } from '../../hooks/useSurveyState';
 import SurveyAccordion from '../../../../components/SurveyAccordion';
-import { formatSurveyForAPI } from '../../utils/surveyHelpers';
 
 export function ChannelTab() {
     const {
@@ -13,6 +12,9 @@ export function ChannelTab() {
         surveyTitle,
         isActive
     } = useSurveyState();
+
+    // Filter out the email channel
+    const filteredChannelItems = channelItems.filter(item => item.id !== 'email');
 
     // State to track which accordion is currently open (only one at a time)
     const [openAccordionId, setOpenAccordionId] = useState(null);
@@ -36,14 +38,14 @@ export function ChannelTab() {
 
     // Sync local state with store state on mount or when channelItems change
     useEffect(() => {
-        const expandedItem = channelItems.find(item => item.isExpanded);
+        const expandedItem = filteredChannelItems.find(item => item.isExpanded);
         if (expandedItem) {
             setOpenAccordionId(expandedItem.id);
         } else {
             // Reset the openAccordionId if no items are expanded
             setOpenAccordionId(null);
         }
-    }, [channelItems]);
+    }, [filteredChannelItems]);
 
     // Handle channel updates
     const handleChannelUpdate = (channelId, enabled) => {
@@ -75,7 +77,7 @@ export function ChannelTab() {
                     </Text>
 
                     <Card padding="000">
-                        {channelItems.map((item) => (
+                        {filteredChannelItems.map((item) => (
                             <SurveyAccordion
                                 key={item.id}
                                 item={{

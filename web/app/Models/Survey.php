@@ -119,4 +119,14 @@ class Survey extends Model
     {
         return $this->survey_meta_data['Integrations']['klaviyo']["listId"] ?? null;
     }
+
+    public function isEmailDataPresent()
+    {
+        return $this->survey_meta_data['channels']['post_purchase_email']['enabled'] ?? false;
+    }
+
+    public function getEmailData()
+    {
+        return $this->survey_meta_data['channels']['post_purchase_email']['email_data'] ?? [];
+    }
 }
