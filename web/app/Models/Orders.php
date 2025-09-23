@@ -22,4 +22,14 @@ class Orders extends Model
     {
         return $this->hasMany(OrderItems::class, 'order_uuid', 'uuid');
     }
+
+    public function getOrderId()
+    {
+        return $this->order['id'] ?? "123" ;
+    }
+
+    public function getOrderName()
+    {
+        return $this->order['name'] ?? "#123";
+    }
 }

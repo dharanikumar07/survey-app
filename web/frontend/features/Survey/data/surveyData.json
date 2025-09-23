@@ -5,7 +5,9 @@
       "description": "Tell us your needs - we'll take care of everything.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false },
+        { "id": "email", "title": "Post-purchase Email", "icon": "email", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -45,6 +47,17 @@
           "productPurchased": false,
           "widgetRecurrence": "every_time"
         },
+        "emailConfig": {
+          "emailTitle": "",
+          "emailSubject": "",
+          "userTargeting": "all",
+          "userTag": false,
+          "customerType": {
+            "newCustomer": false,
+            "returnCustomer": false
+          },
+          "productPurchased": false
+        },
         "brandedConfig": {
           "logo": "",
           "colors": {
@@ -69,12 +82,12 @@
         }
       },
       "questions": [
-        { 
-          "id": "1", 
-          "content": "What would you like to ask?", 
-          "type": "text", 
-          "description": "", 
-          "questionType": "Short answer", 
+        {
+          "id": "1",
+          "content": "What would you like to ask?",
+          "type": "text",
+          "description": "",
+          "questionType": "Short answer",
           "isDraggable": true,
           "answerOptions": []
         },
@@ -86,7 +99,9 @@
       "description": "Find out which marketing channels are most effective.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false },
+        { "id": "email", "title": "Post-purchase Email", "icon": "email", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -114,12 +129,12 @@
         "editModalOpen": false
       },
       "questions": [
-        { 
-          "id": "1", 
-          "content": "How did you hear about us?", 
-          "type": "single-choice", 
-          "description": "Select the option that best describes your answer.", 
-          "questionType": "Single choice", 
+        {
+          "id": "1",
+          "content": "How did you hear about us?",
+          "type": "single-choice",
+          "description": "Select the option that best describes your answer.",
+          "questionType": "Single choice",
           "isDraggable": true,
           "answerOptions": [
             { "id": "opt1", "text": "Word of mouth" },
@@ -137,7 +152,9 @@
       "description": "Gauge customer experience and satisfaction across key touchpoints.",
      "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false },
+        { "id": "email", "title": "Post-purchase Email", "icon": "email", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -165,12 +182,12 @@
         "editModalOpen": false
       },
       "questions": [
-        { 
-          "id": "1", 
-          "content": "How likely are you to recommend us to a friend?", 
-          "type": "rating", 
-          "description": "Rate your likelihood on a scale from 1 (Not likely) to 5 (Extremely likely).", 
-          "questionType": "Star rating", 
+        {
+          "id": "1",
+          "content": "How likely are you to recommend us to a friend?",
+          "type": "rating",
+          "description": "Rate your likelihood on a scale from 1 (Not likely) to 5 (Extremely likely).",
+          "questionType": "Star rating",
           "isDraggable": true,
           "answerOptions": [
             { "id": "opt1", "text": "1 - Not likely" },
@@ -180,12 +197,12 @@
             { "id": "opt5", "text": "5 - Extremely likely" }
           ]
         },
-        { 
-          "id": "2", 
-          "content": "How satisfied are you with your recent purchase?", 
-          "type": "satisfaction", 
-          "description": "Please indicate your level of satisfaction with our service.", 
-          "questionType": "Satisfaction", 
+        {
+          "id": "2",
+          "content": "How satisfied are you with your recent purchase?",
+          "type": "satisfaction",
+          "description": "Please indicate your level of satisfaction with our service.",
+          "questionType": "Satisfaction",
           "isDraggable": true,
           "answerOptions": [
             { "id": "opt6", "text": "Very Dissatisfied" },
@@ -203,7 +220,9 @@
       "description": "Understand what's stopping users from purchasing on your site.",
      "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false },
+        { "id": "email", "title": "Post-purchase Email", "icon": "email", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -231,12 +250,12 @@
         "editModalOpen": false
       },
       "questions": [
-        { 
-          "id": "1", 
-          "content": "What stopped you from making a purchase today?", 
-          "type": "single-choice", 
-          "description": "Select the option that best describes your reason.", 
-          "questionType": "Single choice", 
+        {
+          "id": "1",
+          "content": "What stopped you from making a purchase today?",
+          "type": "single-choice",
+          "description": "Select the option that best describes your reason.",
+          "questionType": "Single choice",
           "isDraggable": true,
           "answerOptions": [
             { "id": "opt1", "text": "Price too high" },
@@ -254,7 +273,9 @@
       "description": "Understand what's stopping users from purchasing on your site.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false },
+        { "id": "email", "title": "Post-purchase Email", "icon": "email", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -282,12 +303,12 @@
         "editModalOpen": false
       },
       "questions": [
-        { 
-          "id": "1", 
-          "content": "You're leaving?", 
-          "type": "text", 
-          "description": "Before you go, we'd love to know what we could improve.", 
-          "questionType": "Short answer", 
+        {
+          "id": "1",
+          "content": "You're leaving?",
+          "type": "text",
+          "description": "Before you go, we'd love to know what we could improve.",
+          "questionType": "Short answer",
           "isDraggable": true,
           "answerOptions": []
         },
@@ -299,7 +320,9 @@
       "description": "AI-generated survey with custom title and questions.",
       "channelItems": [
         { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false },
+        { "id": "dedicatedPageSurvey", "title": "Custom branded page", "icon": "code", "isExpanded": false, "isEnabled": false },
+        { "id": "email", "title": "Post-purchase Email", "icon": "email", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -327,12 +350,12 @@
         "editModalOpen": false
       },
       "questions": [
-        { 
-          "id": "1", 
-          "content": "What would you like to ask?", 
-          "type": "text", 
-          "description": "This question was generated by AI based on your prompt.", 
-          "questionType": "Short answer", 
+        {
+          "id": "1",
+          "content": "What would you like to ask?",
+          "type": "text",
+          "description": "This question was generated by AI based on your prompt.",
+          "questionType": "Short answer",
           "isDraggable": true,
           "answerOptions": []
         },

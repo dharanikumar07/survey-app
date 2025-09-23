@@ -129,4 +129,9 @@ class Survey extends Model
     {
         return $this->survey_meta_data['channels']['post_purchase_email']['email_data'] ?? [];
     }
+
+    public function getSurveyLink()
+    {
+        return $this->survey_meta_data['channels']['branded_survey'] ?? '';
+    }
 }
