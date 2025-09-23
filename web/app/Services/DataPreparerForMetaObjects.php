@@ -60,6 +60,10 @@ class DataPreparerForMetaObjects
             return array_values(array_diff($allPages, $mappedPages));
         }
 
+        if ($type == 'all') {
+            return $allPages;
+        }
+
         return $mappedPages;
     }
 }

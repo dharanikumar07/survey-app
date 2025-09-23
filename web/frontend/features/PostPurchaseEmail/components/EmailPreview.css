@@ -1,0 +1,147 @@
+/* Email Preview Styles */
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Add rounded corners to the Card */
+.email-preview-card {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.email-preview-container {
+  border: 1px solid #e1e3e5;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(63, 63, 68, 0.05), 0 1px 3px 0 rgba(63, 63, 68, 0.15);
+  height: calc(100vh - 220px); /* Adjust for better height */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Ensure content doesn't break the border-radius */
+}
+
+/* Mobile view styling */
+.email-preview-container.mobile-view {
+  max-width: 375px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Desktop view styling */
+.email-preview-container.desktop-view {
+  width: 100%;
+}
+
+/* Email header section */
+.email-preview-header {
+  padding: 16px;
+  border-bottom: 1px solid #e1e3e5;
+  background-color: #f9fafb;
+  flex-shrink: 0; /* Prevent header from shrinking */
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.email-preview-subject {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: baseline;
+}
+
+.email-preview-subject:last-child {
+  margin-bottom: 0;
+}
+
+/* Formatted subject styling */
+.formatted-subject {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  color: #202223;
+  flex-grow: 1;
+}
+
+.formatted-subject p {
+  margin: 0;
+  display: inline;
+}
+
+.formatted-subject strong {
+  font-weight: 600;
+}
+
+.formatted-subject em {
+  font-style: italic;
+}
+
+.formatted-subject u {
+  text-decoration: underline;
+}
+
+/* Email body section - THIS IS WHERE THE SCROLL SHOULD BE */
+.email-preview-body {
+  padding: 16px;
+  flex-grow: 1; /* Allow body to grow and take available space */
+  overflow-y: auto; /* Add scroll here */
+}
+
+/* Email content styling */
+.email-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  color: #202223;
+}
+
+.email-content h1,
+.email-content h2,
+.email-content h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.email-content p {
+  margin-bottom: 16px;
+}
+
+/* Product review block styling */
+.product-review-block {
+  margin: 16px 0;
+  border: 1px solid #e1e3e5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.product-item {
+  display: flex;
+  padding: 12px;
+  border-bottom: 1px solid #e1e3e5;
+}
+
+.product-item:last-child {
+  border-bottom: none;
+}
+
+.product-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 12px;
+}
+
+.product-details {
+  flex: 1;
+}
+
+.product-name {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.product-price {
+  color: #5c5f62;
+}

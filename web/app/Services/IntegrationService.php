@@ -8,10 +8,11 @@ use Illuminate\Support\Facades\Log;
 
 class IntegrationService
 {
-    public function validateIntegration(string $type, string $apiKey): array|false
+    public function validateIntegration(string $type, array $config): array|false
     {
         return match ($type) {
-            'klaviyo' => $this->validateKlaviyo($apiKey),
+            'klaviyo' => $this->validateKlaviyo($config['apiKey']),
+            'google_anlytics' => $this->validateGoogleAnalyticsKeys($config),
             default   => false,
         };
     }
@@ -53,6 +54,67 @@ class IntegrationService
             return false;
         }
     }
+
+    protected function validateGoogleAnalyticsKeys(array $config): array|false
+    {
+        try {
+            $measurementId = $config['measurement_id'] ?? null;
+            $apiSecret     = $config['api_secret'] ?? null;
+
+            if (!$measurementId || !$apiSecret) {
+                return false;
+            }
+
+            $endpoint = "https://www.google-analytics.com/debug/mp/collect";
+
+            $payload = [
+                "client_id" => uniqid(), // required, can be any string
+                "events" => [
+                    [
+                        "name" => "test_validation_event"
+                    ]
+                ]
+            ];
+
+            $response = Http::post($endpoint, [
+                'query' => [
+                    'measurement_id' => $measurementId,
+                    'api_secret'     => $apiSecret,
+                ],
+                'json' => $payload,
+            ]);
+
+            Log::info('Google Analytics validation response', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
+            ]);
+
+            if (!$response->successful()) {
+                return false;
+            }
+
+            $json = $response->json();
+
+            // Validation passes if no errors
+            if (empty($json['validationMessages'])) {
+                return [
+                    'measurement_id' => $measurementId,
+                    'api_secret'     => $apiSecret,
+                    'status'         => 'connected',
+                    'type'           => 'google_analytics',
+                ];
+            }
+
+            return false;
+
+        } catch (\Exception $e) {
+            Log::error('Google Analytics integration failed', [
+                'message' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
 
     public function getIntegrationsData(string $storeUuid): array
     {
