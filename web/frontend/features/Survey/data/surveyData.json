@@ -4,8 +4,7 @@
       "title": "Blank survey",
       "description": "Tell us your needs - we'll take care of everything.",
       "channelItems": [
-        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -85,8 +84,7 @@
       "title": "Marketing attribution",
       "description": "Find out which marketing channels are most effective.",
       "channelItems": [
-        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -136,8 +134,7 @@
       "title": "Customer experience survey",
       "description": "Gauge customer experience and satisfaction across key touchpoints.",
      "channelItems": [
-        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -202,8 +199,7 @@
       "title": "Reason for not purchasing",
       "description": "Understand what's stopping users from purchasing on your site.",
      "channelItems": [
-        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -253,8 +249,7 @@
       "title": "Exit intent",
       "description": "Understand what's stopping users from purchasing on your site.",
       "channelItems": [
-        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",
@@ -298,8 +293,7 @@
       "title": "AI-assisted survey",
       "description": "AI-generated survey with custom title and questions.",
       "channelItems": [
-        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false },
-        { "id": "thankyou", "title": "Thank you page", "icon": "checkmark", "isExpanded": false, "isEnabled": false }
+        { "id": "onsite", "title": "On-site survey", "icon": "store", "isExpanded": false, "isEnabled": false }
       ],
       "discountSettings": {
         "discount_type": "generic",

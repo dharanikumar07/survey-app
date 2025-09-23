@@ -160,7 +160,7 @@ export function BrandedSurveyConfig() {
         { label: 'Primary', value: 'primary' },
         { label: 'Secondary', value: 'secondary' },
         { label: 'Accent', value: 'accent' },
-        { label: 'Background', value: 'background' },
+        // { label: 'Background', value: 'background' },
         { label: 'Text', value: 'text' }
     ];
 
@@ -185,7 +185,7 @@ export function BrandedSurveyConfig() {
         <>
             <BlockStack gap="400">
                 {/* Brand Identity Section */}
-                <Box>
+                {/* <Box>
                     <Text variant="headingMd" as="h4">
                         Brand Identity
                     </Text>
@@ -198,9 +198,9 @@ export function BrandedSurveyConfig() {
                             helpText="Enter the URL of your brand logo"
                         />
                     </Box>
-                </Box>
+                </Box> */}
 
-                <Divider />
+                {/* <Divider /> */}
 
                 {/* Color Scheme Section */}
                 <Box>
@@ -215,8 +215,8 @@ export function BrandedSurveyConfig() {
 
                                 return (
                                     <Box key={color.value}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'start' }}>
-                                            <div style={{ marginTop: '20px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'start', width: '90%' }}>
+                                            <div >
                                                 <Popover
                                                     active={activeColorPopover === color.value}
                                                     activator={
@@ -237,7 +237,7 @@ export function BrandedSurveyConfig() {
                                                     }
                                                     onClose={() => setActiveColorPopover(null)}
                                                 >
-                                                    <div style={{ padding: '12px' }}>
+                                                    <div style={{ padding: '20px' }}>
                                                         <ColorPicker
                                                             onChange={(hsb) => handleColorChange(color.value, hsb)}
                                                             color={{
@@ -249,7 +249,7 @@ export function BrandedSurveyConfig() {
                                                     </div>
                                                 </Popover>
                                             </div>
-                                            <div style={{ flex: 1 }}>
+                                            <div style={{ flex: 1 }} className='!w-2'>
                                                 <TextField
                                                     label={color.label}
                                                     value={hexColor}
@@ -271,7 +271,7 @@ export function BrandedSurveyConfig() {
                 <Divider />
 
                 {/* Typography Section */}
-                <Box>
+                {/* <Box>
                     <Text variant="headingMd" as="h4">
                         Typography
                     </Text>
@@ -299,12 +299,12 @@ export function BrandedSurveyConfig() {
                             )}
                         </BlockStack>
                     </Box>
-                </Box>
+                </Box> */}
 
-                <Divider />
+                {/* <Divider /> */}
 
                 {/* Display Settings Section */}
-                <Box>
+                {/* <Box>
                     <Text variant="headingMd" as="h4">
                         Display Settings
                     </Text>
@@ -341,9 +341,9 @@ export function BrandedSurveyConfig() {
                             )}
                         </BlockStack>
                     </Box>
-                </Box>
+                </Box> */}
 
-                <Divider />
+                {/* <Divider /> */}
 
                 {/* Advanced Customization Section */}
                 <Box>
@@ -351,14 +351,17 @@ export function BrandedSurveyConfig() {
                         Advanced Customization
                     </Text>
                     <Box paddingBlockStart="200">
-                        <TextField
-                            label="Custom CSS"
-                            value={brandedConfig?.customCss || ''}
-                            onChange={handleCustomCssChange}
-                            placeholder="/* Add your custom CSS here */"
-                            multiline={4}
-                            helpText="Add custom CSS to further customize the survey appearance"
-                        />
+                        <div style={{ width: '90%' }}>
+                            <TextField
+                                label="Custom CSS"
+                                labelHidden
+                                value={brandedConfig?.customCss || ''}
+                                onChange={handleCustomCssChange}
+                                placeholder="/* Add your custom CSS here */"
+                                multiline={4}
+                                helpText="Add custom CSS to further customize the survey appearance"
+                            />
+                        </div>
                     </Box>
                 </Box>
             </BlockStack>

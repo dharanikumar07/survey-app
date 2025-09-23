@@ -137,8 +137,8 @@ export const validateSurveyForAPI = (surveyData) => {
         errors.push('Survey name is required and must be a string');
     }
     
-    if (!surveyData.survey_type || !['post_purchase', 'site_widget', 'email', 'exit_intent', 'embedded'].includes(surveyData.survey_type)) {
-        errors.push('Survey type must be one of: post_purchase, site_widget, email, exit_intent, embedded');
+    if (!surveyData.survey_type || !['post_purchase', 'on_site', 'email', 'exit_intent', 'embedded'].includes(surveyData.survey_type)) {
+        errors.push('Survey type must be one of: post_purchase, on_site, email, exit_intent, embedded');
     }
     
     if (!surveyData.status || !['active', 'inactive', 'draft'].includes(surveyData.status)) {
@@ -168,7 +168,7 @@ export const mapChannelTypesToSurveyType = (channelTypes) => {
     if (!Array.isArray(channelTypes)) return 'post_purchase';
     
     if (channelTypes.includes('email')) return 'email';
-    if (channelTypes.includes('onsite')) return 'site_widget';
+    if (channelTypes.includes('onsite')) return 'on_site';
     if (channelTypes.includes('exit')) return 'exit_intent';
     if (channelTypes.includes('embed')) return 'embedded';
     return 'post_purchase'; // default

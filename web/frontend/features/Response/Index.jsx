@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useId } from 'react';
 import {
     Page,
     Card,
@@ -81,9 +81,11 @@ export default function Response() {
     });
 
     // Search and filter responses
-    const searchedResponses = filteredResponses.filter(response => {
+    const searchedResponses = filteredResponses.filter((response, index) => {
         if (queryValue) {
-            return response.uuid.toLowerCase().includes(queryValue.toLowerCase()) ||
+            const sequentialId = generateSequentialId(index);
+            return sequentialId.toLowerCase().includes(queryValue.toLowerCase()) ||
+                response.uuid.toLowerCase().includes(queryValue.toLowerCase()) ||
                 response.survey_name.toLowerCase().includes(queryValue.toLowerCase());
         }
         return true;
@@ -98,26 +100,34 @@ export default function Response() {
     const endIndex = startIndex + itemsPerPage;
     const paginatedResponses = sortedResponses.slice(startIndex, endIndex);
 
+    // Generate sequential IDs for responses based on global response index
+    const generateSequentialId = (globalIndex) => {
+        return `TH-SF-${String(globalIndex + 1).padStart(4, '0')}`;
+    };
+
     // Flatten responses for table display
-    const tableRows = paginatedResponses.flatMap(response =>
-        response.answers.map((answer, index) => ({
-            id: `${response.uuid}-${index}`,
-            responseId: response.uuid,
+    const tableRows = paginatedResponses.flatMap((response, localIndex) => {
+        const globalIndex = startIndex + localIndex; // Calculate global index for consistent IDs
+        return response.answers.map((answer, answerIndex) => ({
+            id: `${globalIndex}-${answerIndex}`,
+            responseId: generateSequentialId(globalIndex),
+            originalUuid: response.uuid, // Keep original UUID for API calls
             survey: response.survey_name,
             question: answer.question,
             // Use the answer type from the API response
             answerType: answer.type,
             // Handle different answer formats
-            answer: answer.type === 'multiple' ? 
-                (Array.isArray(answer.answers) && answer.answers[0] ? 
-                    answer.answers[0].join(', ') : '') : 
+            answer: answer.type === 'multiple' ?
+                (Array.isArray(answer.answers) && answer.answers[0] ?
+                    answer.answers[0].join(', ') : '') :
                 answer.answer,
             date: new Date(response.created_at).toLocaleDateString(),
-            actions: response.uuid
-        }))
-    );
+            actions: generateSequentialId(globalIndex)
+        }));
+    });
 
     // Bulk actions state using useIndexResourceState hook
+    // We'll use the original UUIDs for selection but display sequential IDs
     const { selectedResources, allResourcesSelected, handleSelectionChange } = useIndexResourceState(responses);
 
     // IndexFilters configuration
@@ -180,7 +190,7 @@ export default function Response() {
             'multiple': 'Multiple choice',
             'text': 'Text'
         };
-        
+
         appliedFilters.push({
             key: 'taggedWith',
             label: `Answer type: ${typeLabels[taggedWith] || taggedWith}`,
@@ -219,8 +229,8 @@ export default function Response() {
         }
     };
 
-    const handleViewResponse = (responseId) => {
-        const response = responses.find(r => r.uuid === responseId);
+    const handleViewResponse = (responseUuid) => {
+        const response = responses.find(r => r.uuid === responseUuid);
         setSelectedResponse(response);
         setModalOpen(true);
     };
@@ -236,11 +246,11 @@ export default function Response() {
     };
 
     const rowMarkup = tableRows.map(
-        ({ id, responseId, survey, question, answerType, answer, date, actions }, index) => (
+        ({ id, responseId, originalUuid, survey, question, answerType, answer, date, actions }, index) => (
             <IndexTable.Row
                 id={responseId}
                 key={id}
-                selected={selectedResources.includes(responseId)}
+                selected={selectedResources.includes(originalUuid)}
                 position={index}
             >
                 <IndexTable.Cell>
@@ -282,7 +292,7 @@ export default function Response() {
                             icon={ViewIcon}
                             size="slim"
                             variant='plain'
-                            onClick={() => handleViewResponse(responseId)}
+                            onClick={() => handleViewResponse(originalUuid)}
                             aria-label={`View response ${responseId}`}
                         />
                         {/* <Button
@@ -390,7 +400,7 @@ export default function Response() {
             <Modal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
-                title={`Response #${selectedResponse?.uuid?.substring(0, 8) || ''}`}
+                title={`Response #${selectedResponse ? generateSequentialId(responses.findIndex(r => r.uuid === selectedResponse.uuid)) : ''}`}
                 primaryAction={{
                     content: 'Close',
                     onAction: () => setModalOpen(false),
@@ -418,10 +428,10 @@ export default function Response() {
                                     </Text>
                                     <Text variant="bodyMd" as="p">
                                         <strong>Answer:</strong> {
-                                            answer.type === 'multiple' ? 
-                                            (Array.isArray(answer.answers) && answer.answers[0] ? 
-                                                answer.answers[0].join(', ') : 'No answer') : 
-                                            answer.answer || 'No answer'
+                                            answer.type === 'multiple' ?
+                                                (Array.isArray(answer.answers) && answer.answers[0] ?
+                                                    answer.answers[0].join(', ') : 'No answer') :
+                                                answer.answer || 'No answer'
                                         }
                                     </Text>
                                 </Box>
