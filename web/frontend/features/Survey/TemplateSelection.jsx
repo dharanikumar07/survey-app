@@ -6,6 +6,7 @@ import {
     Text,
     Button,
     Badge,
+    Scrollable,
 } from "@shopify/polaris";
 import { ArrowLeftIcon } from "@shopify/polaris-icons";
 import surveyData from "./data/surveyData.json";
@@ -104,41 +105,44 @@ export default function TemplateSelection() {
                 onAction: handleBack,
                 icon: ArrowLeftIcon
             }}
+            // fullWidth
         >
             <BlockStack gap="600">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {templateList.map((template) => (
-                        <div
-                            key={template.key}
-                            onClick={() => handleTemplateSelect(template.key)}
-                            className="cursor-pointer"
-                        >
-                            <Card padding="500">
-                                <BlockStack gap="400">
-                                    <div className={`flex justify-center items-center h-48 rounded-md ${template.customBackground || 'bg-gray-50'}`}>
-                                        {template.image ? (
-                                            <img
-                                                src={template.image}
-                                                alt={template.title}
-                                                className="w-full h-full object-cover rounded-md"
-                                            />
-                                        ) : (
-                                            template.customContent
-                                        )}
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <Text variant="headingMd" as="h3">{template.title}</Text>
-                                        {template.badge && (
-                                            <Badge tone={template.badge.status} progress={template.badge?.progress}>{template.badge.content}</Badge>
-                                        )}
-                                    </div>
-                                    <Text variant="bodyMd" as="p" color="subdued">{template.description}</Text>
-                                    <Button variant="primary">{template.buttonText}</Button>
-                                </BlockStack>
-                            </Card>
-                        </div>
-                    ))}
-                </div>
+                <Scrollable shadow="none" style={{ maxHeight: '90vh' }}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {templateList.map((template) => (
+                            <div
+                                key={template.key}
+                                onClick={() => handleTemplateSelect(template.key)}
+                                className="cursor-pointer"
+                            >
+                                <Card padding="500">
+                                    <BlockStack gap="400">
+                                        <div className={`flex justify-center items-center h-48 rounded-md ${template.customBackground || 'bg-gray-50'}`}>
+                                            {template.image ? (
+                                                <img
+                                                    src={template.image}
+                                                    alt={template.title}
+                                                    className="w-full h-full object-cover rounded-md"
+                                                />
+                                            ) : (
+                                                template.customContent
+                                            )}
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <Text variant="headingMd" as="h3">{template.title}</Text>
+                                            {template.badge && (
+                                                <Badge tone={template.badge.status} progress={template.badge?.progress}>{template.badge.content}</Badge>
+                                            )}
+                                        </div>
+                                        <Text variant="bodyMd" as="p" color="subdued">{template.description}</Text>
+                                        <Button variant="primary">{template.buttonText}</Button>
+                                    </BlockStack>
+                                </Card>
+                            </div>
+                        ))}
+                    </div>
+                </Scrollable>
             </BlockStack>
         </Page>
     );
