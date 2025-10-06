@@ -53,8 +53,13 @@ function Klaviyo() {
                         setConnectionData(klaviyoIntegration);
                         
                         // Pre-fill API key field if available
-                        if (klaviyoIntegration.config && klaviyoIntegration.config.apiKey) {
-                            setApiKey(klaviyoIntegration.config.apiKey);
+                        if (klaviyoIntegration.config) {
+                            // Handle both array and object format for config
+                            if (Array.isArray(klaviyoIntegration.config) && klaviyoIntegration.config.length > 0) {
+                                setApiKey(klaviyoIntegration.config[0].apiKey || '');
+                            } else if (klaviyoIntegration.config.apiKey) {
+                                setApiKey(klaviyoIntegration.config.apiKey);
+                            }
                         }
                     }
                 }
@@ -87,6 +92,15 @@ function Klaviyo() {
                         const status = klaviyoIntegration.status.toLowerCase() === 'connected' ? 'connected' : 'disconnected';
                         setConnectionStatus(status);
                         setConnectionData(klaviyoIntegration);
+                        
+                        // Update API key field
+                        if (klaviyoIntegration.config) {
+                            if (Array.isArray(klaviyoIntegration.config) && klaviyoIntegration.config.length > 0) {
+                                setApiKey(klaviyoIntegration.config[0].apiKey || '');
+                            } else if (klaviyoIntegration.config.apiKey) {
+                                setApiKey(klaviyoIntegration.config.apiKey);
+                            }
+                        }
                     }
                 } else if (integrationData.type === 'klaviyo') {
                     // If it's a single object and it's klaviyo

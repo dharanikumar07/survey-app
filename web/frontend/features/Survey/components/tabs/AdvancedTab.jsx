@@ -489,10 +489,10 @@ export function AdvancedTab() {
                                         )}
                                     </BlockStack>
 
-                                    <Divider />
+                                    {/* <Divider /> */}
 
                                     {/* Retainful Integration */}
-                                    <BlockStack gap="300">
+                                    {/* <BlockStack gap="300">
                                         <Box>
                                             <InlineStack blockAlign="center" wrap={false} align="space-between">
                                                 <InlineStack gap="200" blockAlign="center">
@@ -554,7 +554,7 @@ export function AdvancedTab() {
                                                 </BlockStack>
                                             </Box>
                                         )}
-                                    </BlockStack>
+                                    </BlockStack> */}
                                 </>
                             )}
                         </BlockStack>

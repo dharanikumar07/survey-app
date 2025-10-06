@@ -15,7 +15,8 @@ import {
   Popover,
   ActionList,
   Autocomplete,
-  Badge
+  Badge,
+  Modal
 } from '@shopify/polaris';
 import { SearchIcon, SendIcon } from '@shopify/polaris-icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -52,8 +53,12 @@ export default function PostPurchaseEmail() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSendingTest, setIsSendingTest] = useState(false);
   
+  // Send Test Email Modal state
+  const [isTestEmailModalOpen, setIsTestEmailModalOpen] = useState(false);
+  const [testEmailAddress, setTestEmailAddress] = useState('');
+  
   // API hooks
-  const { getPostPurchaseEmailData, savePostPurchaseEmailData } = usePostPurchaseEmailApi();
+  const { getPostPurchaseEmailData, savePostPurchaseEmailData, sendTestEmail } = usePostPurchaseEmailApi();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -300,11 +305,24 @@ export default function PostPurchaseEmail() {
     }
   };
 
-  // Handle send test email
-  const handleSendTestEmail = async () => {
+  // Open test email modal
+  const openTestEmailModal = () => {
     if (!selectedSurvey) {
       showToast({
         message: 'Please select a survey first',
+        type: 'error'
+      });
+      return;
+    }
+    setIsTestEmailModalOpen(true);
+    setTestEmailAddress('');
+  };
+
+  // Handle send test email
+  const handleSendTestEmail = async () => {
+    if (!testEmailAddress) {
+      showToast({
+        message: 'Please enter an email address',
         type: 'error'
       });
       return;
@@ -313,17 +331,17 @@ export default function PostPurchaseEmail() {
     setIsSendingTest(true);
 
     try {
-      const emailData = {
+      const testEmailData = {
         survey_uuid: selectedSurvey,
+        email: testEmailAddress,
         email_data: {
           subject: emailSubject,
           message: messageContent,
           footer: footerContent
-        },
-        send_test: true // Add this flag to indicate we want to send a test email
+        }
       };
 
-      const response = await savePostPurchaseEmailData(emailData);
+      const response = await sendTestEmail(testEmailData);
       
       showToast({
         message: 'Test email sent successfully',
@@ -331,6 +349,9 @@ export default function PostPurchaseEmail() {
       });
       
       console.log('Test email response:', response);
+      
+      // Close the modal
+      setIsTestEmailModalOpen(false);
       
       // After successful test email send, refresh the data to get the latest updates
       await queryClient.invalidateQueries(['post-purchase-email']);
@@ -410,17 +431,52 @@ export default function PostPurchaseEmail() {
                 <Icon source={SendIcon} />
               </div>
               <Text as="span" variant="bodyMd">
-                {isSendingTest ? 'Sending...' : 'Send Test Email'}
+                Send Test Email
               </Text>
             </div>
           ),
-          onAction: handleSendTestEmail,
-          loading: isSendingTest,
-          disabled: isSendingTest || !selectedSurvey
+          onAction: openTestEmailModal,
+          disabled: !selectedSurvey
         }
       ]}
       fullWidth
     >
+      {/* Test Email Modal */}
+      <Modal
+        open={isTestEmailModalOpen}
+        onClose={() => setIsTestEmailModalOpen(false)}
+        title="Send Test Email"
+        primaryAction={{
+          content: isSendingTest ? 'Sending...' : 'Send',
+          onAction: handleSendTestEmail,
+          loading: isSendingTest,
+          disabled: isSendingTest || !testEmailAddress
+        }}
+        secondaryActions={[
+          {
+            content: 'Cancel',
+            onAction: () => setIsTestEmailModalOpen(false)
+          }
+        ]}
+      >
+        <Modal.Section>
+          <TextField
+            label="Email Address"
+            type="email"
+            value={testEmailAddress}
+            onChange={(value) => setTestEmailAddress(value)}
+            autoComplete="email"
+            placeholder="Enter recipient email address"
+            helpText="This will be the recipient email for your test email."
+          />
+          <div style={{ marginTop: '8px' }}>
+            <Text variant="bodySm" color="subdued">
+              This will send a test email with your current template.
+            </Text>
+          </div>
+        </Modal.Section>
+      </Modal>
+
       {availableSurveys.length === 0 ? (
         <Banner
           title="No surveys available"

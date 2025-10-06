@@ -112,12 +112,12 @@ class Survey extends Model
 
     public function getIntegrationKlaviyoEnabled()
     {
-        return $this->survey_meta_data['Integrations']['klaviyo']["enabled"] ?? false;
+        return $this->survey_meta_data['integrations']['klaviyo']["enabled"] ?? false;
     }
 
     public function getIntegrationKlaviyoListId()
     {
-        return $this->survey_meta_data['Integrations']['klaviyo']["listId"] ?? null;
+        return $this->survey_meta_data['integrations']['klaviyo']["listId"] ?? null;
     }
 
     public function isEmailDataPresent()
@@ -128,5 +128,10 @@ class Survey extends Model
     public function getEmailData()
     {
         return $this->survey_meta_data['channels']['post_purchase_email']['email_data'] ?? [];
+    }
+
+    public function getSurveyLink()
+    {
+        return $this->survey_meta_data['channels']['branded_survey'] ?? '';
     }
 }

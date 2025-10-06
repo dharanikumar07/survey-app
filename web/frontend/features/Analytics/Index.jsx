@@ -64,9 +64,9 @@ function Analytics() {
         }),
         {
             onSuccess: (data) => {
-                console.log("rawAnalyticsData", data);
+                console.log("rawAnalyticsData", data.data.data);
                 // Set the actual data from the nested structure
-                setAnalyticsData(data?.data || null);
+                setAnalyticsData(data?.data?.data || null);
             },
             onError: (error) => {
                 console.log("error", error);
@@ -126,13 +126,8 @@ function Analytics() {
     ];
 
     // State for question filter
-    const [selectedQuestion, setSelectedQuestion] = useState("where_did_you_find_us");
+    const [selectedQuestion, setSelectedQuestion] = useState("rating");
     const [questionPopoverActive, setQuestionPopoverActive] = useState(false);
-    const questionOptions = [
-        { label: "Where did you find us?", value: "where_did_you_find_us" },
-        { label: "How was your experience?", value: "how_was_your_experience" },
-        { label: "Would you recommend us?", value: "would_you_recommend" },
-    ];
 
     // State for chart type toggle
     const [chartType, setChartType] = useState('bar');
@@ -142,6 +137,42 @@ function Analytics() {
         if (!analyticsData?.surveys?.surveys || !selectedSurvey) return null;
         return analyticsData.surveys.surveys[selectedSurvey];
     }, [analyticsData, selectedSurvey]);
+
+    // Generate question options based on selected survey data
+    const questionOptions = useMemo(() => {
+        if (!selectedSurveyData?.questions) return [];
+
+        const questions = selectedSurveyData.questions;
+        const options = [];
+
+        if (questions.rating) {
+            options.push({ label: "Rating", value: "rating" });
+        }
+        if (questions.satisfaction) {
+            options.push({ label: "Satisfaction", value: "satisfaction" });
+        }
+        if (questions['number-scale']) {
+            options.push({ label: "Number Scale", value: "number-scale" });
+        }
+        if (questions.short_answer) {
+            options.push({ label: "Short Answer", value: "short_answer" });
+        }
+        if (questions.single) {
+            options.push({ label: "Single Choice", value: "single" });
+        }
+        if (questions.multiple) {
+            options.push({ label: "Multiple Choice", value: "multiple" });
+        }
+
+        return options;
+    }, [selectedSurveyData]);
+
+    // Set default selected question when survey data changes
+    useEffect(() => {
+        if (questionOptions.length > 0 && !questionOptions.find(q => q.value === selectedQuestion)) {
+            setSelectedQuestion(questionOptions[0].value);
+        }
+    }, [questionOptions, selectedQuestion]);
 
     const conversionRate = useMemo(() => {
         if (!selectedSurveyData) return 0;
@@ -156,27 +187,35 @@ function Analytics() {
     }, [selectedSurveyData]);
 
     const hasAnswerRateData = useMemo(() => {
-        return analyticsData?.questions && Object.values(analyticsData.questions).some(value =>
-            typeof value === 'number' && value > 0
-        );
-    }, [analyticsData]);
+        if (!selectedSurveyData?.questions) return false;
+
+        const questions = selectedSurveyData.questions;
+        return Object.values(questions).some(questionData => {
+            if (typeof questionData === 'object' && questionData !== null) {
+                return Object.values(questionData).some(value =>
+                    typeof value === 'number' && value > 0
+                );
+            }
+            return false;
+        });
+    }, [selectedSurveyData]);
 
     const emailEnabled = useMemo(() => {
         return selectedSurveyData?.type === 'post_purchase';
     }, [selectedSurveyData]);
 
-    // Chart data for ratings distribution
+    // Chart data for ratings distribution from selected survey
     const ratingsChartData = useMemo(() => {
-        if (!analyticsData?.ratings) return null;
+        if (!selectedSurveyData?.questions?.rating) return null;
 
-        const { rating_1, rating_2, rating_3, rating_4, rating_5 } = analyticsData.ratings;
+        const { stars_1, stars_2, stars_3, stars_4, stars_5 } = selectedSurveyData.questions.rating;
 
         return {
             labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
             datasets: [
                 {
                     label: 'Number of Ratings',
-                    data: [rating_1, rating_2, rating_3, rating_4, rating_5],
+                    data: [stars_1, stars_2, stars_3, stars_4, stars_5],
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.6)',
                         'rgba(255, 159, 64, 0.6)',
@@ -195,20 +234,26 @@ function Analytics() {
                 },
             ],
         };
-    }, [analyticsData]);
+    }, [selectedSurveyData]);
 
-    // Chart data for question types
+    // Chart data for question types from selected survey
     const questionTypesChartData = useMemo(() => {
-        if (!analyticsData?.questions) return null;
+        if (!selectedSurveyData?.questions) return null;
 
-        const { text, satisfaction, rating, 'number-scale': numberScale, multiple, single } = analyticsData.questions;
+        const questions = selectedSurveyData.questions;
+        const textCount = questions.short_answer?.total_count || 0;
+        const satisfactionCount = Object.values(questions.satisfaction || {}).reduce((sum, count) => sum + count, 0);
+        const ratingCount = Object.values(questions.rating || {}).reduce((sum, count) => sum + count, 0);
+        const numberScaleCount = Object.values(questions['number-scale'] || {}).reduce((sum, count) => sum + count, 0);
+        const multipleCount = questions.multiple?.total_count || 0;
+        const singleCount = questions.single?.total_count || 0;
 
         return {
             labels: ['Text', 'Satisfaction', 'Rating', 'Number Scale', 'Multiple Choice', 'Single Choice'],
             datasets: [
                 {
                     label: 'Response Count',
-                    data: [text, satisfaction, rating, numberScale, multiple, single],
+                    data: [textCount, satisfactionCount, ratingCount, numberScaleCount, multipleCount, singleCount],
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.6)',
                         'rgba(54, 162, 235, 0.6)',
@@ -229,7 +274,71 @@ function Analytics() {
                 },
             ],
         };
-    }, [analyticsData]);
+    }, [selectedSurveyData]);
+
+    // Chart data for satisfaction responses from selected survey
+    const satisfactionChartData = useMemo(() => {
+        if (!selectedSurveyData?.questions?.satisfaction) return null;
+
+        const { not_satisfied, dissatisfied, neutral, satisfied, very_satisfied } = selectedSurveyData.questions.satisfaction;
+
+        return {
+            labels: ['Not Satisfied', 'Dissatisfied', 'Neutral', 'Satisfied', 'Very Satisfied'],
+            datasets: [
+                {
+                    label: 'Number of Responses',
+                    data: [not_satisfied, dissatisfied, neutral, satisfied, very_satisfied],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(255, 159, 64, 0.6)',
+                        'rgba(255, 205, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                    ],
+                    borderWidth: 1,
+                },
+            ],
+        };
+    }, [selectedSurveyData]);
+
+    // Chart data for number-scale responses from selected survey
+    const numberScaleChartData = useMemo(() => {
+        if (!selectedSurveyData?.questions?.['number-scale']) return null;
+
+        const { poor, fair, good, very_good, excellent } = selectedSurveyData.questions['number-scale'];
+
+        return {
+            labels: ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'],
+            datasets: [
+                {
+                    label: 'Number of Responses',
+                    data: [poor, fair, good, very_good, excellent],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(255, 159, 64, 0.6)',
+                        'rgba(255, 205, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                    ],
+                    borderWidth: 1,
+                },
+            ],
+        };
+    }, [selectedSurveyData]);
 
     // Chart data for page types
     const pageTypesChartData = useMemo(() => {
@@ -251,6 +360,37 @@ function Analytics() {
         };
     }, [analyticsData]);
 
+    // Get chart data based on selected question
+    const getQuestionChartData = useMemo(() => {
+        if (!selectedSurveyData?.questions || !selectedQuestion) return null;
+
+        const questionData = selectedSurveyData.questions[selectedQuestion];
+        if (!questionData) return null;
+
+        switch (selectedQuestion) {
+            case 'rating':
+                return ratingsChartData;
+            case 'satisfaction':
+                return satisfactionChartData;
+            case 'number-scale':
+                return numberScaleChartData;
+            case 'short_answer':
+            case 'single':
+            case 'multiple':
+                return {
+                    labels: ['Responses'],
+                    datasets: [{
+                        label: 'Number of Responses',
+                        data: [questionData.total_count || 0],
+                        backgroundColor: ['rgba(75, 192, 192, 0.6)'],
+                        borderColor: ['rgba(75, 192, 192, 1)'],
+                        borderWidth: 1,
+                    }],
+                };
+            default:
+                return null;
+        }
+    }, [selectedSurveyData, selectedQuestion, ratingsChartData, satisfactionChartData, numberScaleChartData]);
 
     // Update date picker month/year when selected dates change
     useEffect(() => {
@@ -368,31 +508,33 @@ function Analytics() {
                                     <BlockStack gap="200">
                                         <Text as="h3" variant="headingSm">Total Responses</Text>
                                         <Text as="p" variant="heading2xl">
-                                            {analyticsData.overall?.total_responses || 0}
+                                            {selectedSurveyData?.total_responses || 0}
                                         </Text>
                                     </BlockStack>
                                 </Card>
                                 <Card>
                                     <BlockStack gap="200">
-                                        <Text as="h3" variant="headingSm">Active Surveys</Text>
+                                        <Text as="h3" variant="headingSm">Survey Type</Text>
                                         <Text as="p" variant="heading2xl">
-                                            {Object.keys(analyticsData.surveys?.surveys || {}).length}
+                                            {selectedSurveyData?.type?.replace('_', ' ') || 'N/A'}
                                         </Text>
                                     </BlockStack>
                                 </Card>
                                 <Card>
                                     <BlockStack gap="200">
-                                        <Text as="h3" variant="headingSm">Highest Rating</Text>
+                                        <Text as="h3" variant="headingSm">Rating Responses</Text>
                                         <Text as="p" variant="heading2xl">
-                                            {analyticsData.ratings?.highest_count || 0}
+                                            {selectedSurveyData?.questions?.rating ?
+                                                Object.values(selectedSurveyData.questions.rating).reduce((sum, count) => sum + count, 0) : 0}
                                         </Text>
                                     </BlockStack>
                                 </Card>
                                 <Card>
                                     <BlockStack gap="200">
-                                        <Text as="h3" variant="headingSm">Top Question Type</Text>
+                                        <Text as="h3" variant="headingSm">Satisfaction Responses</Text>
                                         <Text as="p" variant="heading2xl">
-                                            {analyticsData.questions?.highest_response_type || 'N/A'}
+                                            {selectedSurveyData?.questions?.satisfaction ?
+                                                Object.values(selectedSurveyData.questions.satisfaction).reduce((sum, count) => sum + count, 0) : 0}
                                         </Text>
                                     </BlockStack>
                                 </Card>
@@ -535,11 +677,7 @@ function Analytics() {
                                 <BlockStack gap="300">
                                     <Text as="h3" variant="headingSm">Answer rate per question</Text>
                                     <div style={{ height: "180px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                        {!hasAnswerRateData ? (
-                                            <Text as="p" variant="bodyMd" color="subdued">
-                                                There was no data found for this date range.
-                                            </Text>
-                                        ) : (
+                                        {questionTypesChartData ? (
                                             <div style={{ width: "100%", height: "100%" }}>
                                                 <Pie
                                                     data={questionTypesChartData}
@@ -558,6 +696,10 @@ function Analytics() {
                                                     }}
                                                 />
                                             </div>
+                                        ) : (
+                                            <Text as="p" variant="bodyMd" color="subdued">
+                                                No question data available
+                                            </Text>
                                         )}
                                     </div>
                                 </BlockStack>
@@ -625,7 +767,9 @@ function Analytics() {
                             {/* Number of votes per answer */}
                             <Card>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                    <Text as="h3" variant="headingSm">Number of votes per answer</Text>
+                                    <Text as="h3" variant="headingSm">
+                                        {questionOptions.find(q => q.value === selectedQuestion)?.label || 'Question'} Responses
+                                    </Text>
                                     <div style={{ display: 'flex', gap: '8px' }}>
                                         <ButtonGroup variant="segmented">
                                             <Button
@@ -649,11 +793,11 @@ function Analytics() {
                                     alignItems: 'center',
                                     justifyContent: 'center'
                                 }}>
-                                    {ratingsChartData && analyticsData?.ratings?.highest_count > 0 ? (
+                                    {getQuestionChartData ? (
                                         <div style={{ width: "100%", height: "100%" }}>
                                             {chartType === 'bar' ? (
                                                 <Bar
-                                                    data={ratingsChartData}
+                                                    data={getQuestionChartData}
                                                     options={{
                                                         responsive: true,
                                                         maintainAspectRatio: false,
@@ -674,7 +818,7 @@ function Analytics() {
                                                 />
                                             ) : (
                                                 <Pie
-                                                    data={ratingsChartData}
+                                                    data={getQuestionChartData}
                                                     options={{
                                                         responsive: true,
                                                         maintainAspectRatio: false,
@@ -693,7 +837,7 @@ function Analytics() {
                                         </div>
                                     ) : (
                                         <Text as="p" variant="bodyMd" color="subdued">
-                                            There was no data found for this date range.
+                                            There was no data found for this question.
                                         </Text>
                                     )}
                                 </div>
@@ -709,7 +853,7 @@ function Analytics() {
                                         alignItems: 'center',
                                         justifyContent: 'center'
                                     }}>
-                                        {pageTypesChartData && analyticsData?.overall?.total_responses > 0 ? (
+                                        {pageTypesChartData ? (
                                             <div style={{ width: "100%", height: "100%" }}>
                                                 <Bar
                                                     data={pageTypesChartData}

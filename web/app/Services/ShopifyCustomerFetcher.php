@@ -194,10 +194,12 @@ GRAPHQL;
             throw new \Exception("Customer with platform ID {$platformCustomerId} not found in Shopify.");
         }
 
-        $customerData = $this->handleCustomerData($response);
+        $customerData = $this->mapCustomerData($response);
 
         return Customer::updateOrCreate(
-            ['platform_customer_id' => (string) $platformCustomerId],
+            [
+                'platform_customer_id' => (string) $platformCustomerId
+            ],
             $customerData
         );
 

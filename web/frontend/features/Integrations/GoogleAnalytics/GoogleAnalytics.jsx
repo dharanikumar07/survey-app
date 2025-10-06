@@ -19,7 +19,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from '../../../components/helper/toast-helper';
 
 function GoogleAnalytics() {
-    const [trackingId, setTrackingId] = useState('');
+    const [apiSecretKey, setApiSecretKey] = useState('');
     const [measurementId, setMeasurementId] = useState('');
     const [connectionStatus, setConnectionStatus] = useState('disconnected');
     const [connectionData, setConnectionData] = useState(null);
@@ -47,17 +47,30 @@ function GoogleAnalytics() {
                     // If we found it, check its status
                     if (gaIntegration) {
                         // Convert to lowercase for consistency
-                        const status = gaIntegration.status.toLowerCase() === 'connected' ? 'connected' : 'disconnected';
+                        const status = gaIntegration.status?.toLowerCase() === 'connected' ? 'connected' : 'disconnected';
                         setConnectionStatus(status);
                         setConnectionData(gaIntegration);
                         
                         // Pre-fill fields if available
                         if (gaIntegration.config) {
-                            if (gaIntegration.config.trackingId) {
-                                setTrackingId(gaIntegration.config.trackingId);
-                            }
-                            if (gaIntegration.config.measurementId) {
-                                setMeasurementId(gaIntegration.config.measurementId);
+                            // Handle case where config is an array
+                            if (Array.isArray(gaIntegration.config) && gaIntegration.config.length > 0) {
+                                const configObj = gaIntegration.config[0];
+                                if (configObj.apiSecretKey || configObj.apiKey) {
+                                    setApiSecretKey(configObj.apiSecretKey || configObj.apiKey || '');
+                                }
+                                if (configObj.measurementId || configObj.measurement_id) {
+                                    setMeasurementId(configObj.measurementId || configObj.measurement_id || '');
+                                }
+                            } 
+                            // Handle case where config is an object
+                            else if (typeof gaIntegration.config === 'object') {
+                                if (gaIntegration.config.apiSecretKey || gaIntegration.config.apiKey) {
+                                    setApiSecretKey(gaIntegration.config.apiSecretKey || gaIntegration.config.apiKey || '');
+                                }
+                                if (gaIntegration.config.measurementId || gaIntegration.config.measurement_id) {
+                                    setMeasurementId(gaIntegration.config.measurementId || gaIntegration.config.measurement_id || '');
+                                }
                             }
                         }
                     }
@@ -86,15 +99,61 @@ function GoogleAnalytics() {
                     );
                     
                     if (gaIntegration) {
-                        const status = gaIntegration.status.toLowerCase() === 'connected' ? 'connected' : 'disconnected';
+                        const status = gaIntegration.status?.toLowerCase() === 'connected' ? 'connected' : 'disconnected';
                         setConnectionStatus(status);
                         setConnectionData(gaIntegration);
+                        
+                        // Update fields if available in response
+                        if (gaIntegration.config) {
+                            // Handle case where config is an array
+                            if (Array.isArray(gaIntegration.config) && gaIntegration.config.length > 0) {
+                                const configObj = gaIntegration.config[0];
+                                if (configObj.apiSecretKey || configObj.apiKey) {
+                                    setApiSecretKey(configObj.apiSecretKey || configObj.apiKey || '');
+                                }
+                                if (configObj.measurementId || configObj.measurement_id) {
+                                    setMeasurementId(configObj.measurementId || configObj.measurement_id || '');
+                                }
+                            } 
+                            // Handle case where config is an object
+                            else if (typeof gaIntegration.config === 'object') {
+                                if (gaIntegration.config.apiSecretKey || gaIntegration.config.apiKey) {
+                                    setApiSecretKey(gaIntegration.config.apiSecretKey || gaIntegration.config.apiKey || '');
+                                }
+                                if (gaIntegration.config.measurementId || gaIntegration.config.measurement_id) {
+                                    setMeasurementId(gaIntegration.config.measurementId || gaIntegration.config.measurement_id || '');
+                                }
+                            }
+                        }
                     }
                 } else if (integrationData.type === 'google_analytics') {
                     // If it's a single object and it's google_analytics
-                    const status = integrationData.status.toLowerCase() === 'connected' ? 'connected' : 'disconnected';
+                    const status = integrationData.status?.toLowerCase() === 'connected' ? 'connected' : 'disconnected';
                     setConnectionStatus(status);
                     setConnectionData(integrationData);
+                    
+                    // Update fields if available in response
+                    if (integrationData.config) {
+                        // Handle case where config is an array
+                        if (Array.isArray(integrationData.config) && integrationData.config.length > 0) {
+                            const configObj = integrationData.config[0];
+                            if (configObj.apiSecretKey || configObj.apiKey) {
+                                setApiSecretKey(configObj.apiSecretKey || configObj.apiKey || '');
+                            }
+                            if (configObj.measurementId || configObj.measurement_id) {
+                                setMeasurementId(configObj.measurementId || configObj.measurement_id || '');
+                            }
+                        } 
+                        // Handle case where config is an object
+                        else if (typeof integrationData.config === 'object') {
+                            if (integrationData.config.apiSecretKey || integrationData.config.apiKey) {
+                                setApiSecretKey(integrationData.config.apiSecretKey || integrationData.config.apiKey || '');
+                            }
+                            if (integrationData.config.measurementId || integrationData.config.measurement_id) {
+                                setMeasurementId(integrationData.config.measurementId || integrationData.config.measurement_id || '');
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -103,8 +162,8 @@ function GoogleAnalytics() {
         }
     })
 
-    const handleTrackingIdChange = (value) => {
-        setTrackingId(value);
+    const handleApiSecretKeyChange = (value) => {
+        setApiSecretKey(value);
     };
 
     const handleMeasurementIdChange = (value) => {
@@ -115,10 +174,15 @@ function GoogleAnalytics() {
         // Call the API to connect with Google Analytics
         saveIntegrationMutation({ 
             type: 'google_analytics',
-            trackingId: trackingId,
+            apiSecretKey: apiSecretKey,
             measurementId: measurementId
         });
     };
+
+    // Debug values
+    useEffect(() => {
+        console.log('Current values:', { apiSecretKey, measurementId, connectionStatus });
+    }, [apiSecretKey, measurementId, connectionStatus]);
 
     return (
         <Page
@@ -169,18 +233,18 @@ function GoogleAnalytics() {
 
                                 <BlockStack gap="300">
                                     <Text as="label" variant="bodyMd" fontWeight="medium">
-                                        Tracking ID (UA-XXXXXXXX-X or G-XXXXXXXXXX)
+                                        API Secret Key
                                     </Text>
                                     <TextField
-                                        value={trackingId}
-                                        onChange={handleTrackingIdChange}
-                                        placeholder="Enter your Google Analytics Tracking ID"
+                                        value={apiSecretKey}
+                                        onChange={handleApiSecretKeyChange}
+                                        placeholder="Enter your Google Analytics API Secret Key"
                                         autoComplete="off"
                                         helpText="For Universal Analytics use UA-XXXXXXXX-X format"
                                     />
                                     
                                     <Text as="label" variant="bodyMd" fontWeight="medium">
-                                        Measurement ID (G-XXXXXXXXXX)
+                                        Measurement ID
                                     </Text>
                                     <TextField
                                         value={measurementId}
@@ -194,7 +258,7 @@ function GoogleAnalytics() {
                                         <Button
                                             variant="primary"
                                             onClick={handleConnect}
-                                            disabled={!trackingId.trim() || isLoading}
+                                            disabled={!apiSecretKey.trim() || isLoading}
                                             loading={isLoading}
                                             icon={ExternalIcon}
                                         >

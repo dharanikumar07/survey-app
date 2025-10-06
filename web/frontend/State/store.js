@@ -10,6 +10,7 @@ const useStore = create((set, get) => ({
     isActive: false,
     questions: [],
     channelItems: [],
+    brandedSurveyUrl: '',
     onsiteConfig: {
         pageTargeting: 'all', // 'all' or 'specific'
         specificPages: '',
@@ -80,6 +81,11 @@ const useStore = create((set, get) => ({
     
     // TabsContent state
     setSelectedTab: (index) => set({ selectedTab: index }),
+    
+    // Set branded survey URL
+    setBrandedSurveyUrl: (url) => set({
+        brandedSurveyUrl: url
+    }),
     
     // Channel tab state
     setChannelItems: (items) => set({ 
@@ -433,11 +439,15 @@ const useStore = create((set, get) => ({
             // Transform branded config from preferences.branding
             const brandedConfig = get().transformBrandedConfig(surveyMeta.preferences?.branding || {});
             
+            // Extract branded survey URL from the channels if available
+            const brandedSurveyUrl = surveyMeta.channels?.branded_survey || '';
+            
             const transformedData = {
                 // Survey basic info
                 surveyTitle: surveyMeta.name || apiData.name || 'Survey',
                 isActive: surveyMeta.isActive || apiData.is_active || true,
                 selectedTheme: 'default',
+                brandedSurveyUrl,
                 
                 // Questions
                 questions: questions,
@@ -626,6 +636,7 @@ const useStore = create((set, get) => ({
             isActive: false,
             questions: [],
             channelItems: [],
+            brandedSurveyUrl: '',
             onsiteConfig: {
                 pageTargeting: 'all', // 'all' or 'specific'
                 specificPages: '',
@@ -733,7 +744,11 @@ const useStore = create((set, get) => ({
                 discountSettings: state.discountSettings,
                 selectedTheme: state.selectedTheme,
                 survey_meta_data: {
-                    integrations: state.integrations
+                    integrations: state.integrations,
+                    channels: {
+                        ...state.survey_meta_data?.channels,
+                        branded_survey: state.brandedSurveyUrl
+                    }
                 }
             };
             

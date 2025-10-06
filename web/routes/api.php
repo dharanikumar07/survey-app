@@ -53,7 +53,7 @@ Route::middleware('shopify.auth')->group(function () {
 
     Route::get('/post-purchase-email', [PostPurchaseEmailController::class, 'getPostPurchaseEmail']);
     Route::post('/post-purchase-email', [PostPurchaseEmailController::class, 'savePostPurchaseEmail']);
-
+    Route::post('/send-test-email', [PostPurchaseEmailController::class, 'sendTestEmail']);
 });
 
 Route::get('/get-survey/{store_uuid}/{survey_uuid?}', [SurveyViewController::class, 'getSurveyWidget']);

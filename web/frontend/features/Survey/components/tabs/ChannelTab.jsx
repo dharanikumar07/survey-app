@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, BlockStack, Text, Card } from '@shopify/polaris';
+import { Box, BlockStack, Text, Card, Divider } from '@shopify/polaris';
 import { useSurveyState } from '../../hooks/useSurveyState';
 import SurveyAccordion from '../../../../components/SurveyAccordion';
+import { LinkIcon } from '@shopify/polaris-icons';
 
 export function ChannelTab() {
     const {
@@ -10,7 +11,8 @@ export function ChannelTab() {
         toggleChannelEnabled,
         questions,
         surveyTitle,
-        isActive
+        isActive,
+        brandedSurveyUrl
     } = useSurveyState();
 
     // Filter out the email channel
@@ -66,6 +68,20 @@ export function ChannelTab() {
 
         console.log('Enabled channels:', enabledChannels);
     };
+    console.log('ChannelItems', channelItems);
+
+    // Create a branded survey item that's always expanded with the branded survey link from global state
+    const brandedSurveyItem = {
+        id: 'branded',
+        title: 'Branded Survey Page',
+        description: 'Share a direct link to your survey',
+        isEnabled: true,
+        isExpanded: true,
+        icon: 'document',
+        config: {
+            branded_survey: brandedSurveyUrl
+        }
+    };
 
     return (
         <BlockStack gap="400">
@@ -77,6 +93,17 @@ export function ChannelTab() {
                     </Text>
 
                     <Card padding="000">
+                        {/* Always-expanded Branded Survey Page */}
+                        <SurveyAccordion
+                            key="branded"
+                            item={brandedSurveyItem}
+                            onToggleExpand={() => {}} // No-op since it's always expanded
+                            onToggleEnabled={() => {}} // No-op since it's always enabled
+                        />
+
+                        <Divider />
+
+                        {/* Other channel items */}
                         {filteredChannelItems.map((item) => (
                             <SurveyAccordion
                                 key={item.id}
