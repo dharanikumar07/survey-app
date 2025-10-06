@@ -17,7 +17,7 @@ class StoreSurveyRequest extends FormRequest
 		return [
 			'name' => ['required', 'string', 'max:255'],
 			'status' => ['sometimes', Rule::in(['active', 'inactive', 'draft'])],
-			'survey_type' => ['required', Rule::in(['post_purchase', 'site_widget', 'email', 'exit_intent', 'embedded'])],
+			'survey_type' => ['required', Rule::in(['post_purchase', 'site_widget', 'email', 'exit_intent','on_site', 'embedded'])],
 			'survey_meta_data' => ['nullable', 'array'],
 			'is_active' => ['sometimes', 'boolean'],
 		];

@@ -20,7 +20,7 @@ class DataPreparerForMetaObjects
                     'url' => env('HOST'),
                     'access_token' => $store->getAccessToken(),
                 ],
-                'onsite_survey' => $this->getAllActiveSurveyBasedOnSurveyType($store, Survey::SITE_WIDGET),
+                'onsite_survey' => $this->getAllActiveSurveyBasedOnSurveyType($store, Survey::ONSITE_SURVEY),
                 //'thank_you_page' => $this->getAllActiveSurveyBasedOnSurveyType($store, Survey::THANK_YOU_PAGE_SURVEY),
         ];
     }

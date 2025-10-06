@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('store_uuid');
             $table->string('name');
             $table->enum('status', ['active', 'inactive', 'draft'])->default('draft');
-            $table->enum('survey_type', ['post_purchase', 'site_widget', 'email', 'exit_intent', 'embedded']);
+            $table->enum('survey_type', ['post_purchase', 'site_widget', 'on_site', 'email', 'exit_intent', 'embedded']);
             $table->json('survey_meta_data')->nullable();
             $table->unsignedInteger('total_responses')->default(0);
             $table->unsignedInteger('total_impressions')->default(0);
