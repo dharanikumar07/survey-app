@@ -52,10 +52,10 @@ export default function SurveyAccordion({ item, onToggleExpand, onToggleEnabled 
         >
             <InlineStack blockAlign="center" gap="800" wrap={false}>
                 <Box
-                    onClick={() => onToggleExpand(item.id)}
+                    onClick={() => item.id === 'branded' ? null : onToggleExpand(item.id)}
                     className={`th-sf-accordion-header `}
                     style={{
-                        cursor: 'pointer',
+                        cursor: item.id === 'branded' ? 'default' : 'pointer',
                         padding: '8px',
                         borderRadius: '4px',
                         transition: 'background-color 0.2s ease',
@@ -64,10 +64,13 @@ export default function SurveyAccordion({ item, onToggleExpand, onToggleEnabled 
                 >
                     <InlineStack blockAlign="center" gap="300">
                         <Box>
-                            <Icon
-                                source={item.isExpanded ? ChevronUpIcon : ChevronDownIcon}
-                                color={item.isExpanded ? "info" : "subdued"}
-                            />
+                            {/* Hide chevron for branded survey page */}
+                            {item.id !== 'branded' && (
+                                <Icon
+                                    source={item.isExpanded ? ChevronUpIcon : ChevronDownIcon}
+                                    color={item.isExpanded ? "info" : "subdued"}
+                                />
+                            )}
                         </Box>
                         <Box>
                             <Icon source={getIcon(item.icon)} color={item.isExpanded ? "info" : "base"} />
@@ -82,11 +85,14 @@ export default function SurveyAccordion({ item, onToggleExpand, onToggleEnabled 
                     </InlineStack>
                 </Box>
                 <Box>
-                    <Knob
-                        selected={item.isEnabled}
-                        onClick={() => onToggleEnabled(item.id)}
-                        ariaLabel={`Toggle ${item.title}`}
-                    />
+                    {/* Hide toggle for branded survey page */}
+                    {item.id !== 'branded' && (
+                        <Knob
+                            selected={item.isEnabled}
+                            onClick={() => onToggleEnabled(item.id)}
+                            ariaLabel={`Toggle ${item.title}`}
+                        />
+                    )}
                 </Box>
             </InlineStack>
 

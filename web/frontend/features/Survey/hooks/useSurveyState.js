@@ -6,6 +6,10 @@ export const useSurveyState = () => {
         selectedTab,
         setSelectedTab,
         
+        // Branded Survey URL
+        brandedSurveyUrl,
+        setBrandedSurveyUrl,
+        
         // Channel tab state
         channelItems,
         toggleChannelExpand,
@@ -96,6 +100,10 @@ export const useSurveyState = () => {
         // TabsContent state
         selectedTab,
         setSelectedTab,
+        
+        // Branded Survey URL
+        brandedSurveyUrl,
+        setBrandedSurveyUrl,
         
         // Channel tab state
         channelItems,

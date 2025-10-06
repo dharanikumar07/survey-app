@@ -21,7 +21,7 @@ class IntegrationController extends Controller
         $type   = $request->input('type');
         $apiKey = $request->input('apiKey');
         $measurement_id = $request->input('measurementId') ?? null;
-        $api_secret = $request->input('apiSecret') ?? null;
+        $api_secret = $request->input('apiSecretKey') ?? null;
         $appId = $request->input('appId') ?? null;
 
         $config = [
@@ -32,7 +32,7 @@ class IntegrationController extends Controller
             'app_id' => $appId,
         ];
 
-        $result = $service->validateIntegration($config['type'], $config);
+        $result = $service->validateIntegration($config);
 
         if (!$result) {
             return Response::json([
@@ -47,10 +47,7 @@ class IntegrationController extends Controller
             ],
             [
                 'status' => $result['status'],
-                'config' => [
-                    'apiKey'  => $result['apiKey'],
-                    'listIds' => $result['listIds'],
-                ],
+                'config' => $result,
             ]
         );
 
@@ -58,9 +55,7 @@ class IntegrationController extends Controller
             'message' => 'Integration saved successfully',
             'data'    => [
                 'uuid'    => $integration->uuid,
-                'apiKey'  => $result['apiKey'],
-                'listIds' => $result['listIds'],
-                'status'  => $result['status'],
+                'config'  => $result,
             ],
         ],HttpResponse::HTTP_OK);
     }

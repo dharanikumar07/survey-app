@@ -89,10 +89,9 @@ function Integrations() {
                     </Text>
                 </div>
             ) : (
-                <Layout>
-
+            <Layout>
                 {/* Klaviyo Integration Card */}
-                <Layout.Section oneThird>
+                <Layout.Section>
                     <Card>
                         <BlockStack gap="400">
                             <InlineStack align="space-between">
@@ -130,7 +129,7 @@ function Integrations() {
                 </Layout.Section>
 
                 {/* Retainful Integration Card */}
-                <Layout.Section oneThird>
+                {/* <Layout.Section oneThird>
                     <Card>
                         <BlockStack gap="400">
                             <InlineStack align="space-between">
@@ -165,10 +164,10 @@ function Integrations() {
                             </div>
                         </BlockStack>
                     </Card>
-                </Layout.Section>
+                </Layout.Section> */}
                 
                 {/* Google Analytics Integration Card */}
-                <Layout.Section oneThird>
+                {/* <Layout.Section oneThird>
                     <Card>
                         <BlockStack gap="400">
                             <InlineStack align="space-between">
@@ -203,7 +202,7 @@ function Integrations() {
                             </div>
                         </BlockStack>
                     </Card>
-                </Layout.Section>
+                </Layout.Section> */}
             </Layout>
             )}
         </Page>

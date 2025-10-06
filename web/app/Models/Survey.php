@@ -112,12 +112,12 @@ class Survey extends Model
 
     public function getIntegrationKlaviyoEnabled()
     {
-        return $this->survey_meta_data['Integrations']['klaviyo']["enabled"] ?? false;
+        return $this->survey_meta_data['integrations']['klaviyo']["enabled"] ?? false;
     }
 
     public function getIntegrationKlaviyoListId()
     {
-        return $this->survey_meta_data['Integrations']['klaviyo']["listId"] ?? null;
+        return $this->survey_meta_data['integrations']['klaviyo']["listId"] ?? null;
     }
 
     public function isEmailDataPresent()

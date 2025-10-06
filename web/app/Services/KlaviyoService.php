@@ -134,16 +134,10 @@ class KlaviyoService
                 'phone'      => $customer->phone,
                 'properties' => [
                     'platform_customer_id'=> $customer->platform_customer_id,
-                    'state'               => $customer->state,
-                    'tags'                => $customer->tags,
-                    'marketing_state'     => $customer->marketing_state,
-                    'address1'            => $customer->address1,
-                    'address2'            => $customer->address2,
-                    'city'                => $customer->city,
-                    'country'             => $customer->country,
-                    'zip'                 => $customer->zip,
                 ],
             ];
+
+            info($listId);
 
             $profile = $this->createProfile($payload);
 

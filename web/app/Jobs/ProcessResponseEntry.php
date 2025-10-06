@@ -12,7 +12,6 @@ use App\Models\Store;
 use App\Models\Survey;
 use App\Services\DiscountCodeQuery;
 use App\Services\KlaviyoService;
-use App\Services\RetainfulService;
 use App\Services\ShopifyCustomerFetcher;
 use App\Services\ShopifyOrderFetcher;
 use Carbon\Carbon;
@@ -49,7 +48,6 @@ class ProcessResponseEntry implements ShouldQueue
             $order = $this->fetchOrder($this->responseData['order_id'] ?? null);
             $customer = $this->fetchCustomer(
                 $this->responseData['customer_id'] ?? null,
-                $order
             );
 
             $this->createResponseData($this->responseData, $customer, $order);
@@ -84,7 +82,7 @@ class ProcessResponseEntry implements ShouldQueue
         return $order;
     }
 
-    protected function fetchCustomer($platformCustomerId, $order)
+    protected function fetchCustomer($platformCustomerId)
     {
         if (!$platformCustomerId) {
             return null;
@@ -147,34 +145,36 @@ class ProcessResponseEntry implements ShouldQueue
 
     protected function handleIntegrations($customer)
     {
+
         if (!$customer) {
+            info("enetere in the return");
             return;
         }
 
         $integrations = Integrations::where('store_uuid', $this->store->uuid)
-            ->where('status', 'CONNECTED')
+            ->where('status', 'connected')
             ->get();
 
         $surveyData = $this->constructSurveyEventData();
 
         foreach ($integrations as $integration) {
-            $config = json_decode($integration->config, true) ?? [];
+            $config = $integration->config ?? [];
 
-            switch ($integration->type && $this->survey->getIntegrationKlaviyoEnabled()) {
+            if(is_string($integration->config)) {
+                $config = json_decode($integration->config, true) ?? [];
+            }
+
+            info(print_r($integration, true));
+            switch ($integration->type) {
                 case 'klaviyo':
-                    if (!empty($config['apiKey'])) {
+                    info(print_r($config, true));
+                    if (!empty($config['apiKey']) && $this->survey->getIntegrationKlaviyoEnabled()) {
+                        info("enetereddd in the klaviyo integrations");
                         $service = new KlaviyoService($config['apiKey']);
                         $listIds = $this->survey->getIntegrationKlaviyoListId();
                         $service->handleKlaviyoIntegration($customer, $listIds, $surveyData);
                     }
                     break;
-
-//                case 'retainful':
-//                    if (!empty($config['apiKey'])) {
-//                        $service = new RetainfulService($config['apiKey']);
-//                        $service->handleRetainfulIntegration($customer, $config);
-//                    }
-//                    break;
 
                 default:
                     info("No handler for integration type: {$integration->type}");
@@ -185,7 +185,9 @@ class ProcessResponseEntry implements ShouldQueue
     public function constructSurveyEventData()
     {
         return [
-            'survey' => $this->survey,
+            'uuid' => $this->survey->uuid,
+            'name' => $this->survey->name,
+            'type' => $this->survey->survey_type,
             'response' => $this->responseData,
         ];
     }

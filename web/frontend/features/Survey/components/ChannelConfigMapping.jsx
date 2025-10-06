@@ -2,11 +2,13 @@ import React from 'react';
 import { OnsiteSurveyConfig } from './OnsiteSurveyConfig';
 import { ThankYouConfig } from './ThankYouConfig';
 import { BrandedSurveyConfig } from './BrandedSurveyConfig';
+import { BrandedSurveyLinkConfig } from './BrandedSurveyLinkConfig';
 
 // Component mapping for different channel types
 export const CHANNEL_CONFIG_COMPONENTS = {
     onsite: OnsiteSurveyConfig,
     thankyou: ThankYouConfig,
+    branded: BrandedSurveyLinkConfig,
     // Add more channel types here as needed
     // exit: ExitIntentConfig,
     // embed: EmbedConfig,
