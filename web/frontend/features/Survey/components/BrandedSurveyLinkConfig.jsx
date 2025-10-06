@@ -87,7 +87,7 @@ export function BrandedSurveyLinkConfig({ item }) {
             </Text>
             
             <Box paddingBlockStart="200">
-                <Text as="p" fontWeight="medium">Survey URL (click to copy)</Text>
+                <Text as="p" fontWeight="medium">Survey URL</Text>
                 <div style={{ position: 'relative' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ flex: 1 }} onClick={handleCopyToClipboard}>
