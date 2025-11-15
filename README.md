@@ -4,7 +4,7 @@ This app allows Shopify merchants to collect customer insights immediately after
 It automatically displays a survey on the Order Status Page and can reward customers with discount codes.
 Survey responses sync directly to Klaviyo for advanced segmentation and automation.
 
-# ✨ Features
+## ✨ Features
 🎯 Post-Purchase Survey
 
 Appears on the Order Status / Thank You Page.
@@ -17,7 +17,7 @@ Multi-language support.
 
 Fully responsive widget.
 
-# 💸 Automatic Discount Code Generation
+## 💸 Automatic Discount Code Generation
 
 Auto-generates discount codes on survey submission.
 
@@ -25,7 +25,7 @@ Supports % and fixed discounts, expiry rules, usage limits, etc.
 
 Tracks discount redemption.
 
-# 📬 Klaviyo Integration
+## 📬 Klaviyo Integration
 
 Real-time syncing of survey responses.
 
@@ -33,7 +33,7 @@ Maps answers to custom Klaviyo properties.
 
 Triggers flows and segmentation events.
 
-# 📊 Admin Dashboard
+## 📊 Admin Dashboard
 
 Create/manage surveys.
 
@@ -43,7 +43,7 @@ Analytics for responses & discount usage.
 
 CSV export.
 
-# 🔌 Backend Features
+## 🔌 Backend Features
 
 API-driven architecture using Laravel.
 
@@ -53,7 +53,7 @@ PostgreSQL-based structured survey models.
 
 Webhooks for uninstall, order updates, etc.
 
-# 🛠️ Technology Stack
+## 🛠️ Technology Stack
 
 Frontend: React + Vite + Polaris
 
