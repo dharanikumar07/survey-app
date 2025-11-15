@@ -1,4 +1,4 @@
-# 🧾 Overview
+## 🧾 Overview
 
 This app allows Shopify merchants to collect customer insights immediately after purchase.
 It automatically displays a survey on the Order Status Page and can reward customers with discount codes.
