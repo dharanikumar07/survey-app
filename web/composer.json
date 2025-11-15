@@ -15,7 +15,9 @@
         "laravel/tinker": "^2.9",
         "predis/predis": "^3.2",
         "prism-php/prism": "^0.87.0",
-        "shopify/shopify-api": "^5.0"
+        "shopify/shopify-api": "^5.0",
+        "symfony/http-client": "^7.3",
+        "symfony/mailgun-mailer": "^7.3"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^2.4",
