@@ -1,3 +1,73 @@
+# 🧾 Overview
+
+This app allows Shopify merchants to collect customer insights immediately after purchase.
+It automatically displays a survey on the Order Status Page and can reward customers with discount codes.
+Survey responses sync directly to Klaviyo for advanced segmentation and automation.
+
+# ✨ Features
+🎯 Post-Purchase Survey
+
+Appears on the Order Status / Thank You Page.
+
+Supports MCQ, Rating, NPS, and Text questions.
+
+Conditional question logic.
+
+Multi-language support.
+
+Fully responsive widget.
+
+# 💸 Automatic Discount Code Generation
+
+Auto-generates discount codes on survey submission.
+
+Supports % and fixed discounts, expiry rules, usage limits, etc.
+
+Tracks discount redemption.
+
+# 📬 Klaviyo Integration
+
+Real-time syncing of survey responses.
+
+Maps answers to custom Klaviyo properties.
+
+Triggers flows and segmentation events.
+
+# 📊 Admin Dashboard
+
+Create/manage surveys.
+
+Drag-and-drop question builder.
+
+Analytics for responses & discount usage.
+
+CSV export.
+
+# 🔌 Backend Features
+
+API-driven architecture using Laravel.
+
+Redis caching for fast survey loading.
+
+PostgreSQL-based structured survey models.
+
+Webhooks for uninstall, order updates, etc.
+
+# 🛠️ Technology Stack
+
+Frontend: React + Vite + Polaris
+
+Backend: Laravel
+
+Database: PostgreSQL
+
+Cache: Redis
+
+Shopify Integrations: App Bridge, Admin API, ScriptTag/App Embed
+
+3rd-Party Integration: Klaviyo API
+
+
 # Shopify App Template - PHP
 
 This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using PHP and React. It contains the basics for building a Shopify app.
